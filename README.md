@@ -22,8 +22,8 @@ Note: The backend functionality for account creation, login validation, and stud
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/your-username/Classes_Manager.git
-cd Classes_Manager
+git clone https://github.com/ali-hue-byte/Class_Manager.git
+cd Class_Manager
 ```
 2. Install the required dependencies:
 

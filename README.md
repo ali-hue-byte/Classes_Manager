@@ -1,4 +1,4 @@
-# Classes_Manager
+# Class_Manager
 
 
 ## Detailed Description

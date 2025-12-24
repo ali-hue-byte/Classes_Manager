@@ -43,3 +43,6 @@ python Student_Management.py
 - **Student_Management.py** – The main Python file used to run the application.
 - **Main_ui.py** – The Python file generated from Qt Designer that contains all the UI widgets and layouts.
 
+## Screenshots 
+
+<img width="1974" height="1131" alt="image" src="https://github.com/user-attachments/assets/59d6bd7c-fd31-49b6-a881-f91c83d0fa5b" />

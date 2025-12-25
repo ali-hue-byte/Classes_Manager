@@ -108,8 +108,10 @@ class Ui_Dialog(object):
         self.welcome_label = QLabel(self.page)
         self.welcome_label.setObjectName(u"welcome_label")
         self.welcome_label.setGeometry(QRect(190, 80, 531, 101))
-        self.welcome_label.setStyleSheet(u"font: 900 9pt \"Arial\";\n"
-"font: 900 28pt \"Arial\";")
+        self.welcome_label.setStyleSheet(
+    'font: 900 28pt "Arial";'
+    'color: #000000;'
+)
         self.frame_4 = QFrame(self.page)
         self.frame_4.setObjectName(u"frame_4")
         self.frame_4.setGeometry(QRect(460, 260, 191, 171))
@@ -532,5 +534,6 @@ class Ui_Dialog(object):
 "", None))
         self.label_2_n.setText(QCoreApplication.translate("Dialog", u"Creat account", None))
     # retranslateUi
+
 
 

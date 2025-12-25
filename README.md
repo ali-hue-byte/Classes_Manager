@@ -47,4 +47,5 @@ python Student_Management.py
 ## Screenshots 
 
 <img width="1974" height="1131" alt="image" src="https://github.com/user-attachments/assets/59d6bd7c-fd31-49b6-a881-f91c83d0fa5b" />
-<img width="1974" height="1119" alt="image" src="https://github.com/user-attachments/assets/30a3e8dd-7dbc-4844-afdd-d419287f6f7b" />
+<img width="1976" height="1177" alt="image" src="https://github.com/user-attachments/assets/c6d25a6d-0d4f-4c65-a451-7b8ef36e6021" />
+

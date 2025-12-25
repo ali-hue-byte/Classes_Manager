@@ -1,14 +1,12 @@
 import sys
 
-from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import QApplication, QMainWindow, QLineEdit
+from PySide6.QtGui import QIcon, QColor
+from PySide6.QtWidgets import QApplication, QMainWindow, QLineEdit , QGraphicsDropShadowEffect, QFrame
 from App import Ui_Dialog
 from PySide6.QtCore import QPropertyAnimation, QEasingCurve, QPoint
-from Functions import SALT, hash_password, save_data, load_data, check_strength, check_user
+from Functions import SALT, hash_password, save_data, load_data, check_strength, KDF, encrypt_data
 from PySide6.QtCore import Qt
-
-
-
+import re
 
 
 
@@ -17,13 +15,17 @@ class Main_app(QMainWindow):
         super().__init__()
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
+        self.wrap_with_shadow(self.ui.frame_5,90)
+        self.wrap_with_shadow(self.ui.frame_4,90)
+        self.wrap_with_shadow(self.ui.frame_3,90)
+        self.wrap_with_shadow(self.ui.frame_2,20)
+        self.wrap_with_shadow(self.ui.frame ,20)
+
+
         self.setFixedSize(990, 560)
         self.ui.label_errn.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.icon_show = QIcon("icons/view_pss.png")
         self.icon_hide = QIcon("icons/hide_pss.png")
-
-
-
 
 
 
@@ -109,7 +111,7 @@ class Main_app(QMainWindow):
             self.ui.label_errn.repaint()
             return
 
-        if check_user(username) or len(username) < 3 or len(password) > 15:
+        if  re.search(r'[^a-zA-Z0-9_]',username) or len(username) < 3 or len(password) > 15:
             self.reset_line(self.ui.lineEdit_n)
             self.reset_line(self.ui.lineEdit_2_n)
             self.ui.label_errn.setText("Username is invalid")
@@ -134,7 +136,7 @@ class Main_app(QMainWindow):
             self.ui.label_errn.show()
             return
 
-        new_user = {"username":username, "password":hash_password(password,SALT())}
+        new_user = {"username":username, "password":hash_password(password,SALT()), "data":[]}
         data.append(new_user)
         self.ui.label_errn.hide()
         self.ui.welcome_label.setText(f"Welcome {username}")
@@ -232,6 +234,33 @@ class Main_app(QMainWindow):
             anim.start()
             self.animations2.append(anim)
             self.empty(self.lines)
+
+
+
+    def wrap_with_shadow(self, frame,x):
+        parent = frame.parentWidget()
+
+
+        wrapper = QFrame(parent)
+        wrapper.setGeometry(
+            frame.x() - 10,
+            frame.y() - 10,
+            frame.width() + 20,
+            frame.height() + 20
+        )
+        wrapper.setStyleSheet("background: transparent;")
+
+        frame.setParent(wrapper)
+        frame.move(10, 10)
+
+        shadow = QGraphicsDropShadowEffect(wrapper)
+        shadow.setBlurRadius(25)
+        shadow.setXOffset(0)
+        shadow.setYOffset(6)
+        shadow.setColor(QColor(0, 0, 0, x))
+        wrapper.setGraphicsEffect(shadow)
+
+        wrapper.show()
 
 
 

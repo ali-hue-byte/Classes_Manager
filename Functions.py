@@ -1,7 +1,7 @@
 import json
 import os
 
-
+from cryptography import fernet
 from cryptography.fernet import Fernet
 import hashlib
 import re
@@ -37,6 +37,15 @@ def SALT():
             f.write(salt.hex())
     return salt
 
+def KDF(password, salt):
+    e_password = password.encode() if isinstance(password, str) else password
+    kdf = PBKDF2HMAC(algorithm=hashes.SHA256(), length=32, salt=salt, iterations=100000)
+    return Fernet(base64.urlsafe_b64encode(kdf.derive(e_password)))
+
+def encrypt_data(data, password, KDF, salt):
+    fernet = KDF(password, salt)
+    return fernet.encrypt(data.encode()).decode()
+
 def hash_password(password, salt):
     return hashlib.sha256(password.encode() + salt).hexdigest()
 
@@ -50,7 +59,4 @@ def check_strength(pss):
             bool(re.search(r"[!@#$%^&*(),.?\":{}|<>]", pss))]
     return all(tests)
 
-def check_user(username):
-    if re.search(r"[!@#$%^&*(),.?\":{}|<>]", username):
-        return True
 

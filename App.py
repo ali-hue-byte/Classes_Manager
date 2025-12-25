@@ -29,6 +29,11 @@ class Ui_Dialog(object):
         self.stackedWidget.setGeometry(QRect(0, 0, 990, 560))
         self.page = QWidget()
         self.page.setObjectName(u"page")
+        self.page.setStyleSheet("""
+        #page {
+            background-color: #f0f0f0;
+        }
+        """)
         self.frame_5 = QFrame(self.page)
         self.frame_5.setObjectName(u"frame_5")
         self.frame_5.setGeometry(QRect(720, 260, 191, 171))
@@ -527,4 +532,5 @@ class Ui_Dialog(object):
 "", None))
         self.label_2_n.setText(QCoreApplication.translate("Dialog", u"Creat account", None))
     # retranslateUi
+
 

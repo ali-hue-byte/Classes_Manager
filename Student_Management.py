@@ -1,13 +1,13 @@
 import sys
 
 from PySide6.QtGui import QIcon, QColor
-from PySide6.QtWidgets import QApplication, QMainWindow, QLineEdit , QGraphicsDropShadowEffect, QFrame
+from PySide6.QtWidgets import QApplication, QMainWindow, QLineEdit , QGraphicsDropShadowEffect, QFrame, QGraphicsOpacityEffect
 from App import Ui_Dialog
 from PySide6.QtCore import QPropertyAnimation, QEasingCurve, QPoint
 from Functions import SALT, hash_password, save_data, load_data, check_strength, KDF, encrypt_data
 from PySide6.QtCore import Qt
 import re
-
+import time
 
 
 class Main_app(QMainWindow):
@@ -111,7 +111,7 @@ class Main_app(QMainWindow):
             self.ui.label_errn.repaint()
             return
 
-        if  re.search(r'[^a-zA-Z0-9_]',username) or len(username) < 3 or len(password) > 15:
+        if  re.search(r'[^a-zA-Z0-9_]',username) or len(username) < 3 or len(username) > 15:
             self.reset_line(self.ui.lineEdit_n)
             self.reset_line(self.ui.lineEdit_2_n)
             self.ui.label_errn.setText("Username is invalid")
@@ -140,12 +140,13 @@ class Main_app(QMainWindow):
         data.append(new_user)
         self.ui.label_errn.hide()
         self.ui.welcome_label.setText(f"Welcome {username}")
-        self.ui.stackedWidget.setCurrentIndex(0)
 
+        self.animate_page(self.ui.page, 1, 0)
+        self.ui.stackedWidget.setCurrentIndex(0)
         save_data(data)
         for i in self.lines:
             i.clear()
-
+            self.reset_line(i)
 
     def log_clicked(self):
         username = str(self.ui.lineEdit_5.text())
@@ -167,9 +168,13 @@ class Main_app(QMainWindow):
                 self.reset_line(self.ui.lineEdit_6)
                 self.ui.label_errn.hide()
                 self.ui.welcome_label.setText(f"Welcome {username}")
+
+
+                self.animate_page(self.ui.page, 1, 0)
                 self.ui.stackedWidget.setCurrentIndex(0)
                 for i in self.lines:
                     i.clear()
+                    self.reset_line(i)
                 return
         self.update_line(self.ui.lineEdit_5)
         self.update_line(self.ui.lineEdit_6)
@@ -178,6 +183,7 @@ class Main_app(QMainWindow):
         return
 
     def exit_clicked(self):
+        self.animate_page(self.ui.page_2,1,0)
         self.ui.stackedWidget.setCurrentIndex(1)
         return
 
@@ -235,7 +241,31 @@ class Main_app(QMainWindow):
             self.animations2.append(anim)
             self.empty(self.lines)
 
+    def animate_page(self, pag, x, y):
 
+        overlay = QFrame(pag)
+        overlay.setGeometry(0, 0, 990, 560)
+        overlay.setStyleSheet("background-color: black;")
+        overlay.show()
+
+        effect = QGraphicsOpacityEffect(overlay)
+        overlay.setGraphicsEffect(effect)
+        effect.setOpacity(x)
+
+        anim = QPropertyAnimation(effect, b"opacity")
+        anim.setDuration(1000)
+        anim.setStartValue(x)
+        anim.setEndValue(y)
+        anim.setEasingCurve(QEasingCurve.OutQuad)
+        anim.start()
+        self.animations.append(anim)
+
+
+        def on_finished():
+            overlay.hide()
+            overlay.deleteLater()
+
+        anim.finished.connect(on_finished)
 
     def wrap_with_shadow(self, frame,x):
         parent = frame.parentWidget()

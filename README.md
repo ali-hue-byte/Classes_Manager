@@ -28,6 +28,7 @@ cd Class_Manager
 
 ```bash
 pip install PySide6
+pip install cryptography
 ```
 3. Run the main application:
 

@@ -8,7 +8,7 @@ import re
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 import base64
-from Home import Home_page
+
 
 
 
@@ -53,3 +53,4 @@ def check_strength(pss):
 def check_user(username):
     if re.search(r"[!@#$%^&*(),.?\":{}|<>]", username):
         return True
+

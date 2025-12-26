@@ -2,17 +2,19 @@
 
 
 ## Detailed Description
-This project currently includes the initial user interface for a student management system.  
-It is a work in progress.
+This project is a work in progress.
 
 Features included in this prototype:
 
+- Modern UI built with PySide6 (Qt Designer)
 - Animated transitions between the login and create account screens
-- Login screen with username and password fields, including passwords validation
+- Login screen with username and password fields, including input validation
 - Create account screen with username and password fields, including password strength checking
 - Smooth UI animations for widgets sliding in and out
 - Automatic navigation to the main application window after successful login
-- Secure password saving using a salt and hash function
+- Secure password storage using a salted hash
+- Student information stored separatly for each user
+- All stored student data is protected using encryption based on a Key Derivation Function (KDF)
   
 ---
 

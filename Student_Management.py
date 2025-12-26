@@ -490,7 +490,7 @@ class Main_app(QMainWindow):
             i.hide()
         for i in self.widgets_to_clear:
             i.clear()
-                for i in self.widgets_to_clear:
+        for i in self.widgets_to_clear:
             i.clear()
             self.reset_line2(i)
         self.ui.ClassComboBox.setStyleSheet(u"QComboBox { border : 1px solid grey ;\n"
@@ -737,3 +737,4 @@ if __name__ == "__main__":
     window.show()
 
     sys.exit(app.exec())
+

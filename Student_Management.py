@@ -577,7 +577,7 @@ class Main_app(QMainWindow):
             self.ui.requirederrlast.show()
             self.update_line2(self.ui.lastnameline)
             err = err or True
-        elif not re.fullmatch(r"[A-Za-z]+", self.last_name):
+        elif not re.fullmatch(r"[A-Za-z ]+", self.last_name):
             self.ui.requirederrlast.setText("Invalid Last Name")
             self.ui.requirederrlast.show()
             self.update_line2(self.ui.lastnameline)
@@ -737,4 +737,5 @@ if __name__ == "__main__":
     window.show()
 
     sys.exit(app.exec())
+
 

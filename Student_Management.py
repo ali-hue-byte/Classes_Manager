@@ -67,6 +67,7 @@ class Main_app(QMainWindow):
             self.ui.class2,
             self.ui.requirederrfirst_2,
             self.ui.requirederrfirst_3,
+            self.ui.errclasse
 
         ]
 
@@ -469,6 +470,8 @@ class Main_app(QMainWindow):
         self.ui.requirederrfirst_2.hide()
         self.ui.requirederrfirst_3.hide()
         self.ui.errclasse.hide()
+        for i in [self.ui.lastnameline, self.ui.Firstnameline]:
+            self.reset_line2(i)
         self.ui.Add_top_btn.setStyleSheet(u"QPushButton {font: 700 9pt \"Yu Gothic UI\";\n"
                                            "color :rgb(24, 182, 255);\n"
                                            "border: none;\n"
@@ -477,6 +480,23 @@ class Main_app(QMainWindow):
                                            "")
         self.ui.View_top_btn.setStyleSheet(u"color: rgb(101, 119, 152);\n"
                                           "font: 700 9pt \"Yu Gothic UI\";")
+        self.ui.ClassComboBox.setStyleSheet(u"QComboBox { border : 1px solid grey ;\n"
+                                            "border-radius : 15px ;\n"
+                                            "padding : 6px 8px;  \n"
+                                            "background-color: rgb(255,255,255)\n"
+                                            "}\n"
+                                            "QComboBox:drop-down { width: 0;\n"
+                                            "}\n"
+                                            "\n"
+                                            "QComboBox:hover{border: 2px solid black;\n"
+                                            "padding : 5px 7px;\n"
+                                            "}\n"
+                                            "\n"
+                                            "QComboBox:focus {\n"
+                                            "  border : 2px solid #0078d7;\n"
+                                            "}\n"
+                                            "\n"
+                                            "")
 
     def Add_top_clicked(self):
         self.ui.Add_top_btn.show()
@@ -490,6 +510,7 @@ class Main_app(QMainWindow):
             i.hide()
         for i in self.widgets_to_clear:
             i.clear()
+
         for i in self.widgets_to_clear:
             i.clear()
             self.reset_line2(i)
@@ -524,6 +545,7 @@ class Main_app(QMainWindow):
                                            "")
         self.ui.View_top_btn.setStyleSheet(u"color: rgb(101, 119, 152);\n"
                                           "font: 700 9pt \"Yu Gothic UI\";")
+
 
 
     def home_clicked(self):
@@ -735,7 +757,4 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = Main_app()
     window.show()
-
     sys.exit(app.exec())
-
-

@@ -12,9 +12,21 @@ import base64
 
 
 
-
+DATA_FILE = "data.json"
 USER = "users.json"
 SALT_file = "salt"
+def load():
+    if os.path.exists(DATA_FILE):
+        with open(DATA_FILE, "r") as f:
+            return json.load(f)
+    else:
+        return {}
+
+def save(data):
+    with open(DATA_FILE, "w") as f:
+        return json.dump(data, f, indent=4)
+
+
 def load_data():
     if os.path.exists(USER):
         with open(USER, "r") as f:
@@ -45,6 +57,10 @@ def KDF(password, salt):
 def encrypt_data(data, password, KDF, salt):
     fernet = KDF(password, salt)
     return fernet.encrypt(data.encode()).decode()
+
+def decrypt_data(data, password, KDF, salt):
+    fernet = KDF(password, salt)
+    return fernet.decrypt(data.encode()).decode()
 
 def hash_password(password, salt):
     return hashlib.sha256(password.encode() + salt).hexdigest()

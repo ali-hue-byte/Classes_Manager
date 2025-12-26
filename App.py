@@ -424,7 +424,6 @@ class Ui_Dialog(object):
                                     "color: rgb(51, 51, 51);")
         self.ClassComboBox = QComboBox(self.page)
         self.ClassComboBox.setObjectName(u"ClassComboBox")
-        self.ClassComboBox.addItem("")
 
         self.ClassComboBox.setGeometry(QRect(300, 300, 221, 41))
         self.ClassComboBox.setStyleSheet(u"QComboBox { border : 1px solid grey ;\n"
@@ -889,7 +888,6 @@ class Ui_Dialog(object):
         self.Firstnameline.setText("")
         self.GenderComboBox.setItemText(0, QCoreApplication.translate("Dialog", u"Male", None))
         self.GenderComboBox.setItemText(1, QCoreApplication.translate("Dialog", u"Female", None))
-        self.ClassComboBox.setItemText(0, QCoreApplication.translate("Dialog", u"Class1", None))
         self.Firstname.setText(QCoreApplication.translate("Dialog", u"First Name*     :", None))
         self.lastname.setText(QCoreApplication.translate("Dialog", u"Last Name*          :", None))
         self.birth.setText(QCoreApplication.translate("Dialog", u"Date Of Birth*      :", None))
@@ -954,4 +952,5 @@ class Ui_Dialog(object):
 "", None))
         self.label_2_n.setText(QCoreApplication.translate("Dialog", u"Creat account", None))
     # retranslateUi
+
 

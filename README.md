@@ -12,9 +12,10 @@ Features included in this prototype:
 - Create account screen with username and password fields, including password strength checking
 - Smooth UI animations for widgets sliding in and out
 - Automatic navigation to the main application window after successful login
-- Secure password storage using a salted hash
 - Student information stored separatly for each user
 - All stored student data is protected using encryption based on a Key Derivation Function (KDF)
+- **Students Information page**- View and manage students details
+- **Adding classes**-View and creat new Classes
   
 ---
 

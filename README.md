@@ -54,4 +54,5 @@ python Student_Management.py
 <img width="1978" height="1175" alt="Screenshot 2025-12-26 215057" src="https://github.com/user-attachments/assets/832affe8-3071-4bd8-9473-244a84239649" />
 
 
+<img width="1971" height="1172" alt="image" src="https://github.com/user-attachments/assets/8225db52-1306-48c7-8558-55486c238df2" />
 

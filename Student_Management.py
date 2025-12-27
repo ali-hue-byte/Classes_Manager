@@ -1,13 +1,20 @@
 import sys
 
 from PySide6.QtGui import QIcon, QColor
-from PySide6.QtWidgets import QApplication, QMainWindow, QLineEdit , QGraphicsDropShadowEffect, QFrame, QGraphicsOpacityEffect
+from PySide6.QtWidgets import (QApplication,
+                               QMainWindow,
+                               QLineEdit,
+                               QGraphicsDropShadowEffect,
+                               QFrame,
+                               QGraphicsOpacityEffect,
+                               QTableWidgetItem,
+                               QPushButton, QWidget)
 from App import Ui_Dialog
-from PySide6.QtCore import QPropertyAnimation, QEasingCurve, QPoint, QDate
+from PySide6.QtCore import QPropertyAnimation, QEasingCurve, QPoint, QDate, QRect
 from Functions import SALT, hash_password, save_data, load_data, check_strength, KDF, decrypt_data,encrypt_data, load,save
 from PySide6.QtCore import Qt
 import re
-import time
+
 
 
 class Main_app(QMainWindow):
@@ -22,7 +29,11 @@ class Main_app(QMainWindow):
         self.wrap_with_shadow(self.ui.frame_3,90)
         self.wrap_with_shadow(self.ui.frame_2,20)
         self.wrap_with_shadow(self.ui.frame ,20)
+
+
         self.salt = SALT()
+
+
 
         self.setFixedSize(990, 560)
         self.ui.label_errn.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -34,7 +45,9 @@ class Main_app(QMainWindow):
             self.ui.lastnameline,
             self.ui.Emailine,
             self.ui.AdressLine,
-            self.ui.Numberline
+            self.ui.Numberline,
+            self.ui.Classnameline,
+            self.ui.maxstudentsline,
         ]
 
         self.widgets_student_add = [
@@ -98,14 +111,14 @@ class Main_app(QMainWindow):
             self.ui.class2,
             self.ui.requirederrfirst_2,
             self.ui.requirederrfirst_3,
-            self.ui.back_button,
-            self.ui.Edit_Button
+
         ]
 
         self.widgets_student_view =[
             self.ui.tableWidget,
             self.ui.ClassComboBox2,
-            self.ui.class2
+            self.ui.class2,
+
         ]
 
         self.widgets_home = [
@@ -113,7 +126,21 @@ class Main_app(QMainWindow):
             self.ui.label_6,
             self.ui.welcome_label,
             self.ui.frame_4,
+            self.ui.frame_5,
+            self.ui.frame_3
 
+        ]
+
+        self.widgets_class = [
+            self.ui.Classnameline,
+            self.ui.classname,
+            self.ui.maxstudents,
+            self.ui.maxstudentsline,
+            self.ui.tableWidget_class,
+            self.ui.add_button_class,
+            self.ui.cancel_button_class,
+            self.ui.requirederrclass,
+            self.ui.requirederrmax
         ]
 
         self.widgets_acc = [{"widget":self.ui.frame_n, "pos_off":QPoint(-490,50),"pos_on":QPoint(560,50)},
@@ -141,7 +168,8 @@ class Main_app(QMainWindow):
             i.hide()
         for i in self.widget_student_edit:
             i.hide()
-
+        for i in self.widgets_class:
+            i.hide()
 #----connecting buttons-----------------------------
 
         self.ui.pushButton_n.clicked.connect(self.creat_clicked)
@@ -157,12 +185,103 @@ class Main_app(QMainWindow):
         self.ui.Cancel_button.clicked.connect(self.cancel_clicked)
         self.ui.View_top_btn.clicked.connect(self.view_top_clicked)
         self.ui.Add_top_btn.clicked.connect(self.Add_top_clicked)
-
+        self.ui.Classes_button.clicked.connect(self.classe_clicked)
+        self.ui.add_button_class.clicked.connect(self.Add_class_clicked)
+        self.ui.ClassComboBox2.currentTextChanged.connect(lambda: self.refresh_view(self.current_user[-1],self.current_password[-1]))
+        self.ui.cancel_button_class.clicked.connect(self.cancel_clicked)
 #------------------------------------------------------------------
 
 
         self.animations = []
         self.animations2 = []
+    def refresh_add(self,user,password):
+        data = load()
+
+        for i, x in enumerate(data[user].get("Classes", {}).values()):
+            if self.ui.ClassComboBox.findText(x["class_Name"]) == -1:
+                 self.ui.ClassComboBox.insertItem(i, x["class_Name"])
+                 self.ui.ClassComboBox2.insertItem(i, x["class_Name"])
+
+    def refresh_view(self,user,password):
+
+        data = load()
+        for i, x in enumerate(data[user].get("Classes", []).values()):
+            if self.ui.ClassComboBox2.findText(x["class_Name"]) == -1:
+
+                 self.ui.ClassComboBox2.insertItem(i, x["class_Name"])
+        current_class = self.ui.ClassComboBox2.currentText()
+        self.ui.tableWidget.setRowCount(0)
+        for x in data[user].get("students", []):
+            if decrypt_data(x["class"],password,KDF,self.salt) != current_class:
+                continue
+
+            row = self.ui.tableWidget.rowCount()
+            self.ui.tableWidget.insertRow(row)
+
+            self.ui.tableWidget.setItem(row, 0, QTableWidgetItem(decrypt_data(x["firstname"],password,KDF,self.salt) + " " +decrypt_data(x["lastname"],password,KDF,self.salt)))
+            self.ui.tableWidget.setItem(row, 1, QTableWidgetItem(decrypt_data(x["birth_date"],password,KDF,self.salt)))
+            self.ui.tableWidget.setItem(row, 2, QTableWidgetItem(decrypt_data(x["gender"],password,KDF,self.salt)))
+            self.ui.tableWidget.setItem(row, 3, QTableWidgetItem(decrypt_data(x["number"],password,KDF,self.salt)))
+            self.ui.tableWidget.setItem(row, 4, QTableWidgetItem(decrypt_data(x["address"],password,KDF,self.salt)))
+            self.container = QWidget()
+            self.container.setGeometry(QRect(0, 0, 100, 40))
+            self.edit_btn = QPushButton("Edit",self.container)
+            self.edit_btn.setStyleSheet(u"QPushButton{background-color: rgb(37, 99, 235);\n"
+                                      "color : rgb(255,255,255);\n"
+                                      "font: 700 11pt \"Microsoft PhagsPa\";\n"
+                                      "border-radius: 15px}\n"
+                                      "\n"
+                                      "QPushButton:hover {background-color:  rgb(25, 86, 179);\n"
+                                      "color: rgb(255,255,255)\n"
+                                      "}")
+            self.edit_btn.setGeometry(QRect(80, 2, 48, 30))
+            self.delete_btn = QPushButton("Delete",self.container)
+            self.delete_btn.setStyleSheet(u"QPushButton{background-color: rgb(37, 99, 235);\n"
+                                       "color : rgb(255,255,255);\n"
+                                       "font: 700 11pt \"Microsoft PhagsPa\";\n"
+                                       "border-radius: 15px}\n"
+                                       "\n"
+                                       "QPushButton:hover {background-color:  rgb(25, 86, 179);\n"
+                                       "color: rgb(255,255,255)\n"
+                                       "}")
+            self.delete_btn.setGeometry(QRect(20 , 2, 55, 30))
+            self.ui.tableWidget.setCellWidget(row, 5,self.container)
+    def refresh_class(self,user,password):
+        data = load()
+        for j,i in enumerate(data[user].get("Classes", {}).values()):
+            self.ui.tableWidget_class.insertRow(j)
+
+            self.ui.tableWidget_class.setItem(j,0,QTableWidgetItem(i["class_Name"]))
+
+            self.ui.tableWidget_class.setItem(j,1,QTableWidgetItem(i["Total_students"]))
+            self.ui.tableWidget_class.setItem(j,2,QTableWidgetItem(i["Max_students"]))
+            self.container_ = QWidget()
+            self.container_.setGeometry(QRect(0, 0, 100, 40))
+            self.edit_btn_ = QPushButton("Edit", self.container_)
+            self.edit_btn_.setStyleSheet(u"QPushButton{background-color: rgb(37, 99, 235);\n"
+                                        "color : rgb(255,255,255);\n"
+                                        "font: 700 11pt \"Microsoft PhagsPa\";\n"
+                                        "border-radius: 15px}\n"
+                                        "\n"
+                                        "QPushButton:hover {background-color:  rgb(25, 86, 179);\n"
+                                        "color: rgb(255,255,255)\n"
+                                        "}")
+            self.edit_btn_.setGeometry(QRect(80, 2, 48, 30))
+            self.delete_btn_ = QPushButton("Delete", self.container_)
+            self.delete_btn_.setStyleSheet(u"QPushButton{background-color: rgb(37, 99, 235);\n"
+                                          "color : rgb(255,255,255);\n"
+                                          "font: 700 11pt \"Microsoft PhagsPa\";\n"
+                                          "border-radius: 15px}\n"
+                                          "\n"
+                                          "QPushButton:hover {background-color:  rgb(25, 86, 179);\n"
+                                          "color: rgb(255,255,255)\n"
+                                          "}")
+            self.delete_btn_.setGeometry(QRect(20, 2, 55, 30))
+            self.ui.tableWidget_class.setCellWidget(j, 3, self.container_)
+
+
+
+
 
     def empty(self,lines):
         for line in lines:
@@ -218,6 +337,8 @@ class Main_app(QMainWindow):
 
 
     def creat_clicked(self):
+        self.ui.ClassComboBox2.clear()
+        self.ui.ClassComboBox.clear()
         username = str(self.ui.lineEdit_n.text())
         password = str(self.ui.lineEdit_2_n.text())
         data = load_data()
@@ -268,13 +389,18 @@ class Main_app(QMainWindow):
         self.ui.stackedWidget.setCurrentIndex(0)
         save_data(data)
         loaded2 = load()
-        loaded2.update({username: {}})
+        loaded2.update({username: {"Classes":{}}})
         save(loaded2)
         for i in self.lines:
             i.clear()
             self.reset_line(i)
 
+
+
+
     def log_clicked(self):
+        self.ui.ClassComboBox2.clear()
+        self.ui.ClassComboBox.clear()
         username = str(self.ui.lineEdit_5.text())
         password = str(self.ui.lineEdit_6.text())
         data = load_data()
@@ -299,6 +425,8 @@ class Main_app(QMainWindow):
 
                 self.animate_page(self.ui.page, 1, 0)
                 self.ui.stackedWidget.setCurrentIndex(0)
+
+
                 for i in self.lines:
                     i.clear()
                     self.reset_line(i)
@@ -452,10 +580,14 @@ class Main_app(QMainWindow):
     def students_clicked(self):
         self.ui.Add_top_btn.show()
         self.ui.View_top_btn.show()
+        self.unwrap_shadow(self.ui.tableWidget)
         self.unwrap_shadow(self.ui.frame_5)
         self.unwrap_shadow(self.ui.frame_4)
         self.unwrap_shadow(self.ui.frame_3)
+        self.unwrap_shadow(self.ui.tableWidget_class)
 
+        for i in self.widgets_class :
+            i.hide()
         for i in self.widgets_student_add:
             i.show()
         for j in self.widgets_home:
@@ -469,6 +601,8 @@ class Main_app(QMainWindow):
         self.ui.requirederrlast.hide()
         self.ui.requirederrfirst_2.hide()
         self.ui.requirederrfirst_3.hide()
+        self.ui.requirederrclass.hide()
+        self.ui.requirederrmax.hide()
         self.ui.errclasse.hide()
         for i in [self.ui.lastnameline, self.ui.Firstnameline]:
             self.reset_line2(i)
@@ -497,11 +631,22 @@ class Main_app(QMainWindow):
                                             "}\n"
                                             "\n"
                                             "")
+        self.refresh_add(self.current_user[-1],self.current_password[-1])
+
+
 
     def Add_top_clicked(self):
         self.ui.Add_top_btn.show()
         self.ui.View_top_btn.show()
+        self.unwrap_shadow(self.ui.tableWidget)
+        self.unwrap_shadow(self.ui.frame_5)
+        self.unwrap_shadow(self.ui.frame_4)
+        self.unwrap_shadow(self.ui.frame_3)
+        self.unwrap_shadow(self.ui.tableWidget_class)
 
+
+        for i in self.widgets_class :
+            i.hide()
         for i in self.widgets_student_add:
             i.show()
         for j in self.widgets_home:
@@ -536,6 +681,8 @@ class Main_app(QMainWindow):
         self.ui.requirederrlast.hide()
         self.ui.requirederrfirst_2.hide()
         self.ui.requirederrfirst_3.hide()
+        self.ui.requirederrclass.hide()
+        self.ui.requirederrmax.hide()
         self.ui.errclasse.hide()
         self.ui.Add_top_btn.setStyleSheet(u"QPushButton {font: 700 9pt \"Yu Gothic UI\";\n"
                                            "color :rgb(24, 182, 255);\n"
@@ -545,14 +692,18 @@ class Main_app(QMainWindow):
                                            "")
         self.ui.View_top_btn.setStyleSheet(u"color: rgb(101, 119, 152);\n"
                                           "font: 700 9pt \"Yu Gothic UI\";")
+        self.refresh_add(self.current_user[-1],self.current_password[-1])
 
 
 
     def home_clicked(self):
+        self.unwrap_shadow(self.ui.tableWidget)
+
 
         self.wrap_with_shadow(self.ui.frame_5, 90)
         self.wrap_with_shadow(self.ui.frame_4, 90)
         self.wrap_with_shadow(self.ui.frame_3, 90)
+        self.unwrap_shadow(self.ui.tableWidget_class)
         self.ui.Add_top_btn.hide()
         self.ui.View_top_btn.hide()
         for i in self.widgets_student_add:
@@ -564,11 +715,15 @@ class Main_app(QMainWindow):
         for i in self.widgets_to_clear:
             i.clear()
             self.reset_line2(i)
+        for i in self.widgets_class :
+            i.hide()
         self.ui.dateEdit.setDate(QDate.currentDate())
+
 
     def add_btn_clicked(self):
         err = False
         data = load()
+
         self.first_name = self.ui.Firstnameline.text()
         self.last_name = self.ui.lastnameline.text()
         self.gender = self.ui.GenderComboBox.currentText()
@@ -687,7 +842,11 @@ class Main_app(QMainWindow):
                   }
 
         data[self.current_user[-1]]["students"] = data[self.current_user[-1]].get("students", []) + [student]
+        data[self.current_user[-1]]["Classes"][self.classe]["Total_students"] = data[self.current_user[-1]]["Classes"][self.classe].get("Total_students", 0) + 1
         save(data)
+        self.refresh_add(self.current_user[-1],self.current_password[-1])
+        for i in self.widgets_to_clear:
+            i.clear()
 
     def cancel_clicked(self):
         for i in self.widgets_to_clear:
@@ -715,11 +874,19 @@ class Main_app(QMainWindow):
         self.ui.requirederrlast.hide()
         self.ui.requirederrfirst_2.hide()
         self.ui.requirederrfirst_3.hide()
+        self.ui.requirederrclass.hide()
+        self.ui.requirederrmax.hide()
+
 
     def view_top_clicked(self):
         self.ui.Add_top_btn.show()
         self.ui.View_top_btn.show()
+        self.wrap_with_shadow(self.ui.tableWidget, 70)
 
+        self.unwrap_shadow(self.ui.frame_5)
+        self.unwrap_shadow(self.ui.frame_4)
+        self.unwrap_shadow(self.ui.frame_3)
+        self.unwrap_shadow(self.ui.tableWidget_class)
 
 
         for i in self.widgets_student_add:
@@ -730,12 +897,17 @@ class Main_app(QMainWindow):
             i.show()
         for i in self.widgets_to_clear:
             i.clear()
+        for i in self.widgets_class :
+            i.hide()
+
 
         self.ui.requirederrfirst.hide()
         self.ui.requirederrlast.hide()
         self.ui.requirederrfirst_2.hide()
         self.ui.requirederrfirst_3.hide()
         self.ui.errclasse.hide()
+        self.ui.requirederrclass.hide()
+        self.ui.requirederrmax.hide()
         self.ui.View_top_btn.setStyleSheet(u"QPushButton {font: 700 9pt \"Yu Gothic UI\";\n"
                                        "color :rgb(24, 182, 255);\n"
                                        "border: none;\n"
@@ -744,6 +916,78 @@ class Main_app(QMainWindow):
                                        "")
         self.ui.Add_top_btn.setStyleSheet(u"color: rgb(101, 119, 152);\n"
                                         "font: 700 9pt \"Yu Gothic UI\";")
+        self.refresh_view(self.current_user[-1],self.current_password[-1])
+
+    def classe_clicked(self):
+        for i in self.widgets_class :
+            i.show()
+        for i in self.widgets_student_add:
+            i.hide()
+        for j in self.widgets_home:
+            j.hide()
+        for i in self.widgets_student_view:
+            i.hide()
+        for i in self.widgets_to_clear:
+            i.clear()
+
+        self.unwrap_shadow(self.ui.tableWidget)
+        self.wrap_with_shadow(self.ui.tableWidget_class, 50)
+        self.unwrap_shadow(self.ui.frame_5)
+        self.unwrap_shadow(self.ui.frame_4)
+        self.unwrap_shadow(self.ui.frame_3)
+
+
+        self.ui.requirederrfirst.hide()
+        self.ui.requirederrlast.hide()
+        self.ui.requirederrfirst_2.hide()
+        self.ui.requirederrfirst_3.hide()
+        self.ui.errclasse.hide()
+        self.ui.requirederrclass.hide()
+        self.ui.requirederrmax.hide()
+        self.ui.Add_top_btn.hide()
+        self.ui.View_top_btn.hide()
+        self.refresh_class(self.current_user[-1],self.current_password[-1])
+
+    def Add_class_clicked(self):
+        self.class_ = self.ui.Classnameline.text()
+        self.MaxxStudents = self.ui.maxstudentsline.text()
+        data = load()
+
+        err = False
+        if self.class_ == "" or not re.fullmatch(r"[A-Za-z0-9 ]+",self.class_):
+            err = True
+            self.update_line2(self.ui.Classnameline)
+            self.ui.requirederrclass.show()
+        else:
+            self.reset_line2(self.ui.Classnameline)
+            self.ui.requirederrclass.hide()
+        if self.MaxxStudents == "" or not self.MaxxStudents.isdigit():
+            err = True
+            self.update_line2(self.ui.maxstudentsline)
+            self.ui.requirederrmax.show()
+        else:
+            self.reset_line2(self.ui.maxstudentsline)
+            self.ui.requirederrmax.hide()
+
+        if err == True :
+            return
+
+        new_class = {"class_Name":self.class_,
+                     "Max_students":self.MaxxStudents,
+                     "Total_students": 0}
+
+        data[self.current_user[-1]]["Classes"][self.class_] =  new_class
+        save(data)
+        self.refresh_class(self.current_user[-1],self.current_password[-1])
+
+        for i in self.widgets_to_clear:
+            i.clear()
+
+    def cancel_class(self):
+        for i in [self.ui.Classnameline,self.ui.maxstudentsline]:
+            i.clear()
+            self.reset_line2(i)
+
 
 
 

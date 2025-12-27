@@ -561,6 +561,21 @@ class Ui_Dialog(object):
         self.tableWidget.horizontalHeader().setDefaultSectionSize(120)
         self.tableWidget.horizontalHeader().setStretchLastSection(True)
         self.tableWidget.verticalHeader().setDefaultSectionSize(30)
+        self.tableWidget.setShowGrid(True)
+        self.tableWidget.setStyleSheet(u"QHeaderView::section {\n"
+                                       "background-color: rgb(25,86,179);\n"
+                                       "color: white;\n"
+                                       "font: 600 10pt \"Inter\";"
+                                       "padding: 6px\n"
+                                       "}\n"
+                                       "QHeaderView::section:hover {\n"
+                                       "background-color: rgb(20,70,150);\n"
+                                       "padding: 6px\n"
+                                       "}\n"
+                                       "QHeaderView::section:pressed {\n"
+                                       "background-color: rgb(15,55,120);\n"
+                                       "padding: 6px\n"
+                                       "}")
         self.ClassComboBox2 = QComboBox(self.page)
         self.ClassComboBox2.setObjectName(u"ClassComboBox2")
         self.ClassComboBox2.setGeometry(QRect(740, 80, 221, 41))
@@ -952,5 +967,6 @@ class Ui_Dialog(object):
 "", None))
         self.label_2_n.setText(QCoreApplication.translate("Dialog", u"Creat account", None))
     # retranslateUi
+
 
 

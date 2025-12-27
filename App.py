@@ -965,8 +965,9 @@ class Ui_Dialog(object):
 "simply, efficiently, and securely.", None))
         self.label_10.setText(QCoreApplication.translate("Dialog", u"Don't have an account? <a href=\"create\">Create one</a>\n"
 "", None))
-        self.label_2_n.setText(QCoreApplication.translate("Dialog", u"Creat account", None))
+        self.label_2_n.setText(QCoreApplication.translate("Dialog", u"Create account", None))
     # retranslateUi
+
 
 
 

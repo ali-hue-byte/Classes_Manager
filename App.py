@@ -543,8 +543,8 @@ class Ui_Dialog(object):
         self.requirederrlast.setGeometry(QRect(740, 170, 111, 16))
         self.requirederrlast.setStyleSheet(u"color: rgb(220, 38, 38);")
         self.tableWidget = QTableWidget(self.page)
-        if (self.tableWidget.columnCount() < 6):
-            self.tableWidget.setColumnCount(6)
+        if (self.tableWidget.columnCount() < 8):
+            self.tableWidget.setColumnCount(8)
         __qtablewidgetitem = QTableWidgetItem()
         self.tableWidget.setHorizontalHeaderItem(0, __qtablewidgetitem)
         __qtablewidgetitem1 = QTableWidgetItem()
@@ -557,8 +557,12 @@ class Ui_Dialog(object):
         self.tableWidget.setHorizontalHeaderItem(4, __qtablewidgetitem4)
         __qtablewidgetitem5 = QTableWidgetItem()
         self.tableWidget.setHorizontalHeaderItem(5, __qtablewidgetitem5)
+        __qtablewidgetitem6 = QTableWidgetItem()
+        self.tableWidget.setHorizontalHeaderItem(6, __qtablewidgetitem6)
+        __qtablewidgetitem7 = QTableWidgetItem()
+        self.tableWidget.setHorizontalHeaderItem(7, __qtablewidgetitem7)
         self.tableWidget.setObjectName(u"tableWidget")
-        self.tableWidget.setGeometry(QRect(170, 130, 791, 411))
+        self.tableWidget.setGeometry(QRect(160, 130, 820, 300))
         self.tableWidget.viewport().setProperty(u"cursor", QCursor(Qt.CursorShape.ArrowCursor))
         self.tableWidget.horizontalHeader().setDefaultSectionSize(120)
         self.tableWidget.horizontalHeader().setStretchLastSection(True)
@@ -580,6 +584,10 @@ class Ui_Dialog(object):
                                        "}\n"
                                        "QTableWidget {"
                                        "border: none;\n}"
+                                       "QTableWidget QLineEdit {\n"
+                                       "background-color: rgb(255,255,255);"
+                                       "border-bottom: 4px;"
+                                       "}\n"
                                        )
 
         self.tableWidget.setFocusPolicy(Qt.NoFocus)
@@ -590,7 +598,53 @@ class Ui_Dialog(object):
         vheader = self.tableWidget.verticalHeader()
         vheader.setSectionResizeMode(QHeaderView.Fixed)
         self.tableWidget.verticalHeader().setHighlightSections(False)
-        self.tableWidget.setFocusPolicy(Qt.NoFocus)
+        self.tableWidget.setColumnWidth(0, 80)
+        self.tableWidget.setColumnWidth(1, 120)
+        self.tableWidget.setColumnWidth(2, 100)
+        self.tableWidget.setColumnWidth(3, 50)
+        self.tableWidget.setColumnWidth(4, 100)
+        self.tableWidget.setColumnWidth(5, 100)
+        self.tableWidget.setColumnWidth(6, 150)
+        self.tableWidget.setColumnWidth(7, 70)
+        self.Save_button = QPushButton(self.page)
+        self.Save_button.setObjectName(u"Edit_button")
+        self.Save_button.setGeometry(QRect(760, 500, 91, 31))
+        self.Save_button.setStyleSheet(u"QPushButton{background-color: rgb(37, 99, 235);\n"
+                                      "color : rgb(255,255,255);\n"
+                                      "font: 700 11pt \"Microsoft PhagsPa\";\n"
+                                      "border-radius: 15px}\n"
+                                      "\n"
+                                      "QPushButton:hover {background-color:  rgb(25, 86, 179);\n"
+                                      "color: rgb(255,255,255)\n"
+                                      "}")
+        self.Edit_button = QPushButton(self.page)
+        self.Edit_button.setObjectName(u"Edit_button")
+        self.Edit_button.setGeometry(QRect(810, 500, 91, 31))
+        self.Edit_button.setStyleSheet(u"QPushButton{background-color: rgb(37, 99, 235);\n"
+                                       "color : rgb(255,255,255);\n"
+                                       "font: 700 11pt \"Microsoft PhagsPa\";\n"
+                                       "border-radius: 15px}\n"
+                                       "\n"
+                                       "QPushButton:hover {background-color:  rgb(25, 86, 179);\n"
+                                       "color: rgb(255,255,255)\n"
+                                       "}")
+        self.Cancel_button2 = QPushButton(self.page)
+        self.Cancel_button2.setObjectName(u"Cancel_button2")
+        self.Cancel_button2.setGeometry(QRect(860, 500, 91, 31))
+        self.Cancel_button2.setStyleSheet(u"QPushButton {background-color: rgb(209, 213, 219);\n"
+                                         "color: rgb(55, 65, 81);\n"
+                                         "font: 700 11pt \"Microsoft PhagsPa\";\n"
+                                         "border-radius: 15px\n"
+                                         "}\n"
+                                         "\n"
+                                         "QPushButton:hover {background-color: rgb(156,163,175)}")
+
+        self.errlbl = QLabel(self.page)
+        self.errlbl.setObjectName(u"requirederrfirst_2")
+        self.errlbl.setGeometry(QRect(180, 80, 270, 16))
+        self.errlbl.setStyleSheet(u"color: rgb(220, 38, 38);")
+        self.errlbl.hide()
+
         self.ClassComboBox2 = QComboBox(self.page)
         self.ClassComboBox2.setObjectName(u"ClassComboBox2")
         self.ClassComboBox2.setGeometry(QRect(740, 80, 221, 41))
@@ -692,7 +746,7 @@ class Ui_Dialog(object):
         __qtablewidgetitem3 = QTableWidgetItem()
         self.tableWidget_class.setHorizontalHeaderItem(3, __qtablewidgetitem3)
         self.tableWidget_class.setObjectName(u"tableWidget_class")
-        self.tableWidget_class.setGeometry(QRect(170, 200, 801, 341))
+        self.tableWidget_class.setGeometry(QRect(170, 200, 801, 280))
         self.tableWidget_class.horizontalHeader().setDefaultSectionSize(190)
         self.tableWidget_class.horizontalHeader().setStretchLastSection(True)
         self.tableWidget_class.verticalHeader().setStretchLastSection(False)
@@ -712,11 +766,19 @@ class Ui_Dialog(object):
                                        "background-color: rgb(15,55,120);\n"
                                        "padding: 6px\n"
                                        "}\n"
-                                       "QTableWidget {border: none}"
+                                       "QTableWidget {border: none}\n"
+                                       "QTableWidget QLineEdit {\n"
+                                       "background-color: rgb(255,255,255);"
+                                       "}\n"
                                        )
-        self.tableWidget_class.setEditTriggers(QTableWidget.NoEditTriggers)
         self.tableWidget_class.setFocusPolicy(Qt.NoFocus)
         self.tableWidget_class.setSelectionMode(QAbstractItemView.NoSelection)
+        self.tableWidget_class.setEditTriggers(QTableWidget.NoEditTriggers)
+        header = self.tableWidget_class.horizontalHeader()
+        header.setSectionResizeMode(QHeaderView.Fixed)
+        vheader = self.tableWidget_class.verticalHeader()
+        vheader.setSectionResizeMode(QHeaderView.Fixed)
+        self.tableWidget_class.verticalHeader().setHighlightSections(False)
 
 
         self.add_button_class = QPushButton(self.page)
@@ -1041,22 +1103,31 @@ class Ui_Dialog(object):
                                                                    "", None))
         self.Add_button.setText(QCoreApplication.translate("Dialog", u"Add", None))
         self.Cancel_button.setText(QCoreApplication.translate("Dialog", u"Cancel", None))
+        self.Edit_button.setText(QCoreApplication.translate("Dialog", u"Edit", None))
+        self.Save_button.setText(QCoreApplication.translate("Dialog", u"Save", None))
+        self.Cancel_button2.setText(QCoreApplication.translate("Dialog", u"Cancel", None))
         self.requirederrfirst.setText(QCoreApplication.translate("Dialog", u"This field is required", None))
         self.requirederrlast.setText(QCoreApplication.translate("Dialog", u"This field is required", None))
         ___qtablewidgetitem = self.tableWidget.horizontalHeaderItem(0)
-        ___qtablewidgetitem.setText(QCoreApplication.translate("Dialog", u"Full Name", None));
+        ___qtablewidgetitem.setText(QCoreApplication.translate("Dialog", u"ID", None));
         ___qtablewidgetitem1 = self.tableWidget.horizontalHeaderItem(1)
-        ___qtablewidgetitem1.setText(QCoreApplication.translate("Dialog", u"Date of birth", None));
+        ___qtablewidgetitem1.setText(QCoreApplication.translate("Dialog", u"Full Name", None));
         ___qtablewidgetitem2 = self.tableWidget.horizontalHeaderItem(2)
-        ___qtablewidgetitem2.setText(QCoreApplication.translate("Dialog", u"Gender", None));
+        ___qtablewidgetitem2.setText(QCoreApplication.translate("Dialog", u"Date of Birth", None));
         ___qtablewidgetitem3 = self.tableWidget.horizontalHeaderItem(3)
-        ___qtablewidgetitem3.setText(QCoreApplication.translate("Dialog", u"Contact Number", None));
+        ___qtablewidgetitem3.setText(QCoreApplication.translate("Dialog", u"M/F", None));
         ___qtablewidgetitem4 = self.tableWidget.horizontalHeaderItem(4)
         ___qtablewidgetitem4.setText(QCoreApplication.translate("Dialog", u"Address", None));
         ___qtablewidgetitem5 = self.tableWidget.horizontalHeaderItem(5)
-        ___qtablewidgetitem5.setText(QCoreApplication.translate("Dialog", u"Actions", None));
+        ___qtablewidgetitem5.setText(QCoreApplication.translate("Dialog", u"Number", None));
+        ___qtablewidgetitem6 = self.tableWidget.horizontalHeaderItem(6)
+        ___qtablewidgetitem6.setText(QCoreApplication.translate("Dialog", u"Email", None));
+        ___qtablewidgetitem7 = self.tableWidget.horizontalHeaderItem(7)
+        ___qtablewidgetitem7.setText(QCoreApplication.translate("Dialog", u"Delete", None));
+
         self.class2.setText(QCoreApplication.translate("Dialog", u"Class     ", None))
         self.requirederrfirst_2.setText(QCoreApplication.translate("Dialog", u"Invalid Email", None))
+        self.errlbl.setText(QCoreApplication.translate("Dialog", u"Please ensure all entered information is correct", None))
         self.errclasse.setText(QCoreApplication.translate("Dialog", u"There are no classes yet", None))
         self.requirederrclass.setText(QCoreApplication.translate("Dialog", u"Please Enter a Valid Class Name", None))
         self.requirederrmax.setText(QCoreApplication.translate("Dialog", u"Please enter a valid numeric value", None))

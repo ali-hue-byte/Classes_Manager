@@ -52,6 +52,6 @@ python Student_Management.py
 <img width="1974" height="1131" alt="image" src="https://github.com/user-attachments/assets/59d6bd7c-fd31-49b6-a881-f91c83d0fa5b" />
 <img width="1975" height="1178" alt="image" src="https://github.com/user-attachments/assets/d4ca972e-ed91-4694-9509-2d01136fe3a8" />
 <img width="1978" height="1175" alt="Screenshot 2025-12-26 215057" src="https://github.com/user-attachments/assets/832affe8-3071-4bd8-9473-244a84239649" />
-<img width="1977" height="1175" alt="Screenshot 2025-12-28 225156" src="https://github.com/user-attachments/assets/f7e306a7-954b-4ac1-b9aa-45779783b2ac" />
-<img width="1978" height="1174" alt="Screenshot 2025-12-28 225212" src="https://github.com/user-attachments/assets/3fd144cf-a3af-48a9-a86e-2d7f8aa281eb" />
+<img width="1980" height="1171" alt="Screenshot 2025-12-28 225644" src="https://github.com/user-attachments/assets/1bd6f18c-98bd-47f3-83fe-26a2e6bab5da" />
+<img width="1978" height="1175" alt="Screenshot 2025-12-28 225653" src="https://github.com/user-attachments/assets/a0d3da70-f5e0-438d-8cbc-933b9fd8ba9b" />
 

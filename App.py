@@ -1143,7 +1143,7 @@ class Ui_Dialog(object):
         ___qtablewidgetitem2c = self.tableWidget_class.horizontalHeaderItem(2)
         ___qtablewidgetitem2c.setText(QCoreApplication.translate("Dialog", u"Max Students", None));
         ___qtablewidgetitem3c = self.tableWidget_class.horizontalHeaderItem(3)
-        ___qtablewidgetitem3c.setText(QCoreApplication.translate("Dialog", u"Actions", None));
+        ___qtablewidgetitem3c.setText(QCoreApplication.translate("Dialog", u"Delete", None));
         self.add_button_class.setText(QCoreApplication.translate("Dialog", u"Add", None))
         self.cancel_button_class.setText(QCoreApplication.translate("Dialog", u"Cancel", None))
 
@@ -1170,4 +1170,5 @@ class Ui_Dialog(object):
 "", None))
         self.label_2_n.setText(QCoreApplication.translate("Dialog", u"Create account", None))
     # retranslateUi
+
 

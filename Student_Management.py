@@ -272,7 +272,7 @@ class Main_app(QMainWindow):
                                        "color: rgb(255,255,255)\n"
                                        "}")
             self.delete_btn.setIcon(icon)
-            self.delete_btn.setGeometry(QRect(10 , 2, 50, 30))
+            self.delete_btn.setGeometry(QRect(20 , 2, 50, 30))
             self.delete_btn.clicked.connect(partial(delete_btn))
             self.ui.tableWidget.setCellWidget(row, 7,self.container)
             self.wrap_with_shadow(self.ui.tableWidget,70)
@@ -1186,3 +1186,4 @@ if __name__ == "__main__":
     window = Main_app()
     window.show()
     sys.exit(app.exec())
+

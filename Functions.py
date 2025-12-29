@@ -15,6 +15,11 @@ import base64
 DATA_FILE = "data.json"
 USER = "users.json"
 SALT_file = "salt"
+
+
+
+
+
 def load():
     if os.path.exists(DATA_FILE):
         with open(DATA_FILE, "r") as f:

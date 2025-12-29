@@ -183,7 +183,11 @@ class Main_app(QMainWindow):
             self.ui.subject_name,
             self.ui.subjectline,
             self.ui.coeff,
-            self.ui.coeffline
+            self.ui.coeffline,
+            self.ui.Edit_button3,
+            self.ui.Save_button3,
+            self.ui.Cancel_button4,
+            self.ui.errlbl3
         ]
 
         self.widgets_acc = [{"widget":self.ui.frame_n, "pos_off":QPoint(-490,50),"pos_on":QPoint(560,50)},
@@ -245,21 +249,67 @@ class Main_app(QMainWindow):
         self.ui.Subject_top_btn.clicked.connect(self.Subjects)
         self.ui.add_button_subject.clicked.connect(self.add_subject)
         self.ui.cancel_button_subject.clicked.connect(self.cancelsub)
+        self.ui.Edit_button3.clicked.connect(self.Edit_btn3)
+        self.ui.Cancel_button4.clicked.connect(self.Canceled3)
+        self.ui.Save_button3.clicked.connect(self.Save_btn_3)
+        self.ui.ClassComboBox3.currentTextChanged.connect(lambda: self.refresh_grades_C(self.current_user[-1],self.current_password[-1]))
 #------------------------------------------------------------------
 
 
         self.animations = []
         self.animations2 = []
 
-    def refresh_grades(self,user):
+
+    def refresh_grades(self,user,password):
+        self.unwrap_shadow(self.ui.tableWidget_grades)
+        data = load()
+        self.ui.ClassComboBox3.clear()
+        for i, x in enumerate(data[user].get("Classes", {}).values()):
+            if self.ui.ClassComboBox3.findText(x["class_Name"]) == -1:
+                self.ui.ClassComboBox3.insertItem(i, x["class_Name"])
+        current_class = self.ui.ClassComboBox3.currentText()
         self.ui.tableWidget_grades.setRowCount(0)
         data = load()
         self.ui.tableWidget_grades.setColumnCount(len(data[user]["Subjects"])+2)
         for j,i in enumerate(data[user]["Subjects"],start=2):
             self.ui.tableWidget_grades.setHorizontalHeaderItem(j, QTableWidgetItem(i))
 
+        for i,y in data[user].get("students", {}).items():
 
+            if decrypt_data(y["class"], password, KDF, self.salt) != current_class:
+                continue
+            row = self.ui.tableWidget_grades.rowCount()
+            self.ui.tableWidget_grades.insertRow(row)
 
+            self.ui.tableWidget_grades.setItem(row,0, QTableWidgetItem(i))
+            self.ui.tableWidget_grades.setItem(row,1, QTableWidgetItem(decrypt_data(y["firstname"],password,KDF,self.salt) + " " +decrypt_data(y["lastname"],password,KDF,self.salt)))
+        self.wrap_with_shadow(self.ui.tableWidget_grades,70)
+
+    def refresh_grades_C(self,user,password):
+        self.unwrap_shadow(self.ui.tableWidget_grades)
+        data = load()
+
+        for i, x in enumerate(data[user].get("Classes", {}).values()):
+            if self.ui.ClassComboBox3.findText(x["class_Name"]) == -1:
+                self.ui.ClassComboBox3.insertItem(i, x["class_Name"])
+        current_class = self.ui.ClassComboBox3.currentText()
+        self.ui.tableWidget_grades.setRowCount(0)
+        data = load()
+        self.ui.tableWidget_grades.setColumnCount(len(data[user]["Subjects"])+2)
+        for j,i in enumerate(data[user]["Subjects"],start=2):
+            self.ui.tableWidget_grades.setHorizontalHeaderItem(j, QTableWidgetItem(i))
+
+        for i,y in data[user].get("students", {}).items():
+
+            if decrypt_data(y["class"], password, KDF, self.salt) != current_class:
+                continue
+            row = self.ui.tableWidget_grades.rowCount()
+            self.ui.tableWidget_grades.insertRow(row)
+
+            self.ui.tableWidget_grades.setItem(row,0, QTableWidgetItem(i))
+            self.ui.tableWidget_grades.setItem(row,1, QTableWidgetItem(decrypt_data(y["firstname"],password,KDF,self.salt) + " " +decrypt_data(y["lastname"],password,KDF,self.salt)))
+
+        self.wrap_with_shadow(self.ui.tableWidget_grades, 70)
     def refresh_subject(self,user):
         self.ui.tableWidget_subjects.setRowCount(0)
         data = load()
@@ -977,6 +1027,8 @@ class Main_app(QMainWindow):
         self.unwrap_shadow(self.ui.add_button_subject)
         self.unwrap_shadow(self.ui.cancel_button_subject)
 
+        self.unwrap_shadow(self.ui.tableWidget_subjects)
+
         for i in self.widgets_class :
             i.hide()
         for i in self.widgets_student_add:
@@ -991,6 +1043,7 @@ class Main_app(QMainWindow):
             i.hide()
 
         self.ui.requirederrfirst.hide()
+        self.ui.errlbl3.hide()
         self.ui.requirederrlast.hide()
         self.ui.requirederrfirst_2.hide()
         self.ui.requirederrfirst_3.hide()
@@ -1024,6 +1077,15 @@ class Main_app(QMainWindow):
                                             "}\n"
                                             "\n"
                                             "")
+
+        self.ui.Subject_top_btn.setStyleSheet(u"QPushButton {font: 700 9pt \"Yu Gothic UI\";\n"
+                                              "color :rgb(24, 182, 255);\n"
+                                              "border: none;\n"
+                                              "border-bottom: 2px solid rgb(24, 182, 255)\n"
+                                              "}\n"
+                                              "")
+        self.ui.grades_top_btn.setStyleSheet(u"color: rgb(101, 119, 152);\n"
+                                             "font: 700 9pt \"Yu Gothic UI\";")
         self.refresh_add(self.current_user[-1],self.current_password[-1])
 
 
@@ -1044,6 +1106,8 @@ class Main_app(QMainWindow):
         self.wrap_with_shadow(self.ui.Add_button,70)
         self.wrap_with_shadow(self.ui.Cancel_button,70)
         self.unwrap_shadow(self.ui.tableWidget_grades)
+
+        self.unwrap_shadow(self.ui.tableWidget_subjects)
 
 
 
@@ -1113,9 +1177,11 @@ class Main_app(QMainWindow):
         self.unwrap_shadow(self.ui.Add_button)
         self.unwrap_shadow(self.ui.Cancel_button)
         self.unwrap_shadow(self.ui.Edit_button)
-        self.unwrap_shadow(self.ui.tableWidget_grades)
+
         self.unwrap_shadow(self.ui.add_button_subject)
         self.unwrap_shadow(self.ui.cancel_button_subject)
+        self.unwrap_shadow(self.ui.tableWidget_grades)
+        self.unwrap_shadow(self.ui.tableWidget_subjects)
         self.ui.Add_top_btn.hide()
         self.ui.View_top_btn.hide()
         for i in self.widgets_student_add:
@@ -1341,11 +1407,13 @@ class Main_app(QMainWindow):
         self.unwrap_shadow(self.ui.frame_4)
         self.unwrap_shadow(self.ui.frame_3)
         self.unwrap_shadow(self.ui.tableWidget_class)
+
         self.unwrap_shadow(self.ui.cancel_button_class)
         self.unwrap_shadow(self.ui.add_button_class)
         self.unwrap_shadow(self.ui.Add_button)
         self.unwrap_shadow(self.ui.Cancel_button)
         self.unwrap_shadow(self.ui.tableWidget_grades)
+        self.unwrap_shadow(self.ui.tableWidget_subjects)
 
         self.wrap_with_shadow(self.ui.Edit_button, 70)
 
@@ -1398,6 +1466,15 @@ class Main_app(QMainWindow):
             i.clear()
         for i in self.widgets_grades:
             i.hide()
+
+        self.ui.Subject_top_btn.setStyleSheet(u"QPushButton {font: 700 9pt \"Yu Gothic UI\";\n"
+                                              "color :rgb(24, 182, 255);\n"
+                                              "border: none;\n"
+                                              "border-bottom: 2px solid rgb(24, 182, 255)\n"
+                                              "}\n"
+                                              "")
+        self.ui.grades_top_btn.setStyleSheet(u"color: rgb(101, 119, 152);\n"
+                                             "font: 700 9pt \"Yu Gothic UI\";")
 
 
 
@@ -1503,6 +1580,11 @@ class Main_app(QMainWindow):
             i.clear()
         for i in self.widgets_grades:
             i.show()
+
+        self.ui.Cancel_button4.hide()
+        self.ui.Save_button3.hide()
+
+        self.wrap_with_shadow(self.ui.Edit_button3, 70)
         self.ui.tableWidget_grades.hide()
         self.ui.class3.hide()
         self.ui.ClassComboBox3.hide()
@@ -1539,14 +1621,22 @@ class Main_app(QMainWindow):
         self.ui.requirederrfirst_3.hide()
         self.ui.errclasse.hide()
         self.ui.requirederrclass.hide()
+        self.ui.errlbl3.hide()
         self.ui.requirederrmax.hide()
         self.ui.Add_top_btn.hide()
         self.ui.View_top_btn.hide()
         self.ui.requirederrsubject.hide()
         self.ui.requirederrcoeff.hide()
         self.refresh_subject(self.current_user[-1])
+        self.ui.tableWidget_subjects.setFocusPolicy(Qt.NoFocus)
+        self.ui.tableWidget_subjects.setSelectionMode(QAbstractItemView.NoSelection)
+        self.ui.tableWidget_subjects.setEditTriggers(QTableWidget.NoEditTriggers)
+        self.ui.subjectline.clear()
+        self.ui.coeffline.clear()
 
     def Subjects(self):
+        self.ui.Edit_button3.show()
+        self.wrap_with_shadow(self.ui.Edit_button3, 70)
         self.ui.tableWidget_subjects.show()
         self.ui.tableWidget_grades.hide()
         self.ui.add_button_subject.show()
@@ -1569,8 +1659,16 @@ class Main_app(QMainWindow):
                                            "")
         self.ui.grades_top_btn.setStyleSheet(u"color: rgb(101, 119, 152);\n"
                                           "font: 700 9pt \"Yu Gothic UI\";")
+        self.ui.subjectline.clear()
+        self.ui.coeffline.clear()
+        self.refresh_subject(self.current_user[-1])
+
+        self.ui.tableWidget_subjects.setFocusPolicy(Qt.NoFocus)
+        self.ui.tableWidget_subjects.setSelectionMode(QAbstractItemView.NoSelection)
+        self.ui.tableWidget_subjects.setEditTriggers(QTableWidget.NoEditTriggers)
 
     def Grades_top(self):
+         self.ui.errlbl3.hide()
          self.reset_line2(self.ui.subjectline)
          self.reset_line2(self.ui.coeffline)
          self.ui.tableWidget_subjects.hide()
@@ -1589,7 +1687,11 @@ class Main_app(QMainWindow):
          self.ui.coeffline.hide()
          self.ui.subject_name.hide()
          self.ui.coeff.hide()
+         self.ui.Cancel_button4.hide()
+         self.ui.Save_button3.hide()
+         self.ui.Edit_button3.hide()
          self.wrap_with_shadow(self.ui.tableWidget_grades,70)
+         self.unwrap_shadow(self.ui.Edit_button3)
          self.unwrap_shadow(self.ui.tableWidget_subjects)
          self.ui.grades_top_btn.setStyleSheet(u"QPushButton {font: 700 9pt \"Yu Gothic UI\";\n"
                                        "color :rgb(24, 182, 255);\n"
@@ -1599,7 +1701,7 @@ class Main_app(QMainWindow):
                                        "")
          self.ui.Subject_top_btn.setStyleSheet(u"color: rgb(101, 119, 152);\n"
                                       "font: 700 9pt \"Yu Gothic UI\";")
-         self.refresh_grades(self.current_user[-1])
+         self.refresh_grades(self.current_user[-1],self.current_password[-1])
 
     def add_subject(self):
         data = load()
@@ -1641,6 +1743,77 @@ class Main_app(QMainWindow):
         self.ui.requirederrcoeff.hide()
         self.ui.requirederrsubject.hide()
 
+    def Edit_btn3(self):
+
+        self.ui.Edit_button3.hide()
+        self.unwrap_shadow(self.ui.Edit_button3)
+        self.wrap_with_shadow(self.ui.Save_button3,70)
+        self.wrap_with_shadow(self.ui.Cancel_button4, 70)
+        self.ui.Save_button3.show()
+        self.ui.Cancel_button4.show()
+
+        self.ui.tableWidget_subjects.setEditTriggers(QTableWidget.AllEditTriggers)
+        self.ui.tableWidget_subjects.setSelectionMode(QAbstractItemView.SingleSelection)
+
+        for i in range(self.ui.tableWidget_subjects.rowCount()):
+            item = self.ui.tableWidget_subjects.item(i,1)
+            if item:
+                item.setBackground(QColor("#FFF9C4"))
+
+        for i in range(1):
+            self.ui.tableWidget_subjects.setItemDelegateForColumn(i,self.delegue)
+
+    def Canceled3(self):
+        self.ui.Edit_button3.show()
+        self.wrap_with_shadow(self.ui.Edit_button3, 70)
+        self.unwrap_shadow(self.ui.Save_button3)
+        self.unwrap_shadow(self.ui.Cancel_button4)
+        self.ui.Save_button3.hide()
+        self.ui.Cancel_button4.hide()
+        self.ui.errlbl3.hide()
+
+        self.refresh_subject(self.current_user[-1])
+        self.ui.tableWidget_subjects.setSelectionMode(QAbstractItemView.NoSelection)
+        self.ui.tableWidget_subjects.setEditTriggers(QTableWidget.NoEditTriggers)
+
+    def Save_btn_3(self):
+        data = load()
+        err = False
+        new_data = {"Subjects":{}}
+        for i in range(self.ui.tableWidget_subjects.rowCount()):
+            subject = self.ui.tableWidget_subjects.item(i,0).text()
+            coeff = self.ui.tableWidget_subjects.item(i,1).text()
+            if coeff == "" or not coeff.isdigit():
+                err = True
+                item = self.ui.tableWidget_subjects.item(i, 1)
+                if item:
+                    item.setBackground(QColor("#F8D7DA"))
+            else:
+                item = self.ui.tableWidget_subjects.item(i, 1)
+                if item:
+                    item.setBackground(QColor("#FFF9C4"))
+
+            new_data["Subjects"][subject] = {"subject": subject, "coeff": coeff}
+
+        if err:
+            self.ui.errlbl3.show()
+            return
+
+        self.ui.errlbl3.hide()
+        data[self.current_user[-1]].update(new_data)
+        save(data)
+        self.ui.Edit_button3.show()
+        self.wrap_with_shadow(self.ui.Edit_button3, 70)
+        self.unwrap_shadow(self.ui.Save_button3)
+        self.unwrap_shadow(self.ui.Cancel_button4)
+        self.ui.Save_button3.hide()
+        self.ui.Cancel_button4.hide()
+        self.refresh_subject(self.current_user[-1])
+        self.ui.tableWidget_subjects.setSelectionMode(QAbstractItemView.NoSelection)
+        self.ui.tableWidget_subjects.setEditTriggers(QTableWidget.NoEditTriggers)
+
+
+
 
 
 
@@ -1651,4 +1824,3 @@ if __name__ == "__main__":
     window = Main_app()
     window.show()
     sys.exit(app.exec())
-

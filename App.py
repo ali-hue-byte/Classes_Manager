@@ -1086,6 +1086,38 @@ class Ui_Dialog(object):
                                           "}\n"
                                           "\n"
                                           "QPushButton:hover {background-color: rgb(156,163,175)}")
+        self.Save_button4 = QPushButton(self.page)
+        self.Save_button4.setObjectName(u"Edit_button")
+        self.Save_button4.setGeometry(QRect(760, 500, 91, 31))
+        self.Save_button4.setStyleSheet(u"QPushButton{background-color: rgb(37, 99, 235);\n"
+                                       "color : rgb(255,255,255);\n"
+                                       "font: 700 11pt \"Microsoft PhagsPa\";\n"
+                                       "border-radius: 15px}\n"
+                                       "\n"
+                                       "QPushButton:hover {background-color:  rgb(25, 86, 179);\n"
+                                       "color: rgb(255,255,255)\n"
+                                       "}")
+        self.Edit_button4 = QPushButton(self.page)
+        self.Edit_button4.setObjectName(u"Edit_button")
+        self.Edit_button4.setGeometry(QRect(810, 500, 91, 31))
+        self.Edit_button4.setStyleSheet(u"QPushButton{background-color: rgb(37, 99, 235);\n"
+                                       "color : rgb(255,255,255);\n"
+                                       "font: 700 11pt \"Microsoft PhagsPa\";\n"
+                                       "border-radius: 15px}\n"
+                                       "\n"
+                                       "QPushButton:hover {background-color:  rgb(25, 86, 179);\n"
+                                       "color: rgb(255,255,255)\n"
+                                       "}")
+        self.Cancel_button5 = QPushButton(self.page)
+        self.Cancel_button5.setObjectName(u"Cancel_button2")
+        self.Cancel_button5.setGeometry(QRect(860, 500, 91, 31))
+        self.Cancel_button5.setStyleSheet(u"QPushButton {background-color: rgb(209, 213, 219);\n"
+                                          "color: rgb(55, 65, 81);\n"
+                                          "font: 700 11pt \"Microsoft PhagsPa\";\n"
+                                          "border-radius: 15px\n"
+                                          "}\n"
+                                          "\n"
+                                          "QPushButton:hover {background-color: rgb(156,163,175)}")
 
         self.errlbl3 = QLabel(self.page)
         self.errlbl3.setObjectName(u"requirederrfirst_22")
@@ -1404,6 +1436,9 @@ class Ui_Dialog(object):
         self.Edit_button3.setText(QCoreApplication.translate("Dialog", u"Edit", None))
         self.Save_button3.setText(QCoreApplication.translate("Dialog", u"Save", None))
         self.Cancel_button4.setText(QCoreApplication.translate("Dialog", u"Cancel", None))
+        self.Edit_button4.setText(QCoreApplication.translate("Dialog", u"Edit", None))
+        self.Save_button4.setText(QCoreApplication.translate("Dialog", u"Save", None))
+        self.Cancel_button5.setText(QCoreApplication.translate("Dialog", u"Cancel", None))
         self.requirederrfirst.setText(QCoreApplication.translate("Dialog", u"This field is required", None))
         self.requirederrlast.setText(QCoreApplication.translate("Dialog", u"This field is required", None))
         ___qtablewidgetitem = self.tableWidget.horizontalHeaderItem(0)

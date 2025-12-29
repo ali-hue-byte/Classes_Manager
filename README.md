@@ -14,9 +14,10 @@ Features included in this prototype:
 - Automatic navigation to the main application window after successful login
 - Student information stored separatly for each user
 - All stored student data is protected using encryption based on a Key Derivation Function (KDF)
+- Dynamic, interconnected tables that automatically update classes, subjects, students, and grades in real time
 - **Students Information page**- View, manage and edit students details
 - **Adding classes**-View, creat and edit new Classes
-- **Grades page**-Add subjects and students grades
+- **Grades page**-Add, delete subjects and students grades 
   
 ---
 

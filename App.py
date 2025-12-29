@@ -1054,6 +1054,44 @@ class Ui_Dialog(object):
         self.requirederrcoeff.setGeometry(QRect(730, 135, 200, 16))
         self.requirederrcoeff.setStyleSheet(u"color: rgb(220, 38, 38);")
 
+        self.Save_button3 = QPushButton(self.page)
+        self.Save_button3.setObjectName(u"Edit_button")
+        self.Save_button3.setGeometry(QRect(760, 500, 91, 31))
+        self.Save_button3.setStyleSheet(u"QPushButton{background-color: rgb(37, 99, 235);\n"
+                                        "color : rgb(255,255,255);\n"
+                                        "font: 700 11pt \"Microsoft PhagsPa\";\n"
+                                        "border-radius: 15px}\n"
+                                        "\n"
+                                        "QPushButton:hover {background-color:  rgb(25, 86, 179);\n"
+                                        "color: rgb(255,255,255)\n"
+                                        "}")
+        self.Edit_button3 = QPushButton(self.page)
+        self.Edit_button3.setObjectName(u"Edit_button")
+        self.Edit_button3.setGeometry(QRect(810, 500, 91, 31))
+        self.Edit_button3.setStyleSheet(u"QPushButton{background-color: rgb(37, 99, 235);\n"
+                                        "color : rgb(255,255,255);\n"
+                                        "font: 700 11pt \"Microsoft PhagsPa\";\n"
+                                        "border-radius: 15px}\n"
+                                        "\n"
+                                        "QPushButton:hover {background-color:  rgb(25, 86, 179);\n"
+                                        "color: rgb(255,255,255)\n"
+                                        "}")
+        self.Cancel_button4 = QPushButton(self.page)
+        self.Cancel_button4.setObjectName(u"Cancel_button2")
+        self.Cancel_button4.setGeometry(QRect(860, 500, 91, 31))
+        self.Cancel_button4.setStyleSheet(u"QPushButton {background-color: rgb(209, 213, 219);\n"
+                                          "color: rgb(55, 65, 81);\n"
+                                          "font: 700 11pt \"Microsoft PhagsPa\";\n"
+                                          "border-radius: 15px\n"
+                                          "}\n"
+                                          "\n"
+                                          "QPushButton:hover {background-color: rgb(156,163,175)}")
+
+        self.errlbl3 = QLabel(self.page)
+        self.errlbl3.setObjectName(u"requirederrfirst_22")
+        self.errlbl3.setGeometry(QRect(180, 160, 270, 16))
+        self.errlbl3.setStyleSheet(u"color: rgb(220, 38, 38);")
+        self.errlbl3.hide()
 
         self.stackedWidget.addWidget(self.page)
         self.tableWidget_class.lower()
@@ -1363,6 +1401,9 @@ class Ui_Dialog(object):
         self.Edit_button2.setText(QCoreApplication.translate("Dialog", u"Edit", None))
         self.Save_button2.setText(QCoreApplication.translate("Dialog", u"Save", None))
         self.Cancel_button2.setText(QCoreApplication.translate("Dialog", u"Cancel", None))
+        self.Edit_button3.setText(QCoreApplication.translate("Dialog", u"Edit", None))
+        self.Save_button3.setText(QCoreApplication.translate("Dialog", u"Save", None))
+        self.Cancel_button4.setText(QCoreApplication.translate("Dialog", u"Cancel", None))
         self.requirederrfirst.setText(QCoreApplication.translate("Dialog", u"This field is required", None))
         self.requirederrlast.setText(QCoreApplication.translate("Dialog", u"This field is required", None))
         ___qtablewidgetitem = self.tableWidget.horizontalHeaderItem(0)
@@ -1391,6 +1432,8 @@ class Ui_Dialog(object):
         self.class3.setText(QCoreApplication.translate("Dialog", u"Class     ", None))
         self.requirederrfirst_2.setText(QCoreApplication.translate("Dialog", u"Invalid Email", None))
         self.errlbl2.setText(
+            QCoreApplication.translate("Dialog", u"Please ensure all entered information is correct", None))
+        self.errlbl3.setText(
             QCoreApplication.translate("Dialog", u"Please ensure all entered information is correct", None))
         self.errlbl.setText(QCoreApplication.translate("Dialog", u"Please ensure all entered information is correct", None))
         self.errclasse.setText(QCoreApplication.translate("Dialog", u"There are no classes yet", None))
@@ -1447,6 +1490,4 @@ class Ui_Dialog(object):
 "", None))
         self.label_2_n.setText(QCoreApplication.translate("Dialog", u"Create account", None))
     # retranslateUi
-
-
 

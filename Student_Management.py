@@ -187,7 +187,10 @@ class Main_app(QMainWindow):
             self.ui.Edit_button3,
             self.ui.Save_button3,
             self.ui.Cancel_button4,
-            self.ui.errlbl3
+            self.ui.errlbl3,
+            self.ui.Cancel_button5,
+            self.ui.Edit_button4,
+            self.ui.Save_button4,
         ]
 
         self.widgets_acc = [{"widget":self.ui.frame_n, "pos_off":QPoint(-490,50),"pos_on":QPoint(560,50)},
@@ -252,6 +255,7 @@ class Main_app(QMainWindow):
         self.ui.Edit_button3.clicked.connect(self.Edit_btn3)
         self.ui.Cancel_button4.clicked.connect(self.Canceled3)
         self.ui.Save_button3.clicked.connect(self.Save_btn_3)
+        self.ui.Edit_button4.clicked.connect(self.Edit_btn_4)
         self.ui.ClassComboBox3.currentTextChanged.connect(lambda: self.refresh_grades_C(self.current_user[-1],self.current_password[-1]))
 #------------------------------------------------------------------
 
@@ -283,6 +287,9 @@ class Main_app(QMainWindow):
 
             self.ui.tableWidget_grades.setItem(row,0, QTableWidgetItem(i))
             self.ui.tableWidget_grades.setItem(row,1, QTableWidgetItem(decrypt_data(y["firstname"],password,KDF,self.salt) + " " +decrypt_data(y["lastname"],password,KDF,self.salt)))
+            for ix,x in enumerate(data[user]["students"][i].get("grades",{}).values(), start=2):
+
+                self.ui.tableWidget_grades.setItem(row,ix, QTableWidgetItem(str(x)))
         self.wrap_with_shadow(self.ui.tableWidget_grades,70)
 
     def refresh_grades_C(self,user,password):
@@ -309,6 +316,11 @@ class Main_app(QMainWindow):
             self.ui.tableWidget_grades.setItem(row,0, QTableWidgetItem(i))
             self.ui.tableWidget_grades.setItem(row,1, QTableWidgetItem(decrypt_data(y["firstname"],password,KDF,self.salt) + " " +decrypt_data(y["lastname"],password,KDF,self.salt)))
 
+            for ix,x in enumerate(data[user]["students"][i].get("grades",{}).values(), start=2):
+
+                self.ui.tableWidget_grades.setItem(row,ix, QTableWidgetItem(str(x)))
+
+
         self.wrap_with_shadow(self.ui.tableWidget_grades, 70)
     def refresh_subject(self,user):
         self.ui.tableWidget_subjects.setRowCount(0)
@@ -319,6 +331,9 @@ class Main_app(QMainWindow):
 
             def delete_subject(de = j):
                 del data[user]["Subjects"][de]
+                for x in data[user]["students"].values():
+                    del x["grades"][de]
+
                 save(data)
                 self.refresh_subject(user)
 
@@ -1347,6 +1362,11 @@ class Main_app(QMainWindow):
         student_id = random.randint(10000000, 99999999)
         while student_id in data[self.current_user[-1]].get("students",{}):
             student_id = random.randint(10000000, 99999999)
+        subjects = {}
+        if data[self.current_user[-1]]["Subjects"] != {}:
+
+            for i in data[self.current_user[-1]]["Subjects"]:
+                 subjects[i] = 0
 
         student = {"firstname":encrypt_data(self.first_name, self.current_password[-1], KDF, self.salt),
                    "lastname":encrypt_data(self.last_name, self.current_password[-1], KDF, self.salt),
@@ -1355,8 +1375,8 @@ class Main_app(QMainWindow):
                    "class":encrypt_data(self.classe, self.current_password[-1], KDF, self.salt),
                    "email":encrypt_data(self.email, self.current_password[-1], KDF, self.salt),
                    "number":encrypt_data(self.number, self.current_password[-1], KDF, self.salt),
-                   "address":encrypt_data(self.address, self.current_password[-1], KDF, self.salt)
-                  }
+                   "address":encrypt_data(self.address, self.current_password[-1], KDF, self.salt),
+                   "grades":subjects}
 
         data[self.current_user[-1]]["students"][student_id] = student
         data[self.current_user[-1]]["Classes"][self.classe]["Total_students"] = data[self.current_user[-1]]["Classes"][self.classe].get("Total_students", 0) + 1
@@ -1580,7 +1600,9 @@ class Main_app(QMainWindow):
             i.clear()
         for i in self.widgets_grades:
             i.show()
-
+        self.ui.Cancel_button5.hide()
+        self.ui.Edit_button4.hide()
+        self.ui.Save_button4.hide()
         self.ui.Cancel_button4.hide()
         self.ui.Save_button3.hide()
 
@@ -1633,6 +1655,14 @@ class Main_app(QMainWindow):
         self.ui.tableWidget_subjects.setEditTriggers(QTableWidget.NoEditTriggers)
         self.ui.subjectline.clear()
         self.ui.coeffline.clear()
+        self.ui.Subject_top_btn.setStyleSheet(u"QPushButton {font: 700 9pt \"Yu Gothic UI\";\n"
+                                              "color :rgb(24, 182, 255);\n"
+                                              "border: none;\n"
+                                              "border-bottom: 2px solid rgb(24, 182, 255)\n"
+                                              "}\n"
+                                              "")
+        self.ui.grades_top_btn.setStyleSheet(u"color: rgb(101, 119, 152);\n"
+                                             "font: 700 9pt \"Yu Gothic UI\";")
 
     def Subjects(self):
         self.ui.Edit_button3.show()
@@ -1668,6 +1698,12 @@ class Main_app(QMainWindow):
         self.ui.tableWidget_subjects.setEditTriggers(QTableWidget.NoEditTriggers)
 
     def Grades_top(self):
+         self.wrap_with_shadow(self.ui.Edit_button4, 70)
+         self.unwrap_shadow(self.ui.Cancel_button5)
+         self.unwrap_shadow(self.ui.Save_button4)
+         self.ui.Cancel_button5.hide()
+         self.ui.Edit_button4.show()
+         self.ui.Save_button4.hide()
          self.ui.errlbl3.hide()
          self.reset_line2(self.ui.subjectline)
          self.reset_line2(self.ui.coeffline)
@@ -1725,6 +1761,10 @@ class Main_app(QMainWindow):
 
         if err:
             return
+
+        for_students = {subject:0}
+        for i in data[self.current_user[-1]]["students"].values() :
+            i.get("grades",{}).update(for_students)
 
         new_subject = {"subject":subject, "coeff":coeff}
         data[self.current_user[-1]]["Subjects"][subject] = new_subject
@@ -1811,6 +1851,26 @@ class Main_app(QMainWindow):
         self.refresh_subject(self.current_user[-1])
         self.ui.tableWidget_subjects.setSelectionMode(QAbstractItemView.NoSelection)
         self.ui.tableWidget_subjects.setEditTriggers(QTableWidget.NoEditTriggers)
+
+    def Edit_btn_4(self):
+        self.ui.Edit_button4.hide()
+        self.unwrap_shadow(self.ui.Edit_button4)
+        self.wrap_with_shadow(self.ui.Save_button4, 70)
+        self.wrap_with_shadow(self.ui.Cancel_button5, 70)
+        self.ui.Save_button4.show()
+        self.ui.Cancel_button5.show()
+
+        self.ui.tableWidget_grades.setEditTriggers(QTableWidget.AllEditTriggers)
+        self.ui.tableWidget_grades.setSelectionMode(QAbstractItemView.SingleSelection)
+
+        for i in range(self.ui.tableWidget_grades.rowCount()):
+            for j in range(2, self.ui.tableWidget_grades.columnCount()):
+                item = self.ui.tableWidget_grades.item(i, j)
+                if item:
+                   item.setBackground(QColor("#FFF9C4"))
+
+        for i in range(2):
+            self.ui.tableWidget_grades.setItemDelegateForColumn(i, self.delegue)
 
 
 

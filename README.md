@@ -16,6 +16,7 @@ Features included in this prototype:
 - All stored student data is protected using encryption based on a Key Derivation Function (KDF)
 - **Students Information page**- View, manage and edit students details
 - **Adding classes**-View, creat and edit new Classes
+- **Grades page**-Add subjects and students grades
   
 ---
 

@@ -17,7 +17,8 @@ Features included in this prototype:
 - Dynamic, interconnected tables that automatically update classes, subjects, students, and grades in real time
 - **Students Information page**- View, manage and edit students details
 - **Adding classes**-View, creat and edit new Classes
-- **Grades page**-Add, delete subjects and students grades 
+- **Grades page**-Add, delete subjects and students grades
+- **Attendance page**-Mark, edit, and track student attendance with clear status indicators and real-time updates
   
 ---
 

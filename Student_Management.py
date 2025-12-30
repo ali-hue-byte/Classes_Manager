@@ -1,7 +1,7 @@
 import sys
 from functools import partial
 
-from PySide6.QtGui import QIcon, QColor
+from PySide6.QtGui import QIcon, QColor, QIntValidator
 from PySide6.QtWidgets import (QApplication,
                                QMainWindow,
                                QLineEdit,
@@ -12,7 +12,8 @@ from PySide6.QtWidgets import (QApplication,
                                QPushButton, QWidget,
                                QAbstractItemView,
                                QTableWidget,
-                               QStyledItemDelegate)
+                               QStyledItemDelegate,
+                               QItemDelegate)
 from App import Ui_Dialog
 from PySide6.QtCore import QPropertyAnimation, QEasingCurve, QPoint, QDate, QRect, QSize
 from Functions import (SALT,
@@ -31,6 +32,8 @@ import random
 class ReadOnlyDelegate(QStyledItemDelegate):
     def createEditor(self, parent, option, index):
         return None
+
+
 
 class Main_app(QMainWindow):
     def __init__(self):
@@ -191,6 +194,15 @@ class Main_app(QMainWindow):
             self.ui.Cancel_button5,
             self.ui.Edit_button4,
             self.ui.Save_button4,
+
+        ]
+
+        self.widget_Attendance =[
+            self.ui.date,
+            self.ui.dateEdit2,
+            self.ui.class4,
+            self.ui.ClassComboBox4,
+            self.ui.tableWidget_att
         ]
 
         self.widgets_acc = [{"widget":self.ui.frame_n, "pos_off":QPoint(-490,50),"pos_on":QPoint(560,50)},
@@ -221,6 +233,8 @@ class Main_app(QMainWindow):
         for i in self.widgets_class:
             i.hide()
         for i in self.widgets_grades:
+            i.hide()
+        for i in self.widget_Attendance:
             i.hide()
 #----connecting buttons-----------------------------
 
@@ -257,14 +271,244 @@ class Main_app(QMainWindow):
         self.ui.Save_button3.clicked.connect(self.Save_btn_3)
         self.ui.Edit_button4.clicked.connect(self.Edit_btn_4)
         self.ui.ClassComboBox3.currentTextChanged.connect(lambda: self.refresh_grades_C(self.current_user[-1],self.current_password[-1]))
+        self.ui.Cancel_button5.clicked.connect(self.Canceled4)
+        self.ui.Save_button4.clicked.connect(self.Save_btn_4)
+        self.ui.Attendance_button.clicked.connect(self.attendance)
+        self.ui.ClassComboBox4.currentTextChanged.connect(lambda: self.refresh_attendance_C(self.current_user[-1],self.current_password[-1]))
+        self.ui.dateEdit2.dateChanged.connect(lambda: self.refresh_attendance_C(self.current_user[-1], self.current_password[-1]))
 #------------------------------------------------------------------
 
 
         self.animations = []
         self.animations2 = []
 
+    def refresh_attendance(self,user,password):
+        data = load()
+        self.ui.ClassComboBox4.clear()
+        for i, x in enumerate(data[user].get("Classes", {}).values()):
+            if self.ui.ClassComboBox4.findText(x["class_Name"]) == -1:
+                self.ui.ClassComboBox4.insertItem(i, x["class_Name"])
+
+        current_class = self.ui.ClassComboBox4.currentText()
+        self.unwrap_shadow(self.ui.tableWidget_att)
+        self.ui.tableWidget_att.setRowCount(0)
+        for i,j in data[user].get("students",{}).items():
+            date = self.ui.dateEdit2.date().toString("yyyy-MM-dd")
+            def presentt(id =i):
+                data[user]["students"][id].setdefault("attendance", {}).update({date:"present"})
+                save(data)
+                self.refresh_attendance(user,password)
+            def absentt(id =i):
+                data[user]["students"][id].setdefault("attendance", {}).update({date:"absent"})
+                save(data)
+                self.refresh_attendance(user,password)
+            def excusedt(id =i):
+                data[user]["students"][id].setdefault("attendance", {}).update({date:"excused"})
+                save(data)
+                self.refresh_attendance(user,password)
+
+
+            if decrypt_data(j["class"], password, KDF, self.salt) != current_class:
+                continue
+            row = self.ui.tableWidget_att.rowCount()
+            self.ui.tableWidget_att.insertRow(row)
+            self.ui.tableWidget_att.setItem(row,0,QTableWidgetItem(i))
+            self.ui.tableWidget_att.setItem(row, 1, QTableWidgetItem(
+                decrypt_data(j["firstname"], password, KDF, self.salt) + " " + decrypt_data(j["lastname"], password,
+                                                                                            KDF, self.salt)))
+
+            frame = QFrame()
+            frame.setGeometry(QRect(0, 0, 200, 40))
+
+            iconpre = QIcon()
+            iconpre.addFile(u"icons/present.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+            iconabs = QIcon()
+            iconabs.addFile(u"icons/absent.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+            iconex = QIcon()
+            iconex.addFile(u"icons/excused.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+
+
+            absent = QPushButton(frame)
+            absent.setGeometry(QRect(130, 2, 50, 36))
+            absent.setIcon(iconabs)
+            present = QPushButton(frame)
+            present.setGeometry(QRect(10, 2, 50, 36))
+            present.setIcon(iconpre)
+            excused = QPushButton(frame)
+            excused.setGeometry(QRect(70, 2, 50, 36))
+            excused.setIcon(iconex)
+            for widget in [absent, present, excused]:
+                widget.setStyleSheet("QPushButton{background-color: rgb(255, 255, 255);\n"
+                                     "border-radius: 5px;\n"
+                                     "}\n"
+                                     "QPushButton:hover{\n"
+                                     "background-color: #F0F0F0;\n"
+                                     "}")
+            if data[user]["students"][i]["attendance"].get(date,"") == "present":
+                present.setStyleSheet("QPushButton{background-color: #E3F5EA;\n"
+                                     "border-radius: 5px;\n"
+                                     "}\n"
+                                     "QPushButton:hover{\n"
+                                     "background-color: #D6F0E0;\n"
+                                     "}")
+            else :
+                present.setStyleSheet("QPushButton{background-color: rgb(255, 255, 255);\n"
+                                     "border-radius: 5px;\n"
+                                     "}\n"
+                                     "QPushButton:hover{\n"
+                                     "background-color: #F0F0F0;\n"
+                                     "}")
+            if data[user]["students"][i]["attendance"].get(date,"") == "absent":
+                absent.setStyleSheet("QPushButton{background-color: #FADDDD;\n"
+                                     "border-radius: 5px;\n"
+                                     "}\n"
+                                     "QPushButton:hover{\n"
+                                     "background-color: #F6CFCF;\n"
+                                     "}")
+            else :
+                absent.setStyleSheet("QPushButton{background-color: rgb(255, 255, 255);\n"
+                                     "border-radius: 5px;\n"
+                                     "}\n"
+                                     "QPushButton:hover{\n"
+                                     "background-color: #F0F0F0;\n"
+                                     "}")
+            if data[user]["students"][i]["attendance"].get(date,"") == "excused":
+                excused.setStyleSheet("QPushButton{background-color: #FFEFBC;\n"
+                                     "border-radius: 5px;\n"
+                                     "}\n"
+                                     "QPushButton:hover{\n"
+                                     "background-color: #FFE7A3;\n"
+                                     "}")
+            else :
+                excused.setStyleSheet("QPushButton{background-color: rgb(255, 255, 255);\n"
+                                     "border-radius: 5px;\n"
+                                     "}\n"
+                                     "QPushButton:hover{\n"
+                                     "background-color: #F0F0F0;\n"
+                                     "}")
+            absent.clicked.connect(partial(absentt))
+            present.clicked.connect(partial(presentt))
+            excused.clicked.connect(partial(excusedt))
+
+            self.ui.tableWidget_att.setCellWidget(row,2,frame)
+
+        self.wrap_with_shadow(self.ui.tableWidget_att,70)
+
+    def refresh_attendance_C(self,user,password):
+        data = load()
+
+        for i, x in enumerate(data[user].get("Classes", {}).values()):
+            if self.ui.ClassComboBox4.findText(x["class_Name"]) == -1:
+                self.ui.ClassComboBox4.insertItem(i, x["class_Name"])
+
+        current_class = self.ui.ClassComboBox4.currentText()
+        self.unwrap_shadow(self.ui.tableWidget_att)
+        self.ui.tableWidget_att.setRowCount(0)
+        for i,j in data[user].get("students",{}).items():
+            date = self.ui.dateEdit2.date().toString("yyyy-MM-dd")
+            def presentt(id =i):
+                data[user]["students"][id].setdefault("attendance", {}).update({date:"present"})
+                save(data)
+                self.refresh_attendance(user,password)
+            def absentt(id =i):
+                data[user]["students"][id].setdefault("attendance", {}).update({date:"absent"})
+                save(data)
+                self.refresh_attendance(user,password)
+            def excusedt(id =i):
+                data[user]["students"][id].setdefault("attendance", {}).update({date:"excused"})
+                save(data)
+                self.refresh_attendance(user,password)
+
+
+            if decrypt_data(j["class"], password, KDF, self.salt) != current_class:
+                continue
+            row = self.ui.tableWidget_att.rowCount()
+            self.ui.tableWidget_att.insertRow(row)
+            self.ui.tableWidget_att.setItem(row,0,QTableWidgetItem(i))
+            self.ui.tableWidget_att.setItem(row, 1, QTableWidgetItem(
+                decrypt_data(j["firstname"], password, KDF, self.salt) + " " + decrypt_data(j["lastname"], password,
+                                                                                            KDF, self.salt)))
+
+            frame = QFrame()
+            frame.setGeometry(QRect(0, 0, 200, 40))
+
+            iconpre = QIcon()
+            iconpre.addFile(u"icons/present.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+            iconabs = QIcon()
+            iconabs.addFile(u"icons/absent.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+            iconex = QIcon()
+            iconex.addFile(u"icons/excused.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+
+
+            absent = QPushButton(frame)
+            absent.setGeometry(QRect(130, 2, 50, 36))
+            absent.setIcon(iconabs)
+            present = QPushButton(frame)
+            present.setGeometry(QRect(10, 2, 50, 36))
+            present.setIcon(iconpre)
+            excused = QPushButton(frame)
+            excused.setGeometry(QRect(70, 2, 50, 36))
+            excused.setIcon(iconex)
+            for widget in [absent, present, excused]:
+                widget.setStyleSheet("QPushButton{background-color: rgb(255, 255, 255);\n"
+                                     "border-radius: 5px;\n"
+                                     "}\n"
+                                     "QPushButton:hover{\n"
+                                     "background-color: #F0F0F0;\n"
+                                     "}")
+            if data[user]["students"][i]["attendance"].get(date,"") == "present":
+                present.setStyleSheet("QPushButton{background-color: #90EE90;\n"
+                                     "border-radius: 5px;\n"
+                                     "}\n"
+                                     "QPushButton:hover{\n"
+                                     "background-color: #4CBB17;\n"
+                                     "}")
+            else :
+                present.setStyleSheet("QPushButton{background-color: rgb(255, 255, 255);\n"
+                                     "border-radius: 5px;\n"
+                                     "}\n"
+                                     "QPushButton:hover{\n"
+                                     "background-color: #F0F0F0;\n"
+                                     "}")
+            if data[user]["students"][i]["attendance"].get(date,"") == "absent":
+                absent.setStyleSheet("QPushButton{background-color: #E53935;\n"
+                                     "border-radius: 5px;\n"
+                                     "}\n"
+                                     "QPushButton:hover{\n"
+                                     "background-color: #C62828;\n"
+                                     "}")
+            else :
+                absent.setStyleSheet("QPushButton{background-color: rgb(255, 255, 255);\n"
+                                     "border-radius: 5px;\n"
+                                     "}\n"
+                                     "QPushButton:hover{\n"
+                                     "background-color: #F0F0F0;\n"
+                                     "}")
+            if data[user]["students"][i]["attendance"].get(date,"") == "excused":
+                excused.setStyleSheet("QPushButton{background-color: #FFEA00;\n"
+                                     "border-radius: 5px;\n"
+                                     "}\n"
+                                     "QPushButton:hover{\n"
+                                     "background-color: #E1C16E;\n"
+                                     "}")
+            else :
+                excused.setStyleSheet("QPushButton{background-color: rgb(255, 255, 255);\n"
+                                     "border-radius: 5px;\n"
+                                     "}\n"
+                                     "QPushButton:hover{\n"
+                                     "background-color: #F0F0F0;\n"
+                                     "}")
+            absent.clicked.connect(partial(absentt))
+            present.clicked.connect(partial(presentt))
+            excused.clicked.connect(partial(excusedt))
+
+            self.ui.tableWidget_att.setCellWidget(row,2,frame)
+
+        self.wrap_with_shadow(self.ui.tableWidget_att,70)
+
 
     def refresh_grades(self,user,password):
+
         self.unwrap_shadow(self.ui.tableWidget_grades)
         data = load()
         self.ui.ClassComboBox3.clear()
@@ -274,11 +518,13 @@ class Main_app(QMainWindow):
         current_class = self.ui.ClassComboBox3.currentText()
         self.ui.tableWidget_grades.setRowCount(0)
         data = load()
-        self.ui.tableWidget_grades.setColumnCount(len(data[user]["Subjects"])+2)
+        self.ui.tableWidget_grades.setColumnCount(len(data[user]["Subjects"])+3)
         for j,i in enumerate(data[user]["Subjects"],start=2):
             self.ui.tableWidget_grades.setHorizontalHeaderItem(j, QTableWidgetItem(i))
+        self.ui.tableWidget_grades.setHorizontalHeaderItem(self.ui.tableWidget_grades.columnCount()-1, QTableWidgetItem("Average"))
 
         for i,y in data[user].get("students", {}).items():
+            grades = []
 
             if decrypt_data(y["class"], password, KDF, self.salt) != current_class:
                 continue
@@ -287,12 +533,27 @@ class Main_app(QMainWindow):
 
             self.ui.tableWidget_grades.setItem(row,0, QTableWidgetItem(i))
             self.ui.tableWidget_grades.setItem(row,1, QTableWidgetItem(decrypt_data(y["firstname"],password,KDF,self.salt) + " " +decrypt_data(y["lastname"],password,KDF,self.salt)))
-            for ix,x in enumerate(data[user]["students"][i].get("grades",{}).values(), start=2):
+            for ix,(k,x) in enumerate(data[user]["students"][i].get("grades",{}).items(), start=2):
 
                 self.ui.tableWidget_grades.setItem(row,ix, QTableWidgetItem(str(x)))
+                coeff = data[user]["Subjects"][k]["coeff"]
+                grades.append((float(x),int(coeff)))
+
+            average = []
+            total_coeff = 0
+            for mark in grades:
+                average.append(mark[0]*mark[1])
+                total_coeff += mark[1]
+            self.ui.tableWidget_grades.setItem(row,self.ui.tableWidget_grades.columnCount()-1, QTableWidgetItem(str(round(sum(average)/total_coeff,2))))
+            item = self.ui.tableWidget_grades.item(row, self.ui.tableWidget_grades.columnCount() - 1)
+            if sum(average)/total_coeff < 10 :
+                item.setBackground(QColor("#FADBD8"))
+            else:
+                item.setBackground(QColor("#D4EDDA"))
+
         self.wrap_with_shadow(self.ui.tableWidget_grades,70)
 
-    def refresh_grades_C(self,user,password):
+    def refresh_grades_C(self, user, password):
         self.unwrap_shadow(self.ui.tableWidget_grades)
         data = load()
 
@@ -302,24 +563,41 @@ class Main_app(QMainWindow):
         current_class = self.ui.ClassComboBox3.currentText()
         self.ui.tableWidget_grades.setRowCount(0)
         data = load()
-        self.ui.tableWidget_grades.setColumnCount(len(data[user]["Subjects"])+2)
-        for j,i in enumerate(data[user]["Subjects"],start=2):
+        self.ui.tableWidget_grades.setColumnCount(len(data[user]["Subjects"]) + 3)
+        for j, i in enumerate(data[user]["Subjects"], start=2):
             self.ui.tableWidget_grades.setHorizontalHeaderItem(j, QTableWidgetItem(i))
+        self.ui.tableWidget_grades.setHorizontalHeaderItem(self.ui.tableWidget_grades.columnCount() - 1,
+                                                           QTableWidgetItem("Average"))
 
-        for i,y in data[user].get("students", {}).items():
+        for i, y in data[user].get("students", {}).items():
+            grades = []
 
             if decrypt_data(y["class"], password, KDF, self.salt) != current_class:
                 continue
             row = self.ui.tableWidget_grades.rowCount()
             self.ui.tableWidget_grades.insertRow(row)
 
-            self.ui.tableWidget_grades.setItem(row,0, QTableWidgetItem(i))
-            self.ui.tableWidget_grades.setItem(row,1, QTableWidgetItem(decrypt_data(y["firstname"],password,KDF,self.salt) + " " +decrypt_data(y["lastname"],password,KDF,self.salt)))
+            self.ui.tableWidget_grades.setItem(row, 0, QTableWidgetItem(i))
+            self.ui.tableWidget_grades.setItem(row, 1, QTableWidgetItem(
+                decrypt_data(y["firstname"], password, KDF, self.salt) + " " + decrypt_data(y["lastname"], password,
+                                                                                            KDF, self.salt)))
+            for ix, (k, x) in enumerate(data[user]["students"][i].get("grades", {}).items(), start=2):
+                self.ui.tableWidget_grades.setItem(row, ix, QTableWidgetItem(str(x)))
+                coeff = data[user]["Subjects"][k]["coeff"]
+                grades.append((int(x), int(coeff)))
 
-            for ix,x in enumerate(data[user]["students"][i].get("grades",{}).values(), start=2):
-
-                self.ui.tableWidget_grades.setItem(row,ix, QTableWidgetItem(str(x)))
-
+            average = []
+            total_coeff = 0
+            for mark in grades:
+                average.append(mark[0] * mark[1])
+                total_coeff += mark[1]
+            self.ui.tableWidget_grades.setItem(row, self.ui.tableWidget_grades.columnCount() - 1,
+                                               QTableWidgetItem(str(round(sum(average) / total_coeff, 2))))
+            item = self.ui.tableWidget_grades.item(row, self.ui.tableWidget_grades.columnCount() - 1)
+            if sum(average) / total_coeff < 10:
+                item.setBackground(QColor("#FADBD8"))
+            else:
+                item.setBackground(QColor("#D4EDDA"))
 
         self.wrap_with_shadow(self.ui.tableWidget_grades, 70)
     def refresh_subject(self,user):
@@ -785,6 +1063,7 @@ class Main_app(QMainWindow):
 
 
     def creat_clicked(self):
+
         self.ui.ClassComboBox2.clear()
         self.ui.ClassComboBox.clear()
         username = str(self.ui.lineEdit_n.text())
@@ -843,10 +1122,15 @@ class Main_app(QMainWindow):
             i.clear()
             self.reset_line(i)
 
+        self.ui.label_6.setText(str(len(loaded2[self.current_user[-1]]["Subjects"])))
+        self.ui.label_4.setText(str(len(loaded2[self.current_user[-1]]["Classes"])))
+        self.ui.label_2.setText(str(len(loaded2[self.current_user[-1]]["students"])))
+
 
 
 
     def log_clicked(self):
+
         self.ui.ClassComboBox2.clear()
         self.ui.ClassComboBox.clear()
         username = str(self.ui.lineEdit_5.text())
@@ -873,6 +1157,10 @@ class Main_app(QMainWindow):
 
                 self.animate_page(self.ui.page, 1, 0)
                 self.ui.stackedWidget.setCurrentIndex(0)
+                data2 = load()
+                self.ui.label_6.setText(str(len(data2[self.current_user[-1]]["Subjects"])))
+                self.ui.label_4.setText(str(len(data2[self.current_user[-1]]["Classes"])))
+                self.ui.label_2.setText(str(len(data2[self.current_user[-1]]["students"])))
 
 
                 for i in self.lines:
@@ -1026,6 +1314,7 @@ class Main_app(QMainWindow):
         frame._shadow_wrapper = None
 
     def students_clicked(self):
+        self.ui.info.hide()
         self.ui.Add_top_btn.show()
         self.ui.View_top_btn.show()
         self.unwrap_shadow(self.ui.tableWidget)
@@ -1055,6 +1344,8 @@ class Main_app(QMainWindow):
         for i in self.widgets_to_clear:
             i.clear()
         for i in self.widgets_grades:
+            i.hide()
+        for i in self.widget_Attendance:
             i.hide()
 
         self.ui.requirederrfirst.hide()
@@ -1142,6 +1433,8 @@ class Main_app(QMainWindow):
             self.reset_line2(i)
         for i in self.widgets_grades:
             i.hide()
+        for i in self.widget_Attendance:
+            i.hide()
         self.ui.ClassComboBox.setStyleSheet(u"QComboBox { border : 1px solid grey ;\n"
                                                 "border-radius : 15px ;\n"
                                                 "padding : 6px 8px;  \n"
@@ -1180,6 +1473,11 @@ class Main_app(QMainWindow):
 
 
     def home_clicked(self):
+        data = load()
+        self.ui.label_6.setText(str(len(data[self.current_user[-1]]["Subjects"])))
+        self.ui.label_4.setText(str(len(data[self.current_user[-1]]["Classes"])))
+        self.ui.label_2.setText(str(len(data[self.current_user[-1]]["students"])))
+        self.ui.info.hide()
         self.unwrap_shadow(self.ui.tableWidget)
 
 
@@ -1211,6 +1509,8 @@ class Main_app(QMainWindow):
         for i in self.widgets_class :
             i.hide()
         for i in self.widgets_grades:
+            i.hide()
+        for i in self.widget_Attendance:
             i.hide()
         self.ui.dateEdit.setDate(QDate.currentDate())
 
@@ -1376,7 +1676,9 @@ class Main_app(QMainWindow):
                    "email":encrypt_data(self.email, self.current_password[-1], KDF, self.salt),
                    "number":encrypt_data(self.number, self.current_password[-1], KDF, self.salt),
                    "address":encrypt_data(self.address, self.current_password[-1], KDF, self.salt),
-                   "grades":subjects}
+                   "grades":subjects,
+                   "attendance":{}}
+
 
         data[self.current_user[-1]]["students"][student_id] = student
         data[self.current_user[-1]]["Classes"][self.classe]["Total_students"] = data[self.current_user[-1]]["Classes"][self.classe].get("Total_students", 0) + 1
@@ -1450,6 +1752,8 @@ class Main_app(QMainWindow):
             i.hide()
         for i in self.widgets_grades:
             i.hide()
+        for i in self.widget_Attendance:
+            i.hide()
 
         self.ui.Cancel_button2.hide()
         self.ui.Save_button.hide()
@@ -1474,6 +1778,7 @@ class Main_app(QMainWindow):
         self.refresh_view(self.current_user[-1],self.current_password[-1])
 
     def classe_clicked(self):
+        self.ui.info.hide()
         for i in self.widgets_class :
             i.show()
         for i in self.widgets_student_add:
@@ -1485,6 +1790,8 @@ class Main_app(QMainWindow):
         for i in self.widgets_to_clear:
             i.clear()
         for i in self.widgets_grades:
+            i.hide()
+        for i in self.widget_Attendance:
             i.hide()
 
         self.ui.Subject_top_btn.setStyleSheet(u"QPushButton {font: 700 9pt \"Yu Gothic UI\";\n"
@@ -1566,6 +1873,7 @@ class Main_app(QMainWindow):
                      "Total_students": 0}
 
         data[self.current_user[-1]]["Classes"][self.class_] =  new_class
+
         save(data)
         self.ui.Edit_button2.show()
         self.wrap_with_shadow(self.ui.Edit_button2, 70)
@@ -1588,6 +1896,7 @@ class Main_app(QMainWindow):
 
 
     def Grades_clicked(self):
+        self.ui.info.hide()
         for i in self.widgets_class :
             i.hide()
         for i in self.widgets_student_add:
@@ -1600,6 +1909,8 @@ class Main_app(QMainWindow):
             i.clear()
         for i in self.widgets_grades:
             i.show()
+        for i in self.widget_Attendance:
+            i.hide()
         self.ui.Cancel_button5.hide()
         self.ui.Edit_button4.hide()
         self.ui.Save_button4.hide()
@@ -1665,6 +1976,7 @@ class Main_app(QMainWindow):
                                              "font: 700 9pt \"Yu Gothic UI\";")
 
     def Subjects(self):
+        self.ui.info.hide()
         self.ui.Edit_button3.show()
         self.wrap_with_shadow(self.ui.Edit_button3, 70)
         self.ui.tableWidget_subjects.show()
@@ -1691,6 +2003,8 @@ class Main_app(QMainWindow):
                                           "font: 700 9pt \"Yu Gothic UI\";")
         self.ui.subjectline.clear()
         self.ui.coeffline.clear()
+        self.ui.Save_button4.hide()
+        self.ui.Cancel_button5.hide()
         self.refresh_subject(self.current_user[-1])
 
         self.ui.tableWidget_subjects.setFocusPolicy(Qt.NoFocus)
@@ -1698,6 +2012,7 @@ class Main_app(QMainWindow):
         self.ui.tableWidget_subjects.setEditTriggers(QTableWidget.NoEditTriggers)
 
     def Grades_top(self):
+         self.ui.info.show()
          self.wrap_with_shadow(self.ui.Edit_button4, 70)
          self.unwrap_shadow(self.ui.Cancel_button5)
          self.unwrap_shadow(self.ui.Save_button4)
@@ -1864,13 +2179,118 @@ class Main_app(QMainWindow):
         self.ui.tableWidget_grades.setSelectionMode(QAbstractItemView.SingleSelection)
 
         for i in range(self.ui.tableWidget_grades.rowCount()):
-            for j in range(2, self.ui.tableWidget_grades.columnCount()):
+            for j in range(2, self.ui.tableWidget_grades.columnCount()-1):
                 item = self.ui.tableWidget_grades.item(i, j)
                 if item:
                    item.setBackground(QColor("#FFF9C4"))
 
         for i in range(2):
             self.ui.tableWidget_grades.setItemDelegateForColumn(i, self.delegue)
+        self.ui.tableWidget_grades.setItemDelegateForColumn(self.ui.tableWidget_grades.columnCount() - 1, self.delegue)
+
+    def Canceled4(self):
+        self.ui.Edit_button4.show()
+        self.wrap_with_shadow(self.ui.Edit_button4, 70)
+        self.unwrap_shadow(self.ui.Save_button4)
+        self.unwrap_shadow(self.ui.Cancel_button5)
+        self.ui.Save_button4.hide()
+        self.ui.Cancel_button4.hide()
+        self.ui.errlbl3.hide()
+
+        self.refresh_grades(self.current_user[-1],self.current_password[-1])
+        self.ui.tableWidget_grades.setSelectionMode(QAbstractItemView.NoSelection)
+        self.ui.tableWidget_grades.setEditTriggers(QTableWidget.NoEditTriggers)
+
+    def Save_btn_4(self):
+        data = load()
+        err = False
+        entering_data = {}
+        for i in range(self.ui.tableWidget_grades.rowCount()):
+            new_grades = {}
+
+            id = self.ui.tableWidget_grades.item(i, 0).text()
+
+            for j in range(2,self.ui.tableWidget_grades.columnCount()-1):
+                grades = []
+
+                subject = self.ui.tableWidget_grades.horizontalHeaderItem(j).text()
+                marks = self.ui.tableWidget_grades.item(i,j).text().strip()
+                marks2 = marks.replace(",",".")
+
+                if marks2 =="" :
+                    err = True
+                    item = self.ui.tableWidget_grades.item(i,j)
+                    item.setBackground(QColor("#F8D7DA"))
+                else :
+                    item = self.ui.tableWidget_grades.item(i, j)
+                    item.setBackground(QColor("#FFF9C4"))
+
+                try :
+                    grades = [float(x) for x in marks2.split(" ")]
+                    item = self.ui.tableWidget_grades.item(i, j)
+                    item.setBackground(QColor("#FFF9C4"))
+                except ValueError :
+                    err = True
+                    item = self.ui.tableWidget_grades.item(i, j)
+                    item.setBackground(QColor("#F8D7DA"))
+
+                if round(sum(grades)/len(grades),2) > 20 :
+                    err = True
+                    item = self.ui.tableWidget_grades.item(i, j)
+                    item.setBackground(QColor("#F8D7DA"))
+                else :
+                    item = self.ui.tableWidget_grades.item(i, j)
+                    item.setBackground(QColor("#FFF9C4"))
+
+                new_grades[subject] = round(sum(grades)/len(grades),2)
+
+            entering_data.update({id:new_grades})
+
+
+
+        if err :
+            return
+
+        for i,j in entering_data.items():
+            data[self.current_user[-1]]["students"][i]["grades"] = j
+
+        save(data)
+        self.refresh_grades(self.current_user[-1],self.current_password[-1])
+
+        self.ui.Save_button4.hide()
+        self.unwrap_shadow(self.ui.Save_button4)
+        self.ui.Cancel_button5.hide()
+        self.unwrap_shadow(self.ui.Cancel_button5)
+        self.ui.Edit_button4.show()
+        self.wrap_with_shadow(self.ui.Edit_button4, 70)
+        self.ui.tableWidget_grades.setSelectionMode(QAbstractItemView.NoSelection)
+        self.ui.tableWidget_grades.setEditTriggers(QTableWidget.NoEditTriggers)
+
+
+    def attendance(self):
+        self.ui.info.hide()
+        for i in self.widgets_class:
+            i.hide()
+            self.unwrap_shadow(i)
+        for i in self.widgets_student_add:
+            i.hide()
+            self.unwrap_shadow(i)
+        for j in self.widgets_home:
+            j.hide()
+            self.unwrap_shadow(j)
+        for i in self.widgets_student_view:
+            i.hide()
+            self.unwrap_shadow(i)
+        for i in self.widgets_to_clear:
+            i.clear()
+            self.unwrap_shadow(i)
+        for i in self.widgets_grades:
+            i.hide()
+            self.unwrap_shadow(i)
+        for i in self.widget_Attendance:
+            i.show()
+        self.wrap_with_shadow(self.ui.tableWidget_att, 70)
+        self.refresh_attendance(self.current_user[-1],self.current_password[-1])
 
 
 

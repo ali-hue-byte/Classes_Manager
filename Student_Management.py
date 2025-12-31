@@ -13,7 +13,7 @@ from PySide6.QtWidgets import (QApplication,
                                QAbstractItemView,
                                QTableWidget,
                                QStyledItemDelegate,
-                               QItemDelegate)
+                               QItemDelegate, QVBoxLayout, QSizePolicy)
 from App import Ui_Dialog
 from PySide6.QtCore import QPropertyAnimation, QEasingCurve, QPoint, QDate, QRect, QSize
 from Functions import (SALT,
@@ -28,6 +28,9 @@ from Functions import (SALT,
 from PySide6.QtCore import Qt
 import re
 import random
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+
 
 class ReadOnlyDelegate(QStyledItemDelegate):
     def createEditor(self, parent, option, index):
@@ -220,6 +223,16 @@ class Main_app(QMainWindow):
 
         ]
 
+        self.widgets_statistics = [
+            self.ui.performane,
+            self.ui.attendancetop,
+            self.ui.other,
+            self.ui.ranking,
+            self.ui.Graph_frame_2,
+            self.ui.Graph_frame,
+
+        ]
+
         self.widgets_acc = [{"widget":self.ui.frame_n, "pos_off":QPoint(-490,50),"pos_on":QPoint(560,50)},
                        {"widget":self.ui.label_3_n, "pos_off": QPoint(-450,190),"pos_on": QPoint(600,190)},
                        {"widget":self.ui.label_4_n, "pos_off":QPoint(-450,280),"pos_on":QPoint(600,280)},
@@ -250,6 +263,8 @@ class Main_app(QMainWindow):
         for i in self.widgets_grades:
             i.hide()
         for i in self.widget_Attendance:
+            i.hide()
+        for i in self.widgets_statistics:
             i.hide()
 #----connecting buttons-----------------------------
 
@@ -298,6 +313,109 @@ class Main_app(QMainWindow):
 
         self.animations = []
         self.animations2 = []
+    def refresh_graph1(self,user,password):
+        
+        data = load()
+        classes = [x for x in data[user]["Classes"]]
+        coeffs = []
+        for c in data[user]["Subjects"]:
+            coeffs.append(int(data[user]["Subjects"][c]["coeff"]))
+        data_classes = []
+        for i,m in data[user]["Classes"].items():
+            class_average = []
+
+            for j,z in data[user]["students"].items():
+                student_average = []
+                if decrypt_data(z["class"],password,KDF,self.salt) != i :
+                    continue
+                for k,mark in z["grades"].items() :
+
+                    student_average.append(float(mark) * int(data[user]["Subjects"][k]["coeff"]))
+                class_average.append(sum(student_average) / sum(coeffs))
+            data_classes.append(sum(class_average)/len(class_average)) if len(class_average) > 0 else data_classes.append(0)
+        layout = self.ui.Graph_frame.layout()
+        if layout is None:
+            layout = QVBoxLayout(self.ui.Graph_frame)
+            self.ui.Graph_frame.setLayout(layout)
+        else:
+
+            while layout.count():
+                item = layout.takeAt(0)
+                widget = item.widget()
+                if widget:
+                    widget.setParent(None)
+                    widget.deleteLater()
+        fig, ax = plt.subplots(figsize=(5,3))
+        if classes == []:
+            ax.text(0.5, 0.5, "No data available", ha="center", va="center", fontsize=12)
+        else :
+
+            ax.set_title("Class Average Scores")
+            ax.bar(classes, data_classes)
+            ax.set_ylim(0, 20)
+            fig.tight_layout()
+            fig.subplots_adjust(bottom=0.2,left=0.15)
+            for label in ax.get_xticklabels():
+                label.set_rotation(90)
+        canvas = FigureCanvas(fig)
+        canvas.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        canvas.updateGeometry()
+        canvas.draw()
+
+
+        layout.addWidget(canvas)
+
+    def refresh_graph2(self,user,password):
+        data = load()
+        subjects = [x for x in data[user]["Subjects"].keys()]
+        average_per_subject = []
+        for subject in subjects:
+            note = []
+            for i,j in data[user]["students"].items():
+
+                for x,s in j["grades"].items() :
+                    if x != subject:
+                         continue
+                    note.append(float(s))
+            average_per_subject.append(sum(note)/len(note))
+
+        layout = self.ui.Graph_frame_2.layout()
+        if layout is None:
+            layout = QVBoxLayout(self.ui.Graph_frame_2)
+            self.ui.Graph_frame_2.setLayout(layout)
+        else:
+
+            while layout.count():
+                item = layout.takeAt(0)
+                widget = item.widget()
+                if widget:
+                    widget.setParent(None)
+                    widget.deleteLater()
+
+        fig, ax = plt.subplots(figsize=(5, 3))
+        if subjects == []:
+            ax.text(0.5, 0.5, "No data available", ha="center", va="center", fontsize=12)
+        else :
+            ax.set_title("Subject Average Scores")
+            ax.bar(subjects, average_per_subject)
+            ax.set_ylim(0, 20)
+            fig.tight_layout()
+            fig.subplots_adjust(bottom=0.2, left=0.15)
+            for label in ax.get_xticklabels():
+                label.set_rotation(90)
+
+        canvas = FigureCanvas(fig)
+        canvas.updateGeometry()
+        canvas.draw()
+        layout.addWidget(canvas)
+
+
+
+
+
+
+
+                
 
     def refresh_attendance(self,user,password):
         data = load()
@@ -842,13 +960,15 @@ class Main_app(QMainWindow):
 
 
     def Edit_btn(self):
+        self.ui.Save_button.show()
+        self.ui.Cancel_button2.show()
+        self.ui.Cancel_button2.setGeometry(QRect(860, 500, 91, 31))
+        self.ui.Save_button.setGeometry(QRect(760, 500, 91, 31))
 
         self.ui.Edit_button.hide()
         self.unwrap_shadow(self.ui.Edit_button)
         self.wrap_with_shadow(self.ui.Save_button,70)
         self.wrap_with_shadow(self.ui.Cancel_button2, 70)
-        self.ui.Save_button.show()
-        self.ui.Cancel_button2.show()
 
         self.ui.tableWidget.setEditTriggers(QTableWidget.AllEditTriggers)
         self.ui.tableWidget.setSelectionMode(QAbstractItemView.SingleSelection)
@@ -861,10 +981,13 @@ class Main_app(QMainWindow):
         for i in range(4):
             self.ui.tableWidget.setItemDelegateForColumn(i,self.delegue)
 
+
+
+
     def Save_btn_(self):
         data = load()
 
-        new_data = {"students":{}}
+        new_data = {}
         err = False
 
         for i in range(self.ui.tableWidget.rowCount()):
@@ -912,20 +1035,24 @@ class Main_app(QMainWindow):
                      "lastname":encrypt_data(fullname[1],self.current_password[-1],KDF,self.salt),
                      "gender":encrypt_data(gender,self.current_password[-1],KDF,self.salt),
                      "birth_date":encrypt_data(date,self.current_password[-1],KDF,self.salt),
-                     "class":encrypt_data(self.ui.ClassComboBox.currentText(),self.current_password[-1],KDF,self.salt),
+                     "class":encrypt_data(self.ui.ClassComboBox2.currentText(),self.current_password[-1],KDF,self.salt),
                      "email":encrypt_data(email,self.current_password[-1],KDF,self.salt),
                      "number":encrypt_data(num,self.current_password[-1],KDF,self.salt),
-                     "address":encrypt_data(adress,self.current_password[-1],KDF,self.salt)}
-            new_data["students"][ID] = added
+                     "address":encrypt_data(adress,self.current_password[-1],KDF,self.salt),
+                     "grades": data[self.current_user[-1]]["students"][ID]["grades"],
+                     "attendance": data[self.current_user[-1]]["students"][ID]["attendance"]}
+            new_data[ID] = added
         if err:
             self.ui.errlbl.show()
             return
         else:
             self.ui.errlbl.hide()
 
-        data[self.current_user[-1]].update(new_data)
+        data[self.current_user[-1]]["students"].update(new_data)
         save(data)
         self.ui.Edit_button.show()
+        self.ui.Edit_button.setGeometry(QRect(810, 500, 91, 31))
+
         self.wrap_with_shadow(self.ui.Edit_button, 70)
         self.unwrap_shadow(self.ui.Save_button)
         self.unwrap_shadow(self.ui.Cancel_button2)
@@ -938,8 +1065,11 @@ class Main_app(QMainWindow):
 
 
 
+
     def Canceled(self):
         self.ui.Edit_button.show()
+        self.ui.Edit_button.setGeometry(QRect(810, 500, 91, 31))
+
         self.wrap_with_shadow(self.ui.Edit_button, 70)
         self.unwrap_shadow(self.ui.Save_button)
         self.unwrap_shadow(self.ui.Cancel_button2)
@@ -953,13 +1083,17 @@ class Main_app(QMainWindow):
 
 
     def Edit_btn2(self):
-
+        self.ui.Save_button2.show()
+        self.ui.Cancel_button3.show()
+        self.ui.Cancel_button3.setGeometry(QRect(860, 500, 91, 31))
+        self.ui.Save_button2.setGeometry(QRect(760, 500, 91, 31))
         self.ui.Edit_button2.hide()
+
         self.unwrap_shadow(self.ui.Edit_button2)
         self.wrap_with_shadow(self.ui.Save_button2,70)
         self.wrap_with_shadow(self.ui.Cancel_button3, 70)
-        self.ui.Save_button2.show()
-        self.ui.Cancel_button3.show()
+
+
 
         self.ui.tableWidget_class.setEditTriggers(QTableWidget.AllEditTriggers)
         self.ui.tableWidget_class.setSelectionMode(QAbstractItemView.SingleSelection)
@@ -974,6 +1108,7 @@ class Main_app(QMainWindow):
 
     def Canceled2(self):
         self.ui.Edit_button2.show()
+        self.ui.Edit_button2.setGeometry(QRect(810, 500, 91, 31))
         self.wrap_with_shadow(self.ui.Edit_button2, 70)
         self.unwrap_shadow(self.ui.Save_button2)
         self.unwrap_shadow(self.ui.Cancel_button3)
@@ -1020,6 +1155,7 @@ class Main_app(QMainWindow):
         data[self.current_user[-1]].update(new_data)
         save(data)
         self.ui.Edit_button2.show()
+        self.ui.Edit_button2.setGeometry(QRect(810, 500, 91, 31))
         self.wrap_with_shadow(self.ui.Edit_button2, 70)
         self.unwrap_shadow(self.ui.Save_button2)
         self.unwrap_shadow(self.ui.Cancel_button3)
@@ -1281,6 +1417,9 @@ class Main_app(QMainWindow):
 
         anim.finished.connect(on_finished)
 
+    def animate_btn(self):
+        anim = QPropertyAnimation(self.ui.lineEdit_5, b"pos")
+
     def wrap_with_shadow(self, frame, x):
 
         wrapper = getattr(frame, "_shadow_wrapper", None)
@@ -1368,6 +1507,8 @@ class Main_app(QMainWindow):
             self.unwrap_shadow(i)
         for i in self.error_labels:
             i.hide()
+        for i in self.widgets_statistics:
+            i.hide()
 
 
         for i in [self.ui.lastnameline, self.ui.Firstnameline]:
@@ -1441,6 +1582,8 @@ class Main_app(QMainWindow):
             self.unwrap_shadow(i)
         for i in self.error_labels:
             i.hide()
+        for i in self.widgets_statistics:
+            i.hide()
         self.ui.ClassComboBox.setStyleSheet(u"QComboBox { border : 1px solid grey ;\n"
                                                 "border-radius : 15px ;\n"
                                                 "padding : 6px 8px;  \n"
@@ -1507,6 +1650,8 @@ class Main_app(QMainWindow):
             i.hide()
             self.unwrap_shadow(i)
         for i in self.error_labels:
+            i.hide()
+        for i in self.widgets_statistics:
             i.hide()
         self.ui.dateEdit.setDate(QDate.currentDate())
 
@@ -1677,7 +1822,7 @@ class Main_app(QMainWindow):
 
 
         data[self.current_user[-1]]["students"][student_id] = student
-        data[self.current_user[-1]]["Classes"][self.classe]["Total_students"] = data[self.current_user[-1]]["Classes"][self.classe].get("Total_students", 0) + 1
+        data[self.current_user[-1]]["Classes"][self.classe]["Total_students"] = int(data[self.current_user[-1]]["Classes"][self.classe].get("Total_students", 0)) + 1
         save(data)
         self.refresh_add(self.current_user[-1],self.current_password[-1])
         for i in self.widgets_to_clear:
@@ -1718,7 +1863,7 @@ class Main_app(QMainWindow):
 
 
 
-        self.wrap_with_shadow(self.ui.Edit_button, 70)
+
 
 
         for i in self.widgets_student_add:
@@ -1742,6 +1887,11 @@ class Main_app(QMainWindow):
             self.unwrap_shadow(i)
         for i in self.error_labels:
             i.hide()
+        for i in self.widgets_statistics:
+            i.hide()
+
+        self.ui.Edit_button.setGeometry(QRect(810, 500, 91, 31)) if not self.ui.Edit_button.isVisible() else self.ui.Edit_button.show()
+        self.wrap_with_shadow(self.ui.Edit_button, 70)
 
         self.ui.Cancel_button2.hide()
         self.ui.Save_button.hide()
@@ -1781,6 +1931,8 @@ class Main_app(QMainWindow):
             self.unwrap_shadow(i)
         for i in self.error_labels:
             i.hide()
+        for i in self.widgets_statistics:
+            i.hide()
 
         self.ui.Subject_top_btn.setStyleSheet(u"QPushButton {font: 700 9pt \"Yu Gothic UI\";\n"
                                               "color :rgb(24, 182, 255);\n"
@@ -1797,6 +1949,7 @@ class Main_app(QMainWindow):
         self.wrap_with_shadow(self.ui.tableWidget_class, 70)
         self.wrap_with_shadow(self.ui.add_button_class, 70)
         self.wrap_with_shadow(self.ui.cancel_button_class, 70)
+        self.ui.Edit_button2.setGeometry(QRect(810, 500, 91, 31)) if not self.ui.Edit_button2.isVisible() else self.ui.Edit_button2.show()
         self.wrap_with_shadow(self.ui.Edit_button2, 70)
 
 
@@ -1890,11 +2043,15 @@ class Main_app(QMainWindow):
             self.unwrap_shadow(i)
         for i in self.error_labels:
             i.hide()
+        for i in self.widgets_statistics:
+            i.hide()
         self.ui.Cancel_button5.hide()
         self.ui.Edit_button4.hide()
         self.ui.Save_button4.hide()
         self.ui.Cancel_button4.hide()
         self.ui.Save_button3.hide()
+
+        self.ui.Edit_button3.setGeometry(QRect(810, 500, 91, 31)) if not self.ui.Edit_button3.isVisible() else self.ui.Edit_button3.show()
 
         self.wrap_with_shadow(self.ui.Edit_button3, 70)
         self.ui.tableWidget_grades.hide()
@@ -1933,7 +2090,10 @@ class Main_app(QMainWindow):
 
     def Subjects(self):
         self.ui.info.hide()
+        self.ui.Edit_button4.hide()
+
         self.ui.Edit_button3.show()
+        self.ui.Edit_button3.setGeometry(QRect(810, 500, 91, 31)) if not self.ui.Edit_button3.isVisible() else self.ui.Edit_button3.show()
         self.wrap_with_shadow(self.ui.Edit_button3, 70)
         self.ui.tableWidget_subjects.show()
         self.ui.tableWidget_grades.hide()
@@ -1969,11 +2129,13 @@ class Main_app(QMainWindow):
 
     def Grades_top(self):
          self.ui.info.show()
+         self.ui.Edit_button4.show()
+         self.ui.Edit_button4.setGeometry(QRect(810, 500, 91, 31)) if not self.ui.Edit_button4.isVisible() else self.ui.Edit_button4.show()
          self.wrap_with_shadow(self.ui.Edit_button4, 70)
          self.unwrap_shadow(self.ui.Cancel_button5)
          self.unwrap_shadow(self.ui.Save_button4)
          self.ui.Cancel_button5.hide()
-         self.ui.Edit_button4.show()
+
          self.ui.Save_button4.hide()
          self.ui.errlbl3.hide()
          self.reset_line2(self.ui.subjectline)
@@ -2055,13 +2217,16 @@ class Main_app(QMainWindow):
         self.ui.requirederrsubject.hide()
 
     def Edit_btn3(self):
+        self.ui.Save_button3.show()
+        self.ui.Cancel_button4.show()
+        self.ui.Save_button3.setGeometry(QRect(760, 500, 91, 31))
+        self.ui.Cancel_button4.setGeometry(QRect(860, 500, 91, 31))
 
         self.ui.Edit_button3.hide()
         self.unwrap_shadow(self.ui.Edit_button3)
         self.wrap_with_shadow(self.ui.Save_button3,70)
         self.wrap_with_shadow(self.ui.Cancel_button4, 70)
-        self.ui.Save_button3.show()
-        self.ui.Cancel_button4.show()
+
 
         self.ui.tableWidget_subjects.setEditTriggers(QTableWidget.AllEditTriggers)
         self.ui.tableWidget_subjects.setSelectionMode(QAbstractItemView.SingleSelection)
@@ -2076,6 +2241,7 @@ class Main_app(QMainWindow):
 
     def Canceled3(self):
         self.ui.Edit_button3.show()
+        self.ui.Edit_button3.setGeometry(QRect(810, 500, 91, 31))
         self.wrap_with_shadow(self.ui.Edit_button3, 70)
         self.unwrap_shadow(self.ui.Save_button3)
         self.unwrap_shadow(self.ui.Cancel_button4)
@@ -2114,6 +2280,7 @@ class Main_app(QMainWindow):
         data[self.current_user[-1]].update(new_data)
         save(data)
         self.ui.Edit_button3.show()
+        self.ui.Edit_button3.setGeometry(QRect(810, 500, 91, 31))
         self.wrap_with_shadow(self.ui.Edit_button3, 70)
         self.unwrap_shadow(self.ui.Save_button3)
         self.unwrap_shadow(self.ui.Cancel_button4)
@@ -2126,10 +2293,13 @@ class Main_app(QMainWindow):
     def Edit_btn_4(self):
         self.ui.Edit_button4.hide()
         self.unwrap_shadow(self.ui.Edit_button4)
-        self.wrap_with_shadow(self.ui.Save_button4, 70)
-        self.wrap_with_shadow(self.ui.Cancel_button5, 70)
         self.ui.Save_button4.show()
         self.ui.Cancel_button5.show()
+        self.ui.Cancel_button5.setGeometry(QRect(860, 500, 91, 31))
+        self.ui.Save_button4.setGeometry(QRect(760, 500, 91, 31))
+        self.wrap_with_shadow(self.ui.Save_button4, 70)
+        self.wrap_with_shadow(self.ui.Cancel_button5, 70)
+
 
         self.ui.tableWidget_grades.setEditTriggers(QTableWidget.AllEditTriggers)
         self.ui.tableWidget_grades.setSelectionMode(QAbstractItemView.SingleSelection)
@@ -2146,6 +2316,7 @@ class Main_app(QMainWindow):
 
     def Canceled4(self):
         self.ui.Edit_button4.show()
+        self.ui.Edit_button4.setGeometry(QRect(810, 500, 91, 31))
         self.wrap_with_shadow(self.ui.Edit_button4, 70)
         self.unwrap_shadow(self.ui.Save_button4)
         self.unwrap_shadow(self.ui.Cancel_button5)
@@ -2213,17 +2384,21 @@ class Main_app(QMainWindow):
         save(data)
         self.refresh_grades(self.current_user[-1],self.current_password[-1])
 
+
         self.ui.Save_button4.hide()
         self.unwrap_shadow(self.ui.Save_button4)
         self.ui.Cancel_button5.hide()
         self.unwrap_shadow(self.ui.Cancel_button5)
         self.ui.Edit_button4.show()
+        self.ui.Edit_button4.setGeometry(QRect(810, 500, 91, 31))
         self.wrap_with_shadow(self.ui.Edit_button4, 70)
         self.ui.tableWidget_grades.setSelectionMode(QAbstractItemView.NoSelection)
         self.ui.tableWidget_grades.setEditTriggers(QTableWidget.NoEditTriggers)
 
 
     def attendance(self):
+        self.ui.Add_top_btn.hide()
+        self.ui.View_top_btn.hide()
         self.ui.info.hide()
         for i in self.widgets_class:
             i.hide()
@@ -2246,6 +2421,8 @@ class Main_app(QMainWindow):
         for i in self.widget_Attendance:
             i.show()
         for i in self.error_labels:
+            i.hide()
+        for i in self.widgets_statistics:
             i.hide()
         self.wrap_with_shadow(self.ui.tableWidget_att, 70)
         self.refresh_attendance(self.current_user[-1],self.current_password[-1])
@@ -2275,6 +2452,14 @@ class Main_app(QMainWindow):
             self.unwrap_shadow(i)
         for i in self.error_labels:
             i.hide()
+        for i in self.widgets_statistics:
+            i.show()
+        self.ui.Add_top_btn.hide()
+        self.ui.View_top_btn.hide()
+        self.refresh_graph1(self.current_user[-1],self.current_password[-1])
+        self.refresh_graph2(self.current_user[-1], self.current_password[-1])
+
+
 
 
 

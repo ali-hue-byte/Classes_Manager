@@ -204,6 +204,21 @@ class Main_app(QMainWindow):
             self.ui.ClassComboBox4,
             self.ui.tableWidget_att
         ]
+        self.error_labels = [
+            self.ui.requirederrfirst,
+            self.ui.requirederrlast,
+            self.ui.requirederrfirst_2,
+            self.ui.errlbl,
+            self.ui.errlbl2,
+            self.ui.errlbl3,
+            self.ui.errclasse,
+            self.ui.requirederrclass,
+            self.ui.requirederrmax,
+            self.ui.requirederrfirst_3,
+            self.ui.requirederrsubject,
+            self.ui.requirederrcoeff,
+
+        ]
 
         self.widgets_acc = [{"widget":self.ui.frame_n, "pos_off":QPoint(-490,50),"pos_on":QPoint(560,50)},
                        {"widget":self.ui.label_3_n, "pos_off": QPoint(-450,190),"pos_on": QPoint(600,190)},
@@ -276,6 +291,8 @@ class Main_app(QMainWindow):
         self.ui.Attendance_button.clicked.connect(self.attendance)
         self.ui.ClassComboBox4.currentTextChanged.connect(lambda: self.refresh_attendance_C(self.current_user[-1],self.current_password[-1]))
         self.ui.dateEdit2.dateChanged.connect(lambda: self.refresh_attendance_C(self.current_user[-1], self.current_password[-1]))
+        self.ui.Statistics_button.clicked.connect(self.statistics)
+
 #------------------------------------------------------------------
 
 
@@ -544,12 +561,14 @@ class Main_app(QMainWindow):
             for mark in grades:
                 average.append(mark[0]*mark[1])
                 total_coeff += mark[1]
-            self.ui.tableWidget_grades.setItem(row,self.ui.tableWidget_grades.columnCount()-1, QTableWidgetItem(str(round(sum(average)/total_coeff,2))))
+            self.ui.tableWidget_grades.setItem(row,self.ui.tableWidget_grades.columnCount()-1, QTableWidgetItem(str(round(sum(average)/total_coeff,2)))) if total_coeff != 0 else QTableWidgetItem("")
             item = self.ui.tableWidget_grades.item(row, self.ui.tableWidget_grades.columnCount() - 1)
-            if sum(average)/total_coeff < 10 :
-                item.setBackground(QColor("#FADBD8"))
+            if total_coeff != 0 and sum(average)/total_coeff < 10 :
+                if item :
+                    item.setBackground(QColor("#FADBD8"))
             else:
-                item.setBackground(QColor("#D4EDDA"))
+                if item :
+                    item.setBackground(QColor("#D4EDDA"))
 
         self.wrap_with_shadow(self.ui.tableWidget_grades,70)
 
@@ -592,12 +611,14 @@ class Main_app(QMainWindow):
                 average.append(mark[0] * mark[1])
                 total_coeff += mark[1]
             self.ui.tableWidget_grades.setItem(row, self.ui.tableWidget_grades.columnCount() - 1,
-                                               QTableWidgetItem(str(round(sum(average) / total_coeff, 2))))
+                                               QTableWidgetItem(str(round(sum(average) / total_coeff, 2)))) if total_coeff != 0 else QTableWidgetItem("")
             item = self.ui.tableWidget_grades.item(row, self.ui.tableWidget_grades.columnCount() - 1)
-            if sum(average) / total_coeff < 10:
-                item.setBackground(QColor("#FADBD8"))
+            if total_coeff != 0 and sum(average) / total_coeff < 10 :
+                if item :
+                     item.setBackground(QColor("#FADBD8"))
             else:
-                item.setBackground(QColor("#D4EDDA"))
+                if item:
+                    item.setBackground(QColor("#D4EDDA"))
 
         self.wrap_with_shadow(self.ui.tableWidget_grades, 70)
     def refresh_subject(self,user):
@@ -1317,45 +1338,38 @@ class Main_app(QMainWindow):
         self.ui.info.hide()
         self.ui.Add_top_btn.show()
         self.ui.View_top_btn.show()
-        self.unwrap_shadow(self.ui.tableWidget)
-        self.unwrap_shadow(self.ui.frame_5)
-        self.unwrap_shadow(self.ui.frame_4)
-        self.unwrap_shadow(self.ui.frame_3)
-        self.unwrap_shadow(self.ui.tableWidget_class)
-        self.unwrap_shadow(self.ui.cancel_button_class)
-        self.unwrap_shadow(self.ui.add_button_class)
-        self.unwrap_shadow(self.ui.Edit_button)
+
         self.wrap_with_shadow(self.ui.Add_button,70)
         self.wrap_with_shadow(self.ui.Cancel_button,70)
-        self.unwrap_shadow(self.ui.tableWidget_grades)
-        self.unwrap_shadow(self.ui.add_button_subject)
-        self.unwrap_shadow(self.ui.cancel_button_subject)
+
 
         self.unwrap_shadow(self.ui.tableWidget_subjects)
 
         for i in self.widgets_class :
             i.hide()
+            self.unwrap_shadow(i)
         for i in self.widgets_student_add:
             i.show()
+
         for j in self.widgets_home:
             j.hide()
+            self.unwrap_shadow(j)
         for i in self.widgets_student_view:
             i.hide()
+            self.unwrap_shadow(i)
         for i in self.widgets_to_clear:
             i.clear()
+            self.unwrap_shadow(i)
         for i in self.widgets_grades:
             i.hide()
+            self.unwrap_shadow(i)
         for i in self.widget_Attendance:
             i.hide()
+            self.unwrap_shadow(i)
+        for i in self.error_labels:
+            i.hide()
 
-        self.ui.requirederrfirst.hide()
-        self.ui.errlbl3.hide()
-        self.ui.requirederrlast.hide()
-        self.ui.requirederrfirst_2.hide()
-        self.ui.requirederrfirst_3.hide()
-        self.ui.requirederrclass.hide()
-        self.ui.requirederrmax.hide()
-        self.ui.errclasse.hide()
+
         for i in [self.ui.lastnameline, self.ui.Firstnameline]:
             self.reset_line2(i)
         self.ui.Add_top_btn.setStyleSheet(u"QPushButton {font: 700 9pt \"Yu Gothic UI\";\n"
@@ -1399,41 +1413,33 @@ class Main_app(QMainWindow):
     def Add_top_clicked(self):
         self.ui.Add_top_btn.show()
         self.ui.View_top_btn.show()
-        self.unwrap_shadow(self.ui.tableWidget)
-        self.unwrap_shadow(self.ui.frame_5)
-        self.unwrap_shadow(self.ui.frame_4)
-        self.unwrap_shadow(self.ui.frame_3)
-        self.unwrap_shadow(self.ui.tableWidget_class)
-        self.unwrap_shadow(self.ui.cancel_button_class)
-        self.unwrap_shadow(self.ui.add_button_class)
-        self.unwrap_shadow(self.ui.Add_button)
-        self.unwrap_shadow(self.ui.Cancel_button)
-        self.unwrap_shadow(self.ui.Edit_button)
+
         self.wrap_with_shadow(self.ui.Add_button,70)
         self.wrap_with_shadow(self.ui.Cancel_button,70)
-        self.unwrap_shadow(self.ui.tableWidget_grades)
-
-        self.unwrap_shadow(self.ui.tableWidget_subjects)
-
 
 
         for i in self.widgets_class :
             i.hide()
+            self.unwrap_shadow(i)
         for i in self.widgets_student_add:
             i.show()
         for j in self.widgets_home:
             j.hide()
+            self.unwrap_shadow(j)
         for i in self.widgets_student_view:
             i.hide()
-        for i in self.widgets_to_clear:
-            i.clear()
+            self.unwrap_shadow(i)
 
         for i in self.widgets_to_clear:
             i.clear()
             self.reset_line2(i)
         for i in self.widgets_grades:
             i.hide()
+            self.unwrap_shadow(i)
         for i in self.widget_Attendance:
+            i.hide()
+            self.unwrap_shadow(i)
+        for i in self.error_labels:
             i.hide()
         self.ui.ClassComboBox.setStyleSheet(u"QComboBox { border : 1px solid grey ;\n"
                                                 "border-radius : 15px ;\n"
@@ -1453,13 +1459,7 @@ class Main_app(QMainWindow):
                                                 "\n"
                                                 "")
 
-        self.ui.requirederrfirst.hide()
-        self.ui.requirederrlast.hide()
-        self.ui.requirederrfirst_2.hide()
-        self.ui.requirederrfirst_3.hide()
-        self.ui.requirederrclass.hide()
-        self.ui.requirederrmax.hide()
-        self.ui.errclasse.hide()
+
         self.ui.Add_top_btn.setStyleSheet(u"QPushButton {font: 700 9pt \"Yu Gothic UI\";\n"
                                            "color :rgb(24, 182, 255);\n"
                                            "border: none;\n"
@@ -1478,39 +1478,35 @@ class Main_app(QMainWindow):
         self.ui.label_4.setText(str(len(data[self.current_user[-1]]["Classes"])))
         self.ui.label_2.setText(str(len(data[self.current_user[-1]]["students"])))
         self.ui.info.hide()
-        self.unwrap_shadow(self.ui.tableWidget)
+
 
 
         self.wrap_with_shadow(self.ui.frame_5, 90)
         self.wrap_with_shadow(self.ui.frame_4, 90)
         self.wrap_with_shadow(self.ui.frame_3, 90)
-        self.unwrap_shadow(self.ui.tableWidget_class)
-        self.unwrap_shadow(self.ui.cancel_button_class)
-        self.unwrap_shadow(self.ui.add_button_class)
-        self.unwrap_shadow(self.ui.Add_button)
-        self.unwrap_shadow(self.ui.Cancel_button)
-        self.unwrap_shadow(self.ui.Edit_button)
 
-        self.unwrap_shadow(self.ui.add_button_subject)
-        self.unwrap_shadow(self.ui.cancel_button_subject)
-        self.unwrap_shadow(self.ui.tableWidget_grades)
-        self.unwrap_shadow(self.ui.tableWidget_subjects)
         self.ui.Add_top_btn.hide()
         self.ui.View_top_btn.hide()
         for i in self.widgets_student_add:
             i.hide()
+            self.unwrap_shadow(i)
         for j in self.widgets_home:
             j.show()
         for i in self.widgets_student_view:
             i.hide()
+            self.unwrap_shadow(i)
         for i in self.widgets_to_clear:
             i.clear()
             self.reset_line2(i)
         for i in self.widgets_class :
             i.hide()
+            self.unwrap_shadow(i)
         for i in self.widgets_grades:
             i.hide()
         for i in self.widget_Attendance:
+            i.hide()
+            self.unwrap_shadow(i)
+        for i in self.error_labels:
             i.hide()
         self.ui.dateEdit.setDate(QDate.currentDate())
 
@@ -1708,13 +1704,8 @@ class Main_app(QMainWindow):
                                                 "}\n"
                                                 "\n"
                                                 "")
-        self.ui.errclasse.hide()
-        self.ui.requirederrfirst.hide()
-        self.ui.requirederrlast.hide()
-        self.ui.requirederrfirst_2.hide()
-        self.ui.requirederrfirst_3.hide()
-        self.ui.requirederrclass.hide()
-        self.ui.requirederrmax.hide()
+        for i in self.error_labels:
+            i.hide()
 
 
     def view_top_clicked(self):
@@ -1725,48 +1716,38 @@ class Main_app(QMainWindow):
         self.ui.tableWidget.setEditTriggers(QTableWidget.NoEditTriggers)
         self.ui.tableWidget.verticalHeader().setHighlightSections(False)
 
-        self.unwrap_shadow(self.ui.frame_5)
-        self.unwrap_shadow(self.ui.frame_4)
-        self.unwrap_shadow(self.ui.frame_3)
-        self.unwrap_shadow(self.ui.tableWidget_class)
 
-        self.unwrap_shadow(self.ui.cancel_button_class)
-        self.unwrap_shadow(self.ui.add_button_class)
-        self.unwrap_shadow(self.ui.Add_button)
-        self.unwrap_shadow(self.ui.Cancel_button)
-        self.unwrap_shadow(self.ui.tableWidget_grades)
-        self.unwrap_shadow(self.ui.tableWidget_subjects)
 
         self.wrap_with_shadow(self.ui.Edit_button, 70)
 
 
         for i in self.widgets_student_add:
             i.hide()
+            self.unwrap_shadow(i)
         for j in self.widgets_home:
             j.hide()
+            self.unwrap_shadow(j)
         for i in self.widgets_student_view:
             i.show()
         for i in self.widgets_to_clear:
             i.clear()
         for i in self.widgets_class :
             i.hide()
+            self.unwrap_shadow(i)
         for i in self.widgets_grades:
             i.hide()
+            self.unwrap_shadow(i)
         for i in self.widget_Attendance:
+            i.hide()
+            self.unwrap_shadow(i)
+        for i in self.error_labels:
             i.hide()
 
         self.ui.Cancel_button2.hide()
         self.ui.Save_button.hide()
 
 
-        self.ui.requirederrfirst.hide()
-        self.ui.requirederrlast.hide()
-        self.ui.requirederrfirst_2.hide()
-        self.ui.requirederrfirst_3.hide()
-        self.ui.errclasse.hide()
-        self.ui.requirederrclass.hide()
-        self.ui.requirederrmax.hide()
-        self.ui.errlbl.hide()
+
         self.ui.View_top_btn.setStyleSheet(u"QPushButton {font: 700 9pt \"Yu Gothic UI\";\n"
                                        "color :rgb(24, 182, 255);\n"
                                        "border: none;\n"
@@ -1783,15 +1764,22 @@ class Main_app(QMainWindow):
             i.show()
         for i in self.widgets_student_add:
             i.hide()
+            self.unwrap_shadow(i)
         for j in self.widgets_home:
             j.hide()
+            self.unwrap_shadow(j)
         for i in self.widgets_student_view:
             i.hide()
+            self.unwrap_shadow(i)
         for i in self.widgets_to_clear:
             i.clear()
         for i in self.widgets_grades:
             i.hide()
+            self.unwrap_shadow(i)
         for i in self.widget_Attendance:
+            i.hide()
+            self.unwrap_shadow(i)
+        for i in self.error_labels:
             i.hide()
 
         self.ui.Subject_top_btn.setStyleSheet(u"QPushButton {font: 700 9pt \"Yu Gothic UI\";\n"
@@ -1811,29 +1799,13 @@ class Main_app(QMainWindow):
         self.wrap_with_shadow(self.ui.cancel_button_class, 70)
         self.wrap_with_shadow(self.ui.Edit_button2, 70)
 
-        self.unwrap_shadow(self.ui.tableWidget)
-        self.unwrap_shadow(self.ui.frame_5)
-        self.unwrap_shadow(self.ui.frame_4)
-        self.unwrap_shadow(self.ui.frame_3)
-        self.unwrap_shadow(self.ui.Add_button)
-        self.unwrap_shadow(self.ui.Cancel_button)
-        self.unwrap_shadow(self.ui.Edit_button)
-        self.unwrap_shadow(self.ui.Cancel_button2)
-        self.unwrap_shadow(self.ui.Save_button)
-        self.unwrap_shadow(self.ui.tableWidget_grades)
+
 
         self.ui.Save_button2.hide()
         self.ui.Cancel_button3.hide()
 
 
-        self.ui.requirederrfirst.hide()
-        self.ui.errlbl2.hide()
-        self.ui.requirederrlast.hide()
-        self.ui.requirederrfirst_2.hide()
-        self.ui.requirederrfirst_3.hide()
-        self.ui.errclasse.hide()
-        self.ui.requirederrclass.hide()
-        self.ui.requirederrmax.hide()
+
         self.ui.Add_top_btn.hide()
         self.ui.View_top_btn.hide()
         self.refresh_class(self.current_user[-1],self.current_password[-1])
@@ -1899,17 +1871,24 @@ class Main_app(QMainWindow):
         self.ui.info.hide()
         for i in self.widgets_class :
             i.hide()
+            self.unwrap_shadow(i)
         for i in self.widgets_student_add:
             i.hide()
+            self.unwrap_shadow(i)
         for j in self.widgets_home:
             j.hide()
+            self.unwrap_shadow(j)
         for i in self.widgets_student_view:
             i.hide()
+            self.unwrap_shadow(i)
         for i in self.widgets_to_clear:
             i.clear()
         for i in self.widgets_grades:
             i.show()
         for i in self.widget_Attendance:
+            i.hide()
+            self.unwrap_shadow(i)
+        for i in self.error_labels:
             i.hide()
         self.ui.Cancel_button5.hide()
         self.ui.Edit_button4.hide()
@@ -1926,40 +1905,17 @@ class Main_app(QMainWindow):
         self.wrap_with_shadow(self.ui.add_button_subject, 70)
         self.wrap_with_shadow(self.ui.cancel_button_subject, 70)
 
-        self.unwrap_shadow(self.ui.tableWidget_class)
-        self.unwrap_shadow(self.ui.add_button_class)
-        self.unwrap_shadow(self.ui.cancel_button_class)
-        self.unwrap_shadow(self.ui.Edit_button2)
 
-        self.unwrap_shadow(self.ui.tableWidget)
-        self.unwrap_shadow(self.ui.frame_5)
-        self.unwrap_shadow(self.ui.frame_4)
-        self.unwrap_shadow(self.ui.frame_3)
-        self.unwrap_shadow(self.ui.Add_button)
-        self.unwrap_shadow(self.ui.Cancel_button)
-        self.unwrap_shadow(self.ui.Edit_button)
-        self.unwrap_shadow(self.ui.Cancel_button2)
-        self.unwrap_shadow(self.ui.Save_button)
-
-        self.unwrap_shadow(self.ui.tableWidget_grades)
         self.wrap_with_shadow(self.ui.tableWidget_subjects, 70)
 
         self.ui.Save_button2.hide()
         self.ui.Cancel_button3.hide()
 
-        self.ui.requirederrfirst.hide()
-        self.ui.errlbl2.hide()
-        self.ui.requirederrlast.hide()
-        self.ui.requirederrfirst_2.hide()
-        self.ui.requirederrfirst_3.hide()
-        self.ui.errclasse.hide()
-        self.ui.requirederrclass.hide()
-        self.ui.errlbl3.hide()
-        self.ui.requirederrmax.hide()
+
+
         self.ui.Add_top_btn.hide()
         self.ui.View_top_btn.hide()
-        self.ui.requirederrsubject.hide()
-        self.ui.requirederrcoeff.hide()
+
         self.refresh_subject(self.current_user[-1])
         self.ui.tableWidget_subjects.setFocusPolicy(Qt.NoFocus)
         self.ui.tableWidget_subjects.setSelectionMode(QAbstractItemView.NoSelection)
@@ -2289,8 +2245,36 @@ class Main_app(QMainWindow):
             self.unwrap_shadow(i)
         for i in self.widget_Attendance:
             i.show()
+        for i in self.error_labels:
+            i.hide()
         self.wrap_with_shadow(self.ui.tableWidget_att, 70)
         self.refresh_attendance(self.current_user[-1],self.current_password[-1])
+
+    def statistics(self):
+        self.ui.info.hide()
+        for i in self.widgets_class:
+            i.hide()
+            self.unwrap_shadow(i)
+        for i in self.widgets_student_add:
+            i.hide()
+            self.unwrap_shadow(i)
+        for j in self.widgets_home:
+            j.hide()
+            self.unwrap_shadow(j)
+        for i in self.widgets_student_view:
+            i.hide()
+            self.unwrap_shadow(i)
+        for i in self.widgets_to_clear:
+            i.clear()
+            self.unwrap_shadow(i)
+        for i in self.widgets_grades:
+            i.hide()
+            self.unwrap_shadow(i)
+        for i in self.widget_Attendance:
+            i.hide()
+            self.unwrap_shadow(i)
+        for i in self.error_labels:
+            i.hide()
 
 
 

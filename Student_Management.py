@@ -307,6 +307,8 @@ class Main_app(QMainWindow):
         self.ui.ClassComboBox4.currentTextChanged.connect(lambda: self.refresh_attendance_C(self.current_user[-1],self.current_password[-1]))
         self.ui.dateEdit2.dateChanged.connect(lambda: self.refresh_attendance_C(self.current_user[-1], self.current_password[-1]))
         self.ui.Statistics_button.clicked.connect(self.statistics)
+        self.ui.attendancetop.clicked.connect(self.attendance_top)
+        self.ui.performane.clicked.connect(self.performance)
 
 #------------------------------------------------------------------
 
@@ -408,6 +410,23 @@ class Main_app(QMainWindow):
         canvas.updateGeometry()
         canvas.draw()
         layout.addWidget(canvas)
+
+    def refresh_graph5(self,user,password):
+        data = load()
+        top_students = []
+        students_averages = {}
+        subjects_data = {subject:int(dic["coeff"])for subject, dic in data[user]["Subjects"].items()}
+        for i,j in data[user]["students"].items():
+            average = []
+            for x,s in j["grades"].items():
+                average.append(float(s)*subjects_data[x])
+            students_averages[i] = sum(average)/sum(subjects_data.values())
+
+        for z in range(5):
+            maxi = max(students_averages, key=students_averages.get)
+            top_students.append((maxi,students_averages[maxi]))
+            del students_averages[maxi]
+
 
 
 
@@ -1391,11 +1410,13 @@ class Main_app(QMainWindow):
             self.animations2.append(anim)
             self.empty(self.lines)
 
-    def animate_page(self, pag, x, y):
+    def animate_page(self, pag, x, y, color="black",b=0,w=990,h=560):
 
         overlay = QFrame(pag)
-        overlay.setGeometry(0, 0, 990, 560)
-        overlay.setStyleSheet("background-color: black;")
+        overlay.setGeometry(0, 0, w, h)
+        overlay.setStyleSheet(f"background-color: {color};"
+                              f"border: 1px solid {color};"
+                              f"border-radius: {b}px;")
         overlay.show()
 
         effect = QGraphicsOpacityEffect(overlay)
@@ -2456,9 +2477,112 @@ class Main_app(QMainWindow):
             i.show()
         self.ui.Add_top_btn.hide()
         self.ui.View_top_btn.hide()
+        self.ui.performane.setStyleSheet(u"QPushButton {font: 700 9pt \"Yu Gothic UI\";\n"
+                                          "color :rgb(24, 182, 255);\n"
+                                          "border: none;\n"
+                                          "border-bottom: 2px solid rgb(24, 182, 255)\n"
+                                          "}\n"
+                                          "")
+        self.ui.ranking.setStyleSheet(u"color: rgb(101, 119, 152);\n"
+                                           "font: 700 9pt \"Yu Gothic UI\";")
+        self.ui.attendancetop.setStyleSheet(u"color: rgb(101, 119, 152);\n"
+                                      "font: 700 9pt \"Yu Gothic UI\";")
+        self.ui.other.setStyleSheet(u"color: rgb(101, 119, 152);\n"
+                                      "font: 700 9pt \"Yu Gothic UI\";")
         self.refresh_graph1(self.current_user[-1],self.current_password[-1])
         self.refresh_graph2(self.current_user[-1], self.current_password[-1])
+        self.animate_page(self.ui.Graph_frame, 1, 0, "white", 15,351,321)
+        self.animate_page(self.ui.Graph_frame_2, 1, 0, "white", 15,351,321)
 
+    def attendance_top(self):
+        self.ui.attendancetop.setStyleSheet(u"QPushButton {font: 700 9pt \"Yu Gothic UI\";\n"
+                                         "color :rgb(24, 182, 255);\n"
+                                         "border: none;\n"
+                                         "border-bottom: 2px solid rgb(24, 182, 255)\n"
+                                         "}\n"
+                                         "")
+        self.ui.ranking.setStyleSheet(u"color: rgb(101, 119, 152);\n"
+                                      "font: 700 9pt \"Yu Gothic UI\";")
+        self.ui.performane.setStyleSheet(u"color: rgb(101, 119, 152);\n"
+                                            "font: 700 9pt \"Yu Gothic UI\";")
+        self.ui.other.setStyleSheet(u"color: rgb(101, 119, 152);\n"
+                                    "font: 700 9pt \"Yu Gothic UI\";")
+        self.ui.info.hide()
+
+        for i in self.widgets_class:
+            i.hide()
+            self.unwrap_shadow(i)
+        for i in self.widgets_student_add:
+            i.hide()
+            self.unwrap_shadow(i)
+        for j in self.widgets_home:
+            j.hide()
+            self.unwrap_shadow(j)
+        for i in self.widgets_student_view:
+            i.hide()
+            self.unwrap_shadow(i)
+        for i in self.widgets_to_clear:
+            i.clear()
+            self.unwrap_shadow(i)
+        for i in self.widgets_grades:
+            i.hide()
+            self.unwrap_shadow(i)
+        for i in self.widget_Attendance:
+            i.hide()
+            self.unwrap_shadow(i)
+        for i in self.error_labels:
+            i.hide()
+        for i in self.widgets_statistics:
+            if i not in [self.ui.attendancetop, self.ui.ranking, self.ui.other, self.ui.performane]:
+               i.hide()
+
+
+
+    def performance(self):
+        self.ui.info.hide()
+        for i in self.widgets_class:
+            i.hide()
+            self.unwrap_shadow(i)
+        for i in self.widgets_student_add:
+            i.hide()
+            self.unwrap_shadow(i)
+        for j in self.widgets_home:
+            j.hide()
+            self.unwrap_shadow(j)
+        for i in self.widgets_student_view:
+            i.hide()
+            self.unwrap_shadow(i)
+        for i in self.widgets_to_clear:
+            i.clear()
+            self.unwrap_shadow(i)
+        for i in self.widgets_grades:
+            i.hide()
+            self.unwrap_shadow(i)
+        for i in self.widget_Attendance:
+            i.hide()
+            self.unwrap_shadow(i)
+        for i in self.error_labels:
+            i.hide()
+        for i in self.widgets_statistics:
+            i.show()
+        self.ui.Add_top_btn.hide()
+        self.ui.View_top_btn.hide()
+        self.ui.performane.setStyleSheet(u"QPushButton {font: 700 9pt \"Yu Gothic UI\";\n"
+                                         "color :rgb(24, 182, 255);\n"
+                                         "border: none;\n"
+                                         "border-bottom: 2px solid rgb(24, 182, 255)\n"
+                                         "}\n"
+                                         "")
+        self.ui.ranking.setStyleSheet(u"color: rgb(101, 119, 152);\n"
+                                      "font: 700 9pt \"Yu Gothic UI\";")
+        self.ui.attendancetop.setStyleSheet(u"color: rgb(101, 119, 152);\n"
+                                            "font: 700 9pt \"Yu Gothic UI\";")
+        self.ui.other.setStyleSheet(u"color: rgb(101, 119, 152);\n"
+                                    "font: 700 9pt \"Yu Gothic UI\";")
+        self.refresh_graph1(self.current_user[-1], self.current_password[-1])
+        self.refresh_graph2(self.current_user[-1], self.current_password[-1])
+        self.animate_page(self.ui.Graph_frame, 1, 0, "white",15,351,321)
+        self.animate_page(self.ui.Graph_frame_2, 1, 0, "white",15,351,321)
 
 
 

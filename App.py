@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+#from PyQt6.QtWidgets.QMainWindow import enterEvent
 ################################################################################
 ## Form generated from reading UI file 'App.ui'
 ##
@@ -9,8 +9,8 @@
 ################################################################################
 
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
-    QMetaObject, QObject, QPoint, QRect,
-    QSize, QTime, QUrl, Qt)
+                            QMetaObject, QObject, QPoint, QRect,
+                            QSize, QTime, QUrl, Qt, QPropertyAnimation, QEasingCurve, QTimer)
 from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
@@ -18,7 +18,86 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
 from PySide6.QtWidgets import (QApplication, QDialog, QFrame, QLabel,
                                QLineEdit, QPushButton, QSizePolicy, QStackedWidget,
                                QToolButton, QWidget, QComboBox, QDateEdit, QTableWidget, QTableWidgetItem, QHeaderView,
-                               QAbstractItemView)
+                               QAbstractItemView, QScrollArea, QGraphicsDropShadowEffect)
+
+
+class HoverButton(QPushButton):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.anim = QPropertyAnimation(self, b"geometry")
+        self.anim.setDuration(100)
+        self.anim.setEasingCurve(QEasingCurve.Type.InOutQuad)
+        self.original_rect = None
+
+
+
+    def enterEvent(self, event):
+        self.anim.stop()
+        if self.original_rect == None:
+              self.original_rect = self.geometry()
+
+        self.anim.setStartValue(self.geometry())
+        target = QRect(
+            self.original_rect.x() - 3,
+            self.original_rect.y() - 3,
+            self.original_rect.width() + 6,
+            self.original_rect.height() + 6
+        )
+        self.anim.setEndValue(target)
+        self.anim.start()
+        super().enterEvent(event)
+
+    def leaveEvent(self, event):
+        if self.original_rect:
+            self.anim.stop()
+            self.anim.setStartValue(self.geometry())
+
+
+            self.anim.setEndValue(self.original_rect)
+            self.anim.start()
+        super().leaveEvent(event)
+
+
+
+
+class HoverFrame(QFrame):
+    def __init__(self, parent=None,x=35,y=35,w=70,h=70):
+        super().__init__(parent)
+        self.anim = QPropertyAnimation(self, b"geometry")
+        self.anim.setDuration(200)
+        self.anim.setEasingCurve(QEasingCurve.Type.InOutQuad)
+        self.original_rect = None
+        self.x = x
+        self.y = y
+        self.w = w
+        self.h = h
+
+    def enterEvent(self, event):
+        self.anim.stop()
+        if self.original_rect == None:
+             self.original_rect = self.geometry()
+        self.anim.setStartValue(self.original_rect)
+        self.anim.setEndValue(QRect(self.original_rect.x() - self.x,
+                                    self.original_rect.y() - self.y,
+                                    self.original_rect.width() + self.w,
+                                     self.original_rect.height()+ self.h))
+        self.anim.start()
+        super().enterEvent(event)
+    def leaveEvent(self, event):
+        if self.original_rect:
+            self.anim.stop()
+            self.anim.setStartValue(QRect(self.original_rect.x() - self.x,
+                                    self.original_rect.y() - self.y,
+                                    self.original_rect.width() + self.w,
+                                     self.original_rect.height()+self.h))
+
+            self.anim.setEndValue(self.original_rect)
+            self.anim.start()
+        super().leaveEvent(event)
+            
+
+
+
 
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
@@ -527,7 +606,7 @@ class Ui_Dialog(object):
         self.label_24.setStyleSheet(u"\n"
                                     "font: 9pt \"Segoe UI\";\n"
                                     "color: rgb(229, 83, 61);")
-        self.Add_button = QPushButton(self.page)
+        self.Add_button = HoverButton(self.page)
         self.Add_button.setObjectName(u"Add_button")
         self.Add_button.setGeometry(QRect(760, 500, 91, 31))
         self.Add_button.setStyleSheet(u"QPushButton{background-color: rgb(37, 99, 235);\n"
@@ -538,7 +617,7 @@ class Ui_Dialog(object):
                                       "QPushButton:hover {background-color:  rgb(25, 86, 179);\n"
                                       "color: rgb(255,255,255)\n"
                                       "}")
-        self.Cancel_button = QPushButton(self.page)
+        self.Cancel_button = HoverButton(self.page)
         self.Cancel_button.setObjectName(u"Cancel_button")
         self.Cancel_button.setGeometry(QRect(860, 500, 91, 31))
         self.Cancel_button.setStyleSheet(u"QPushButton {background-color: rgb(209, 213, 219);\n"
@@ -644,9 +723,10 @@ class Ui_Dialog(object):
         self.tableWidget.setColumnWidth(5, 100)
         self.tableWidget.setColumnWidth(6, 150)
         self.tableWidget.setColumnWidth(7, 70)
-        self.Save_button = QPushButton(self.page)
+        self.Save_button = HoverButton(self.page)
         self.Save_button.setObjectName(u"Edit_button")
         self.Save_button.setGeometry(QRect(760, 500, 91, 31))
+
         self.Save_button.setStyleSheet(u"QPushButton{background-color: rgb(37, 99, 235);\n"
                                       "color : rgb(255,255,255);\n"
                                       "font: 700 11pt \"Microsoft PhagsPa\";\n"
@@ -655,9 +735,10 @@ class Ui_Dialog(object):
                                       "QPushButton:hover {background-color:  rgb(25, 86, 179);\n"
                                       "color: rgb(255,255,255)\n"
                                       "}")
-        self.Edit_button = QPushButton(self.page)
+        self.Edit_button = HoverButton(self.page)
         self.Edit_button.setObjectName(u"Edit_button")
         self.Edit_button.setGeometry(QRect(810, 500, 91, 31))
+
         self.Edit_button.setStyleSheet(u"QPushButton{background-color: rgb(37, 99, 235);\n"
                                        "color : rgb(255,255,255);\n"
                                        "font: 700 11pt \"Microsoft PhagsPa\";\n"
@@ -666,9 +747,10 @@ class Ui_Dialog(object):
                                        "QPushButton:hover {background-color:  rgb(25, 86, 179);\n"
                                        "color: rgb(255,255,255)\n"
                                        "}")
-        self.Cancel_button2 = QPushButton(self.page)
+        self.Cancel_button2 = HoverButton(self.page)
         self.Cancel_button2.setObjectName(u"Cancel_button2")
         self.Cancel_button2.setGeometry(QRect(860, 500, 91, 31))
+
         self.Cancel_button2.setStyleSheet(u"QPushButton {background-color: rgb(209, 213, 219);\n"
                                          "color: rgb(55, 65, 81);\n"
                                          "font: 700 11pt \"Microsoft PhagsPa\";\n"
@@ -848,7 +930,7 @@ class Ui_Dialog(object):
         vheader.setSectionResizeMode(QHeaderView.Fixed)
         self.tableWidget_class.verticalHeader().setHighlightSections(False)
 
-        self.Save_button2 = QPushButton(self.page)
+        self.Save_button2 = HoverButton(self.page)
         self.Save_button2.setObjectName(u"Edit_button")
         self.Save_button2.setGeometry(QRect(760, 500, 91, 31))
         self.Save_button2.setStyleSheet(u"QPushButton{background-color: rgb(37, 99, 235);\n"
@@ -859,7 +941,7 @@ class Ui_Dialog(object):
                                        "QPushButton:hover {background-color:  rgb(25, 86, 179);\n"
                                        "color: rgb(255,255,255)\n"
                                        "}")
-        self.Edit_button2 = QPushButton(self.page)
+        self.Edit_button2 = HoverButton(self.page)
         self.Edit_button2.setObjectName(u"Edit_button")
         self.Edit_button2.setGeometry(QRect(810, 500, 91, 31))
         self.Edit_button2.setStyleSheet(u"QPushButton{background-color: rgb(37, 99, 235);\n"
@@ -870,7 +952,7 @@ class Ui_Dialog(object):
                                        "QPushButton:hover {background-color:  rgb(25, 86, 179);\n"
                                        "color: rgb(255,255,255)\n"
                                        "}")
-        self.Cancel_button3 = QPushButton(self.page)
+        self.Cancel_button3 = HoverButton(self.page)
         self.Cancel_button3.setObjectName(u"Cancel_button2")
         self.Cancel_button3.setGeometry(QRect(860, 500, 91, 31))
         self.Cancel_button3.setStyleSheet(u"QPushButton {background-color: rgb(209, 213, 219);\n"
@@ -882,7 +964,7 @@ class Ui_Dialog(object):
                                           "QPushButton:hover {background-color: rgb(156,163,175)}")
 
 
-        self.add_button_class = QPushButton(self.page)
+        self.add_button_class = HoverButton(self.page)
         self.add_button_class.setObjectName(u"add_button_class")
         self.add_button_class.setGeometry(QRect(470, 160, 101, 31))
         self.add_button_class.setStyleSheet(u"QPushButton{background-color: rgb(37, 99, 235);\n"
@@ -893,7 +975,7 @@ class Ui_Dialog(object):
                                             "QPushButton:hover {background-color:  rgb(25, 86, 179);\n"
                                             "color: rgb(255,255,255)\n"
                                             "}")
-        self.cancel_button_class = QPushButton(self.page)
+        self.cancel_button_class = HoverButton(self.page)
         self.cancel_button_class.setObjectName(u"cancel_button_class")
         self.cancel_button_class.setGeometry(QRect(580, 160, 101, 31))
         self.cancel_button_class.setStyleSheet(u"QPushButton {background-color: rgb(209, 213, 219);\n"
@@ -1115,7 +1197,7 @@ class Ui_Dialog(object):
         self.tableWidget_subjects.verticalHeader().setHighlightSections(False)
         self.tableWidget_subjects.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
-        self.add_button_subject = QPushButton(self.page)
+        self.add_button_subject = HoverButton(self.page)
         self.add_button_subject.setObjectName(u"add_button_class")
         self.add_button_subject.setGeometry(QRect(470, 160, 101, 31))
         self.add_button_subject.setStyleSheet(u"QPushButton{background-color: rgb(37, 99, 235);\n"
@@ -1126,7 +1208,7 @@ class Ui_Dialog(object):
                                               "QPushButton:hover {background-color:  rgb(25, 86, 179);\n"
                                               "color: rgb(255,255,255)\n"
                                               "}")
-        self.cancel_button_subject = QPushButton(self.page)
+        self.cancel_button_subject = HoverButton(self.page)
         self.cancel_button_subject.setObjectName(u"cancel_button_class")
         self.cancel_button_subject.setGeometry(QRect(580, 160, 101, 31))
         self.cancel_button_subject.setStyleSheet(u"QPushButton {background-color: rgb(209, 213, 219);\n"
@@ -1191,7 +1273,7 @@ class Ui_Dialog(object):
         self.requirederrcoeff.setGeometry(QRect(730, 135, 200, 16))
         self.requirederrcoeff.setStyleSheet(u"color: rgb(220, 38, 38);")
 
-        self.Save_button3 = QPushButton(self.page)
+        self.Save_button3 = HoverButton(self.page)
         self.Save_button3.setObjectName(u"Edit_button")
         self.Save_button3.setGeometry(QRect(760, 500, 91, 31))
         self.Save_button3.setStyleSheet(u"QPushButton{background-color: rgb(37, 99, 235);\n"
@@ -1202,7 +1284,7 @@ class Ui_Dialog(object):
                                         "QPushButton:hover {background-color:  rgb(25, 86, 179);\n"
                                         "color: rgb(255,255,255)\n"
                                         "}")
-        self.Edit_button3 = QPushButton(self.page)
+        self.Edit_button3 = HoverButton(self.page)
         self.Edit_button3.setObjectName(u"Edit_button")
         self.Edit_button3.setGeometry(QRect(810, 500, 91, 31))
         self.Edit_button3.setStyleSheet(u"QPushButton{background-color: rgb(37, 99, 235);\n"
@@ -1213,7 +1295,7 @@ class Ui_Dialog(object):
                                         "QPushButton:hover {background-color:  rgb(25, 86, 179);\n"
                                         "color: rgb(255,255,255)\n"
                                         "}")
-        self.Cancel_button4 = QPushButton(self.page)
+        self.Cancel_button4 = HoverButton(self.page)
         self.Cancel_button4.setObjectName(u"Cancel_button2")
         self.Cancel_button4.setGeometry(QRect(860, 500, 91, 31))
         self.Cancel_button4.setStyleSheet(u"QPushButton {background-color: rgb(209, 213, 219);\n"
@@ -1234,7 +1316,7 @@ class Ui_Dialog(object):
                                        "QPushButton:hover {background-color:  rgb(25, 86, 179);\n"
                                        "color: rgb(255,255,255)\n"
                                        "}")
-        self.Edit_button4 = QPushButton(self.page)
+        self.Edit_button4 = HoverButton(self.page)
         self.Edit_button4.setObjectName(u"Edit_button")
         self.Edit_button4.setGeometry(QRect(810, 500, 91, 31))
         self.Edit_button4.setStyleSheet(u"QPushButton{background-color: rgb(37, 99, 235);\n"
@@ -1245,7 +1327,7 @@ class Ui_Dialog(object):
                                        "QPushButton:hover {background-color:  rgb(25, 86, 179);\n"
                                        "color: rgb(255,255,255)\n"
                                        "}")
-        self.Cancel_button5 = QPushButton(self.page)
+        self.Cancel_button5 = HoverButton(self.page)
         self.Cancel_button5.setObjectName(u"Cancel_button2")
         self.Cancel_button5.setGeometry(QRect(860, 500, 91, 31))
         self.Cancel_button5.setStyleSheet(u"QPushButton {background-color: rgb(209, 213, 219);\n"
@@ -1406,6 +1488,56 @@ class Ui_Dialog(object):
         self.tableWidget_att.verticalHeader().setHighlightSections(False)
         self.tableWidget_att.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
+        self.performane = QPushButton(self.frame_2)
+        self.performane.setObjectName(u"performane")
+        self.performane.setGeometry(QRect(410, 40, 81, 31))
+        self.performane.setStyleSheet(u"QPushButton {font: 700 9pt \"Yu Gothic UI\";\n"
+                                      "color :rgb(24, 182, 255);\n"
+                                      "border: none;\n"
+                                      "border-bottom: 2px solid rgb(24, 182, 255)\n"
+                                      "}\n"
+                                      "")
+        self.performane.setFlat(True)
+        self.ranking = QPushButton(self.frame_2)
+        self.ranking.setObjectName(u"ranking")
+        self.ranking.setGeometry(QRect(570, 40, 81, 31))
+        self.ranking.setStyleSheet(u"color: rgb(101, 119, 152);\n"
+                                   "font: 700 9pt \"Yu Gothic UI\";")
+        self.ranking.setFlat(True)
+        self.attendancetop = QPushButton(self.frame_2)
+        self.attendancetop.setObjectName(u"attendancetop")
+        self.attendancetop.setGeometry(QRect(490, 40, 81, 31))
+        self.attendancetop.setStyleSheet(u"color: rgb(101, 119, 152);\n"
+                                         "font: 700 9pt \"Yu Gothic UI\";")
+        self.attendancetop.setFlat(True)
+        self.other = QPushButton(self.frame_2)
+        self.other.setObjectName(u"other")
+        self.other.setGeometry(QRect(650, 40, 81, 31))
+        self.other.setStyleSheet(u"color: rgb(101, 119, 152);\n"
+                                 "font: 700 9pt \"Yu Gothic UI\";")
+        self.other.setFlat(True)
+        self.Graph_frame_2 = HoverFrame(self.page)
+        self.Graph_frame_2.setObjectName(u"scrollArea_2")
+        self.Graph_frame_2.setGeometry(QRect(590, 140, 351, 321))
+        self.Graph_frame_2.setStyleSheet(u"background-color: rgb(255, 255, 255);\n"
+                                        "border-radius: 15px;\n"
+                                       "border: 2px solid black;")
+
+
+
+        self.Graph_frame = HoverFrame(self.page)
+        self.Graph_frame.setObjectName(u"scrollArea_3")
+        self.Graph_frame.setGeometry(QRect(200, 140, 351, 321))
+        self.Graph_frame.setStyleSheet(u"background-color: rgb(255, 255, 255);\n"
+                                        "border-radius: 15px;\n"
+                                       "border: 2px solid black;")
+
+
+
+
+
+
+
         self.stackedWidget.addWidget(self.page)
         self.tableWidget_class.lower()
         self.tableWidget.lower()
@@ -1485,7 +1617,7 @@ class Ui_Dialog(object):
 "}\n"
 "")
         self.lineEdit_2_n.setEchoMode(QLineEdit.EchoMode.Password)
-        self.pushButton_n = QPushButton(self.frame_n)
+        self.pushButton_n = HoverButton(self.frame_n)
         self.pushButton_n.setObjectName(u"pushButton_n")
         self.pushButton_n.setGeometry(QRect(80, 340, 211, 51))
         self.pushButton_n.setStyleSheet(u"QPushButton {\n"
@@ -1552,7 +1684,7 @@ class Ui_Dialog(object):
 "}\n"
 "")
         self.lineEdit_6.setEchoMode(QLineEdit.EchoMode.Password)
-        self.pushButton_5 = QPushButton(self.frame_6)
+        self.pushButton_5 = HoverButton(self.frame_6)
         self.pushButton_5.setObjectName(u"pushButton_5")
         self.pushButton_5.setGeometry(QRect(80, 340, 211, 51))
         self.pushButton_5.setStyleSheet(u"QPushButton {\n"
@@ -1794,6 +1926,10 @@ class Ui_Dialog(object):
         self.label_12.setText(QCoreApplication.translate("Dialog", u"Welcome back !", None))
         self.pushButton_5.setText(QCoreApplication.translate("Dialog", u"LOG IN", None))
         self.toolButton.setText("")
+        self.performane.setText(QCoreApplication.translate("Dialog", u"Performance", None))
+        self.ranking.setText(QCoreApplication.translate("Dialog", u"Ranking", None))
+        self.attendancetop.setText(QCoreApplication.translate("Dialog", u"Attendance", None))
+        self.other.setText(QCoreApplication.translate("Dialog", u"Other", None))
         ___qtablewidgetitema = self.tableWidget_att.horizontalHeaderItem(0)
         ___qtablewidgetitema.setText(QCoreApplication.translate("Dialog", u"ID", None));
         ___qtablewidgetitem1a = self.tableWidget_att.horizontalHeaderItem(1)
@@ -1817,6 +1953,4 @@ class Ui_Dialog(object):
 "", None))
         self.label_2_n.setText(QCoreApplication.translate("Dialog", u"Create account", None))
     # retranslateUi
-
-
 

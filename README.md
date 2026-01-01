@@ -2,9 +2,7 @@
 
 
 ## Detailed Description
-This project is a work in progress.
-
-Features included in this prototype:
+This project is a modern, user-friendly Student Management System built with PySide6 and Qt Designer, designed to simplify student management for teachers and facilitate data visualization. It provides a clean, interactive interface with smooth animations and real-time updates, allowing users to easily manage students, classes, grades, attendance, and statistics. The system ensures data security with encryption while offering dynamic visualizations and intuitive navigation across all screens.
 
 - Modern UI built with PySide6 (Qt Designer)
 - Animated transitions between the login and create account screens
@@ -20,6 +18,11 @@ Features included in this prototype:
 - **Grades page**-Add, delete subjects and students grades
 - **Attendance page**-Mark, edit, and track student attendance with clear status indicators and real-time updates
 - **Statistics Page** – A page for visualizing student data such as grades and attendance using matplotlib for graphs (with animations on hover) and highlighting top-performing students
+
+#### Upcoming features
+- Graphs showing attendance trends over time
+- Visualization of gender distribution among students
+- Percentage breakdown of students per class
   
 ---
 

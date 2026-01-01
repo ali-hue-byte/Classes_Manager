@@ -23,6 +23,7 @@ This project is a modern, user-friendly Student Management System built with PyS
 - Graphs showing attendance trends over time
 - Visualization of gender distribution among students
 - Percentage breakdown of students per class
+- Information page
   
 ---
 

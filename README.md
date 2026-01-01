@@ -19,6 +19,7 @@ Features included in this prototype:
 - **Adding classes**-View, creat and edit new Classes
 - **Grades page**-Add, delete subjects and students grades
 - **Attendance page**-Mark, edit, and track student attendance with clear status indicators and real-time updates
+- **Statistics Page** – A page for visualizing student data such as grades and attendance using matplotlib for graphs and highlighting top-performing students
   
 ---
 

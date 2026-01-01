@@ -247,6 +247,11 @@ class Main_app(QMainWindow):
             self.ui.top_students
         ]
 
+        self.widgets_statistics_2 = [
+            self.ui.Graph_frame_3,
+            self.ui.Graph_frame_4
+        ]
+
 
 
         self.widgets_acc = [{"widget":self.ui.frame_n, "pos_off":QPoint(-490,50),"pos_on":QPoint(560,50)},
@@ -283,6 +288,8 @@ class Main_app(QMainWindow):
         for i in self.widgets_statistics:
             i.hide()
         for i in self.widgets_statistics3:
+            i.hide()
+        for i in self.widgets_statistics_2:
             i.hide()
 #----connecting buttons-----------------------------
 
@@ -330,7 +337,7 @@ class Main_app(QMainWindow):
         self.ui.ranking.clicked.connect(self.ranking)
         self.ui.comboBox2_2.currentTextChanged.connect(lambda: self.refresh_graph5_C(self.current_user[-1],self.current_password[-1]))
         self.ui.comboBox2_1.currentTextChanged.connect(lambda: self.refresh_graph6_C(self.current_user[-1],self.current_password[-1]))
-
+        self.ui.other.clicked.connect(self.other)
 #------------------------------------------------------------------
 
 
@@ -564,7 +571,7 @@ class Main_app(QMainWindow):
               for w,k in j["attendance"].items():
                   if k == "present":
                       present += 1
-              students_data[i] = present/len(j["attendance"]) * 100 if len(j["attendance"])!=0 else 0
+              students_data[i] = present/len(j["attendance"]) * 100 if len(j["attendance"])!=0 else 0.0
         for i in range(5):
             if students_data:
                maxi = max(students_data, key=students_data.get)
@@ -614,7 +621,7 @@ class Main_app(QMainWindow):
             for w, k in j["attendance"].items():
                 if k == "present":
                     present += 1
-            students_data[i] = present / len(j["attendance"]) * 100 if len(j["attendance"])!=0 else 0
+            students_data[i] = present / len(j["attendance"]) * 100 if len(j["attendance"])!=0 else 0.0
         for i in range(5):
             if students_data:
                 maxi = max(students_data, key=students_data.get)
@@ -1746,6 +1753,8 @@ class Main_app(QMainWindow):
             i.hide()
         for i in self.widgets_statistics3:
             i.hide()
+        for i in self.widgets_statistics_2:
+            i.hide()
 
 
         for i in [self.ui.lastnameline, self.ui.Firstnameline]:
@@ -1850,6 +1859,8 @@ class Main_app(QMainWindow):
             i.hide()
         for i in self.widgets_statistics3:
                 i.hide()
+        for i in self.widgets_statistics_2:
+            i.hide()
         self.ui.ClassComboBox.setStyleSheet(u"QComboBox { border : 1px solid grey ;\n"
                                                 "border-radius : 15px ;\n"
                                                 "padding : 6px 8px;  \n"
@@ -1947,6 +1958,8 @@ class Main_app(QMainWindow):
         for i in self.widgets_statistics:
             i.hide()
         for i in self.widgets_statistics3:
+            i.hide()
+        for i in self.widgets_statistics_2:
             i.hide()
         self.ui.dateEdit.setDate(QDate.currentDate())
 
@@ -2266,6 +2279,8 @@ class Main_app(QMainWindow):
             i.hide()
         for i in self.widgets_statistics3:
             i.hide()
+        for i in self.widgets_statistics_2:
+            i.hide()
 
         self.ui.Edit_button.setGeometry(QRect(810, 500, 91, 31)) if not self.ui.Edit_button.isVisible() else self.ui.Edit_button.show()
         self.wrap_with_shadow(self.ui.Edit_button, 70)
@@ -2311,6 +2326,8 @@ class Main_app(QMainWindow):
         for i in self.widgets_statistics:
             i.hide()
         for i in self.widgets_statistics3:
+            i.hide()
+        for i in self.widgets_statistics_2:
             i.hide()
 
         self.ui.Subject_top_btn.setStyleSheet(u"QPushButton {font: 700 9pt \"Yu Gothic UI\";\n"
@@ -2425,6 +2442,8 @@ class Main_app(QMainWindow):
         for i in self.widgets_statistics:
             i.hide()
         for i in self.widgets_statistics3:
+            i.hide()
+        for i in self.widgets_statistics_2:
             i.hide()
         self.ui.Cancel_button5.hide()
         self.ui.Edit_button4.hide()
@@ -2809,6 +2828,8 @@ class Main_app(QMainWindow):
             i.hide()
         for i in self.widgets_statistics3:
             i.hide()
+        for i in self.widgets_statistics_2:
+            i.hide()
         self.wrap_with_shadow(self.ui.tableWidget_att, 70)
         self.refresh_attendance(self.current_user[-1],self.current_password[-1])
 
@@ -2840,6 +2861,8 @@ class Main_app(QMainWindow):
         for i in self.widgets_statistics:
             i.show()
         for i in self.widgets_statistics3:
+            i.hide()
+        for i in self.widgets_statistics_2:
             i.hide()
         self.ui.Add_top_btn.hide()
         self.ui.View_top_btn.hide()
@@ -2903,6 +2926,8 @@ class Main_app(QMainWindow):
                i.hide()
         for i in self.widgets_statistics3:
             i.hide()
+        for i in self.widgets_statistics_2:
+            i.hide()
 
 
 
@@ -2935,6 +2960,8 @@ class Main_app(QMainWindow):
 
             i.show()
         for i in self.widgets_statistics3:
+            i.hide()
+        for i in self.widgets_statistics_2:
             i.hide()
         self.ui.Add_top_btn.hide()
         self.ui.View_top_btn.hide()
@@ -2985,6 +3012,8 @@ class Main_app(QMainWindow):
                 i.hide()
         for i in self.widgets_statistics3:
             i.show()
+        for i in self.widgets_statistics_2:
+            i.hide()
 
         self.ui.ranking.setStyleSheet(u"QPushButton {font: 700 9pt \"Yu Gothic UI\";\n"
                                          "color :rgb(24, 182, 255);\n"
@@ -3001,6 +3030,54 @@ class Main_app(QMainWindow):
 
         self.refresh_graph5(self.current_user[-1], self.current_password[-1])
         self.refresh_graph6(self.current_user[-1], self.current_password[-1])
+
+    def other(self):
+        self.ui.info.hide()
+        for i in self.widgets_class:
+            i.hide()
+            self.unwrap_shadow(i)
+        for i in self.widgets_student_add:
+            i.hide()
+            self.unwrap_shadow(i)
+        for j in self.widgets_home:
+            j.hide()
+            self.unwrap_shadow(j)
+        for i in self.widgets_student_view:
+            i.hide()
+            self.unwrap_shadow(i)
+        for i in self.widgets_to_clear:
+            i.clear()
+            self.unwrap_shadow(i)
+        for i in self.widgets_grades:
+            i.hide()
+            self.unwrap_shadow(i)
+        for i in self.widget_Attendance:
+            i.hide()
+            self.unwrap_shadow(i)
+        for i in self.error_labels:
+            i.hide()
+        for i in self.widgets_statistics:
+            if i not in [self.ui.attendancetop, self.ui.ranking, self.ui.other, self.ui.performane]:
+                i.hide()
+        for i in self.widgets_statistics3:
+            i.hide()
+        for i in self.widgets_statistics_2:
+            i.show()
+
+        self.ui.other.setStyleSheet(u"QPushButton {font: 700 9pt \"Yu Gothic UI\";\n"
+                                         "color :rgb(24, 182, 255);\n"
+                                         "border: none;\n"
+                                         "border-bottom: 2px solid rgb(24, 182, 255)\n"
+                                         "}\n"
+                                         "")
+        self.ui.performane.setStyleSheet(u"color: rgb(101, 119, 152);\n"
+                                      "font: 700 9pt \"Yu Gothic UI\";")
+        self.ui.attendancetop.setStyleSheet(u"color: rgb(101, 119, 152);\n"
+                                            "font: 700 9pt \"Yu Gothic UI\";")
+        self.ui.ranking.setStyleSheet(u"color: rgb(101, 119, 152);\n"
+                                    "font: 700 9pt \"Yu Gothic UI\";")
+
+
 
 
 

@@ -103,7 +103,8 @@ class Main_app(QMainWindow):
             self.ui.class2,
             self.ui.requirederrfirst_2,
             self.ui.requirederrfirst_3,
-            self.ui.errclasse
+            self.ui.errclasse,
+            self.ui.birtherr
 
         ]
 
@@ -220,6 +221,7 @@ class Main_app(QMainWindow):
             self.ui.requirederrfirst_3,
             self.ui.requirederrsubject,
             self.ui.requirederrcoeff,
+            self.ui.birtherr
 
         ]
 
@@ -230,8 +232,22 @@ class Main_app(QMainWindow):
             self.ui.ranking,
             self.ui.Graph_frame_2,
             self.ui.Graph_frame,
+            self.ui.average_class,
+            self.ui.subject_avaeges
 
         ]
+        self.widgets_statistics3= [
+            self.ui.Graph_frame_5,
+            self.ui.Graph_frame_6,
+            self.ui.comboBox2_1,
+            self.ui.comboBox2_2,
+            self.ui.class2_2,
+            self.ui.class2_1,
+            self.ui.top_students_3,
+            self.ui.top_students
+        ]
+
+
 
         self.widgets_acc = [{"widget":self.ui.frame_n, "pos_off":QPoint(-490,50),"pos_on":QPoint(560,50)},
                        {"widget":self.ui.label_3_n, "pos_off": QPoint(-450,190),"pos_on": QPoint(600,190)},
@@ -265,6 +281,8 @@ class Main_app(QMainWindow):
         for i in self.widget_Attendance:
             i.hide()
         for i in self.widgets_statistics:
+            i.hide()
+        for i in self.widgets_statistics3:
             i.hide()
 #----connecting buttons-----------------------------
 
@@ -309,6 +327,9 @@ class Main_app(QMainWindow):
         self.ui.Statistics_button.clicked.connect(self.statistics)
         self.ui.attendancetop.clicked.connect(self.attendance_top)
         self.ui.performane.clicked.connect(self.performance)
+        self.ui.ranking.clicked.connect(self.ranking)
+        self.ui.comboBox2_2.currentTextChanged.connect(lambda: self.refresh_graph5_C(self.current_user[-1],self.current_password[-1]))
+        self.ui.comboBox2_1.currentTextChanged.connect(lambda: self.refresh_graph6_C(self.current_user[-1],self.current_password[-1]))
 
 #------------------------------------------------------------------
 
@@ -348,11 +369,12 @@ class Main_app(QMainWindow):
                     widget.setParent(None)
                     widget.deleteLater()
         fig, ax = plt.subplots(figsize=(5,3))
+
         if classes == []:
             ax.text(0.5, 0.5, "No data available", ha="center", va="center", fontsize=12)
         else :
 
-            ax.set_title("Class Average Scores")
+
             ax.bar(classes, data_classes)
             ax.set_ylim(0, 20)
             fig.tight_layout()
@@ -366,6 +388,7 @@ class Main_app(QMainWindow):
 
 
         layout.addWidget(canvas)
+
 
     def refresh_graph2(self,user,password):
         data = load()
@@ -398,7 +421,7 @@ class Main_app(QMainWindow):
         if subjects == []:
             ax.text(0.5, 0.5, "No data available", ha="center", va="center", fontsize=12)
         else :
-            ax.set_title("Subject Average Scores")
+
             ax.bar(subjects, average_per_subject)
             ax.set_ylim(0, 20)
             fig.tight_layout()
@@ -412,20 +435,202 @@ class Main_app(QMainWindow):
         layout.addWidget(canvas)
 
     def refresh_graph5(self,user,password):
+        for i in [self.ui.top1_name,self.ui.top1_id,self.ui.top1_grade,
+                                       self.ui.top2_name,self.ui.top2_id,self.ui.top2_grade,
+                                       self.ui.top3_name,self.ui.top3_id,self.ui.top3_grade,
+                                       self.ui.top4_name,self.ui.top4_id,self.ui.top4_grade,
+                                       self.ui.top5_name,self.ui.top5_id,self.ui.top5_grade]:
+            i.setText("")
         data = load()
+        current_class = self.ui.comboBox2_2.currentText()
+        self.ui.comboBox2_2.clear()
+        if self.ui.comboBox2_2.findText("all") == -1:
+           self.ui.comboBox2_2.insertItem(0, "all")
+        for i, x in enumerate(data[user].get("Classes", {}).values(),start=1):
+            if self.ui.comboBox2_2.findText(x["class_Name"]) == -1:
+                self.ui.comboBox2_2.insertItem(i, x["class_Name"])
+        self.ui.comboBox2_2.setCurrentText(current_class)
+        classe = self.ui.comboBox2_2.currentText()
         top_students = []
         students_averages = {}
         subjects_data = {subject:int(dic["coeff"])for subject, dic in data[user]["Subjects"].items()}
         for i,j in data[user]["students"].items():
+            if classe != "all":
+                if decrypt_data(j["class"],password,KDF,self.salt) != classe :
+                    continue
             average = []
             for x,s in j["grades"].items():
                 average.append(float(s)*subjects_data[x])
             students_averages[i] = sum(average)/sum(subjects_data.values())
 
         for z in range(5):
-            maxi = max(students_averages, key=students_averages.get)
-            top_students.append((maxi,students_averages[maxi]))
-            del students_averages[maxi]
+            if students_averages:
+                maxi = max(students_averages, key=students_averages.get)
+                top_students.append((maxi, round(students_averages[maxi], 2)))
+                del students_averages[maxi]
+
+
+
+
+        for i, j in zip(top_students, [(self.ui.top1_name,self.ui.top1_id,self.ui.top1_grade),
+                                       (self.ui.top2_name,self.ui.top2_id,self.ui.top2_grade),
+                                       (self.ui.top3_name,self.ui.top3_id,self.ui.top3_grade),
+                                       (self.ui.top4_name,self.ui.top4_id,self.ui.top4_grade),
+                                       (self.ui.top5_name,self.ui.top5_id,self.ui.top5_grade)]):
+
+            firstname = decrypt_data(data[user]["students"][i[0]]["firstname"],password,KDF,self.salt)
+            lastname = decrypt_data(data[user]["students"][i[0]]["lastname"],password,KDF,self.salt)
+            j[0].setText(f"{firstname} {lastname}")
+            j[1].setText(i[0])
+            j[2].setText(str(i[1]))
+
+    def refresh_graph5_C(self,user,password):
+        for i in [self.ui.top1_name,self.ui.top1_id,self.ui.top1_grade,
+                                       self.ui.top2_name,self.ui.top2_id,self.ui.top2_grade,
+                                       self.ui.top3_name,self.ui.top3_id,self.ui.top3_grade,
+                                       self.ui.top4_name,self.ui.top4_id,self.ui.top4_grade,
+                                       self.ui.top5_name,self.ui.top5_id,self.ui.top5_grade]:
+            i.setText("")
+        data = load()
+        current_class = self.ui.comboBox2_2.currentText()
+
+        if self.ui.comboBox2_2.findText("all") == -1:
+            self.ui.comboBox2_2.insertItem(0, "all")
+        for i, x in enumerate(data[user].get("Classes", {}).values(),start=1):
+            if self.ui.comboBox2_2.findText(x["class_Name"]) == -1:
+                self.ui.comboBox2_2.insertItem(i, x["class_Name"])
+        self.ui.comboBox2_2.setCurrentText(current_class)
+        classe = self.ui.comboBox2_2.currentText()
+        top_students = []
+        students_averages = {}
+        subjects_data = {subject:int(dic["coeff"])for subject, dic in data[user]["Subjects"].items()}
+        for i,j in data[user]["students"].items():
+            if classe != "all":
+                if decrypt_data(j["class"],password,KDF,self.salt) != classe :
+                    continue
+            average = []
+            for x,s in j["grades"].items():
+                average.append(float(s)*subjects_data[x])
+            students_averages[i] = sum(average)/sum(subjects_data.values())
+
+        for z in range(5):
+            if students_averages:
+                maxi = max(students_averages, key=students_averages.get)
+                top_students.append((maxi, round(students_averages[maxi], 2)))
+                del students_averages[maxi]
+
+
+
+
+        for i, j in zip(top_students, [(self.ui.top1_name,self.ui.top1_id,self.ui.top1_grade),
+                                       (self.ui.top2_name,self.ui.top2_id,self.ui.top2_grade),
+                                       (self.ui.top3_name,self.ui.top3_id,self.ui.top3_grade),
+                                       (self.ui.top4_name,self.ui.top4_id,self.ui.top4_grade),
+                                       (self.ui.top5_name,self.ui.top5_id,self.ui.top5_grade)]):
+
+            firstname = decrypt_data(data[user]["students"][i[0]]["firstname"],password,KDF,self.salt)
+            lastname = decrypt_data(data[user]["students"][i[0]]["lastname"],password,KDF,self.salt)
+            j[0].setText(f"{firstname} {lastname}")
+            j[1].setText(i[0])
+            j[2].setText(str(i[1]))
+
+    def refresh_graph6_C(self,user,password):
+
+        for i in [self.ui.top1_name_2,self.ui.top1_id_2,self.ui.top1_grade_2,
+                                       self.ui.top2_name_2,self.ui.top2_id_2,self.ui.top2_grade_2,
+                                       self.ui.top3_name_2,self.ui.top3_id_2,self.ui.top3_grade_2,
+                                       self.ui.top4_name_2,self.ui.top4_id_2,self.ui.top4_grade_2,
+                                       self.ui.top5_name_2,self.ui.top5_id_2,self.ui.top5_grade_2]:
+            i.setText("")
+        data = load()
+        current_class = self.ui.comboBox2_1.currentText()
+
+        if self.ui.comboBox2_1.findText("all") == -1:
+            self.ui.comboBox2_1.insertItem(0, "all")
+        for i, x in enumerate(data[user].get("Classes", {}).values(),start=1):
+            if self.ui.comboBox2_1.findText(x["class_Name"]) == -1:
+                self.ui.comboBox2_1.insertItem(i, x["class_Name"])
+        self.ui.comboBox2_1.setCurrentText(current_class)
+        classe = self.ui.comboBox2_1.currentText()
+
+        top_students = []
+        students_data = {}
+
+        for i,j in data[user]["students"].items():
+              if classe != "all":
+                  if decrypt_data(j["class"],password,KDF,self.salt) != classe :
+                      continue
+              present = 0
+              for w,k in j["attendance"].items():
+                  if k == "present":
+                      present += 1
+              students_data[i] = present/len(j["attendance"]) * 100 if len(j["attendance"])!=0 else 0
+        for i in range(5):
+            if students_data:
+               maxi = max(students_data, key=students_data.get)
+               top_students.append((maxi, students_data[maxi]))
+               del students_data[maxi]
+
+        for i, j in zip(top_students, [(self.ui.top1_name_2,self.ui.top1_id_2,self.ui.top1_grade_2),
+                                       (self.ui.top2_name_2,self.ui.top2_id_2,self.ui.top2_grade_2),
+                                       (self.ui.top3_name_2,self.ui.top3_id_2,self.ui.top3_grade_2),
+                                       (self.ui.top4_name_2,self.ui.top4_id_2,self.ui.top4_grade_2),
+                                       (self.ui.top5_name_2,self.ui.top5_id_2,self.ui.top5_grade_2)]):
+
+            firstname = decrypt_data(data[user]["students"][i[0]]["firstname"],password,KDF,self.salt)
+            lastname = decrypt_data(data[user]["students"][i[0]]["lastname"],password,KDF,self.salt)
+            j[0].setText(f"{firstname} {lastname}")
+            j[1].setText(i[0])
+            j[2].setText(f"{i[1]}%")
+
+    def refresh_graph6(self, user, password):
+
+        for i in [self.ui.top1_name_2, self.ui.top1_id_2, self.ui.top1_grade_2,
+                  self.ui.top2_name_2, self.ui.top2_id_2, self.ui.top2_grade_2,
+                  self.ui.top3_name_2, self.ui.top3_id_2, self.ui.top3_grade_2,
+                  self.ui.top4_name_2, self.ui.top4_id_2, self.ui.top4_grade_2,
+                  self.ui.top5_name_2, self.ui.top5_id_2, self.ui.top5_grade_2]:
+            i.setText("")
+        data = load()
+        current_class = self.ui.comboBox2_1.currentText()
+        self.ui.comboBox2_1.clear()
+
+        if self.ui.comboBox2_1.findText("all") == -1:
+            self.ui.comboBox2_1.insertItem(0, "all")
+        for i, x in enumerate(data[user].get("Classes", {}).values(), start=1):
+            if self.ui.comboBox2_1.findText(x["class_Name"]) == -1:
+                self.ui.comboBox2_1.insertItem(i, x["class_Name"])
+        self.ui.comboBox2_1.setCurrentText(current_class)
+        classe = self.ui.comboBox2_1.currentText()
+
+        top_students = []
+        students_data = {}
+
+        for i, j in data[user]["students"].items():
+            if classe != "all":
+                if decrypt_data(j["class"], password, KDF, self.salt) != classe:
+                    continue
+            present = 0
+            for w, k in j["attendance"].items():
+                if k == "present":
+                    present += 1
+            students_data[i] = present / len(j["attendance"]) * 100 if len(j["attendance"])!=0 else 0
+        for i in range(5):
+            if students_data:
+                maxi = max(students_data, key=students_data.get)
+                top_students.append((maxi, students_data[maxi]))
+                del students_data[maxi]
+
+        for i, j in zip(top_students, [(self.ui.top1_name_2, self.ui.top1_id_2, self.ui.top1_grade_2),
+                                       (self.ui.top2_name_2, self.ui.top2_id_2, self.ui.top2_grade_2),
+                                       (self.ui.top3_name_2, self.ui.top3_id_2, self.ui.top3_grade_2),
+                                       (self.ui.top4_name_2, self.ui.top4_id_2, self.ui.top4_grade_2),
+                                       (self.ui.top5_name_2, self.ui.top5_id_2, self.ui.top5_grade_2)]):
+            firstname = decrypt_data(data[user]["students"][i[0]]["firstname"], password, KDF, self.salt)
+            lastname = decrypt_data(data[user]["students"][i[0]]["lastname"], password, KDF, self.salt)
+            j[0].setText(f"{firstname} {lastname}")
+            j[1].setText(i[0])
+            j[2].setText(f"{i[1]}%")
 
 
 
@@ -433,15 +638,16 @@ class Main_app(QMainWindow):
 
 
 
-
-                
 
     def refresh_attendance(self,user,password):
         data = load()
+        current_class1 = self.ui.ClassComboBox4.currentText()
         self.ui.ClassComboBox4.clear()
         for i, x in enumerate(data[user].get("Classes", {}).values()):
             if self.ui.ClassComboBox4.findText(x["class_Name"]) == -1:
                 self.ui.ClassComboBox4.insertItem(i, x["class_Name"])
+
+        self.ui.ClassComboBox4.setCurrentText(current_class1)
 
         current_class = self.ui.ClassComboBox4.currentText()
         self.unwrap_shadow(self.ui.tableWidget_att)
@@ -665,10 +871,12 @@ class Main_app(QMainWindow):
 
         self.unwrap_shadow(self.ui.tableWidget_grades)
         data = load()
+        current_class1 = self.ui.ClassComboBox3.currentText()
         self.ui.ClassComboBox3.clear()
         for i, x in enumerate(data[user].get("Classes", {}).values()):
             if self.ui.ClassComboBox3.findText(x["class_Name"]) == -1:
                 self.ui.ClassComboBox3.insertItem(i, x["class_Name"])
+        self.ui.ClassComboBox3.setCurrentText(current_class1)
         current_class = self.ui.ClassComboBox3.currentText()
         self.ui.tableWidget_grades.setRowCount(0)
         data = load()
@@ -712,10 +920,12 @@ class Main_app(QMainWindow):
     def refresh_grades_C(self, user, password):
         self.unwrap_shadow(self.ui.tableWidget_grades)
         data = load()
+        current_class1 = self.ui.ClassComboBox3.currentText()
 
         for i, x in enumerate(data[user].get("Classes", {}).values()):
             if self.ui.ClassComboBox3.findText(x["class_Name"]) == -1:
                 self.ui.ClassComboBox3.insertItem(i, x["class_Name"])
+        self.ui.ClassComboBox3.setCurrentText(current_class1)
         current_class = self.ui.ClassComboBox3.currentText()
         self.ui.tableWidget_grades.setRowCount(0)
         data = load()
@@ -809,6 +1019,7 @@ class Main_app(QMainWindow):
     def refresh_view(self,user,password):
 
         self.ui.ClassComboBox2.clear()
+        current_class1 = self.ui.ClassComboBox2.currentText()
 
         self.unwrap_shadow(self.ui.tableWidget)
         data = load()
@@ -817,6 +1028,7 @@ class Main_app(QMainWindow):
             if self.ui.ClassComboBox2.findText(x["class_Name"]) == -1:
 
                  self.ui.ClassComboBox2.insertItem(i, x["class_Name"])
+        self.ui.ClassComboBox2.setCurrentText(current_class1)
 
         current_class = self.ui.ClassComboBox2.currentText()
         self.ui.tableWidget.setRowCount(0)
@@ -874,12 +1086,13 @@ class Main_app(QMainWindow):
 
         self.unwrap_shadow(self.ui.tableWidget)
         data = load()
+        current_class1 = self.ui.ClassComboBox2.currentText()
 
         for i, x in enumerate(data[user].get("Classes", {}).values()):
             if self.ui.ClassComboBox2.findText(x["class_Name"]) == -1:
 
                  self.ui.ClassComboBox2.insertItem(i, x["class_Name"])
-
+        self.ui.ClassComboBox2.setCurrentText(current_class1)
         current_class = self.ui.ClassComboBox2.currentText()
         self.ui.tableWidget.setRowCount(0)
         for student_id,y in data[user].get("students", {}).items():
@@ -1505,6 +1718,7 @@ class Main_app(QMainWindow):
 
         self.unwrap_shadow(self.ui.tableWidget_subjects)
 
+
         for i in self.widgets_class :
             i.hide()
             self.unwrap_shadow(i)
@@ -1529,6 +1743,8 @@ class Main_app(QMainWindow):
         for i in self.error_labels:
             i.hide()
         for i in self.widgets_statistics:
+            i.hide()
+        for i in self.widgets_statistics3:
             i.hide()
 
 
@@ -1568,6 +1784,33 @@ class Main_app(QMainWindow):
                                               "")
         self.ui.grades_top_btn.setStyleSheet(u"color: rgb(101, 119, 152);\n"
                                              "font: 700 9pt \"Yu Gothic UI\";")
+        self.ui.dateEdit.setStyleSheet(u"QDateEdit {border-radius: 15px;\n"
+                                       "border: 1px solid grey;\n"
+                                       "padding: 6px 8px;\n"
+                                       "background-color: rgb(255,255,255)\n"
+                                       "}\n"
+                                       "\n"
+                                       "QDateEdit::up-button {width: 0;}\n"
+                                       "QDateEdit::down-button {width: 0;}\n"
+                                       "\n"
+                                       "QDateEdit:hover {border: 2px solid black;\n"
+                                       "padding : 5px 7px;}\n"
+                                       "\n"
+                                       "QDateEdit:focus {border: 2px solid #0078d7;\n"
+                                       "\n"
+                                       "}\n"
+                                       "QDateEdit::drop-down {\n"
+                                       "subcontrol-origin: padding;\n"
+                                       "subcontrol-position: right center;\n"
+                                       "width: 30px;\n"
+                                       "border-top-right-radius: 15px;\n"
+                                       "border-bottom-right-radius: 15px;\n"
+                                       "}\n"
+                                       "QDateEdit::down-arrow {\n"
+                                       "image: url(icons/calendar.png);\n"
+                                       "width: 15px;\n"
+                                       "height: 15px;\n"
+                                       "}")
         self.refresh_add(self.current_user[-1],self.current_password[-1])
 
 
@@ -1605,6 +1848,8 @@ class Main_app(QMainWindow):
             i.hide()
         for i in self.widgets_statistics:
             i.hide()
+        for i in self.widgets_statistics3:
+                i.hide()
         self.ui.ClassComboBox.setStyleSheet(u"QComboBox { border : 1px solid grey ;\n"
                                                 "border-radius : 15px ;\n"
                                                 "padding : 6px 8px;  \n"
@@ -1632,6 +1877,33 @@ class Main_app(QMainWindow):
                                            "")
         self.ui.View_top_btn.setStyleSheet(u"color: rgb(101, 119, 152);\n"
                                           "font: 700 9pt \"Yu Gothic UI\";")
+        self.ui.dateEdit.setStyleSheet(u"QDateEdit {border-radius: 15px;\n"
+                                       "border: 1px solid grey;\n"
+                                       "padding: 6px 8px;\n"
+                                       "background-color: rgb(255,255,255)\n"
+                                       "}\n"
+                                       "\n"
+                                       "QDateEdit::up-button {width: 0;}\n"
+                                       "QDateEdit::down-button {width: 0;}\n"
+                                       "\n"
+                                       "QDateEdit:hover {border: 2px solid black;\n"
+                                       "padding : 5px 7px;}\n"
+                                       "\n"
+                                       "QDateEdit:focus {border: 2px solid #0078d7;\n"
+                                       "\n"
+                                       "}\n"
+                                       "QDateEdit::drop-down {\n"
+                                       "subcontrol-origin: padding;\n"
+                                       "subcontrol-position: right center;\n"
+                                       "width: 30px;\n"
+                                       "border-top-right-radius: 15px;\n"
+                                       "border-bottom-right-radius: 15px;\n"
+                                       "}\n"
+                                       "QDateEdit::down-arrow {\n"
+                                       "image: url(icons/calendar.png);\n"
+                                       "width: 15px;\n"
+                                       "height: 15px;\n"
+                                       "}")
         self.refresh_add(self.current_user[-1],self.current_password[-1])
 
 
@@ -1674,6 +1946,8 @@ class Main_app(QMainWindow):
             i.hide()
         for i in self.widgets_statistics:
             i.hide()
+        for i in self.widgets_statistics3:
+            i.hide()
         self.ui.dateEdit.setDate(QDate.currentDate())
 
 
@@ -1691,16 +1965,69 @@ class Main_app(QMainWindow):
         self.number = self.ui.Numberline.text()
         self.address = self.ui.AdressLine.text()
 
+        if self.date > QDate.currentDate() :
+            err = True
+            self.ui.birtherr.show()
+            self.ui.dateEdit.setStyleSheet((u"QDateEdit {\n"
+                                               "    border-radius: 12px;\n"
+                                               "    padding: 8px 12px;\n"
+                                               "    background-color: rgba(255, 255, 255, 220);\n"
+                                               "    border: 2px solid red;\n"
+                                               "    color: #003366;\n"
+                                               "}\n"
+                                            "QDateEdit::drop-down {\n"
+                                            "subcontrol-origin: padding;\n"
+                                            "subcontrol-position: right center;\n"
+                                            "width: 30px;\n"
+                                            "border-top-right-radius: 15px;\n"
+                                            "border-bottom-right-radius: 15px;\n"
+                                            "}\n"
+                                            "QDateEdit::down-arrow {\n"
+                                            "image: url(icons/calendar.png);\n"
+                                            "width: 15px;\n"
+                                            "height: 15px;\n"
+                                            "}"
+                                            ))
+        else:
+            self.ui.birtherr.hide()
+            self.ui.dateEdit.setStyleSheet(u"QDateEdit {border-radius: 15px;\n"
+                                        "border: 1px solid grey;\n"
+                                        "padding: 6px 8px;\n"
+                                        "background-color: rgb(255,255,255)\n"
+                                        "}\n"
+                                        "\n"
+                                        "QDateEdit::up-button {width: 0;}\n"
+                                        "QDateEdit::down-button {width: 0;}\n"
+                                        "\n"
+                                        "QDateEdit:hover {border: 2px solid black;\n"
+                                        "padding : 5px 7px;}\n"
+                                        "\n"
+                                        "QDateEdit:focus {border: 2px solid #0078d7;\n"
+                                        "\n"
+                                        "}\n"
+                                        "QDateEdit::drop-down {\n"
+                                        "subcontrol-origin: padding;\n"
+                                        "subcontrol-position: right center;\n"
+                                        "width: 30px;\n"
+                                        "border-top-right-radius: 15px;\n"
+                                        "border-bottom-right-radius: 15px;\n"
+                                        "}\n"
+                                        "QDateEdit::down-arrow {\n"
+                                        "image: url(icons/calendar.png);\n"
+                                        "width: 15px;\n"
+                                        "height: 15px;\n"
+                                        "}")
+
         if self.first_name == "" :
             self.ui.requirederrfirst.setText("This field is required")
             self.ui.requirederrfirst.show()
             self.update_line2(self.ui.Firstnameline)
-            err = err or True
+            err =  True
         elif not re.fullmatch(r"[A-Za-z ]+", self.first_name):
             self.ui.requirederrfirst.setText("Invalid First Name")
             self.ui.requirederrfirst.show()
             self.update_line2(self.ui.Firstnameline)
-            err = err or True
+            err = True
         else:
             self.ui.requirederrfirst.hide()
             self.reset_line2(self.ui.Firstnameline)
@@ -1710,12 +2037,12 @@ class Main_app(QMainWindow):
             self.ui.requirederrlast.setText("This field is required")
             self.ui.requirederrlast.show()
             self.update_line2(self.ui.lastnameline)
-            err = err or True
+            err =  True
         elif not re.fullmatch(r"[A-Za-z ]+", self.last_name):
             self.ui.requirederrlast.setText("Invalid Last Name")
             self.ui.requirederrlast.show()
             self.update_line2(self.ui.lastnameline)
-            err = err or True
+            err =  True
         else :
             self.ui.requirederrlast.hide()
             self.reset_line2(self.ui.lastnameline)
@@ -1870,6 +2197,33 @@ class Main_app(QMainWindow):
                                                 "}\n"
                                                 "\n"
                                                 "")
+        self.ui.dateEdit.setStyleSheet(u"QDateEdit {border-radius: 15px;\n"
+                                       "border: 1px solid grey;\n"
+                                       "padding: 6px 8px;\n"
+                                       "background-color: rgb(255,255,255)\n"
+                                       "}\n"
+                                       "\n"
+                                       "QDateEdit::up-button {width: 0;}\n"
+                                       "QDateEdit::down-button {width: 0;}\n"
+                                       "\n"
+                                       "QDateEdit:hover {border: 2px solid black;\n"
+                                       "padding : 5px 7px;}\n"
+                                       "\n"
+                                       "QDateEdit:focus {border: 2px solid #0078d7;\n"
+                                       "\n"
+                                       "}\n"
+                                       "QDateEdit::drop-down {\n"
+                                       "subcontrol-origin: padding;\n"
+                                       "subcontrol-position: right center;\n"
+                                       "width: 30px;\n"
+                                       "border-top-right-radius: 15px;\n"
+                                       "border-bottom-right-radius: 15px;\n"
+                                       "}\n"
+                                       "QDateEdit::down-arrow {\n"
+                                       "image: url(icons/calendar.png);\n"
+                                       "width: 15px;\n"
+                                       "height: 15px;\n"
+                                       "}")
         for i in self.error_labels:
             i.hide()
 
@@ -1909,6 +2263,8 @@ class Main_app(QMainWindow):
         for i in self.error_labels:
             i.hide()
         for i in self.widgets_statistics:
+            i.hide()
+        for i in self.widgets_statistics3:
             i.hide()
 
         self.ui.Edit_button.setGeometry(QRect(810, 500, 91, 31)) if not self.ui.Edit_button.isVisible() else self.ui.Edit_button.show()
@@ -1953,6 +2309,8 @@ class Main_app(QMainWindow):
         for i in self.error_labels:
             i.hide()
         for i in self.widgets_statistics:
+            i.hide()
+        for i in self.widgets_statistics3:
             i.hide()
 
         self.ui.Subject_top_btn.setStyleSheet(u"QPushButton {font: 700 9pt \"Yu Gothic UI\";\n"
@@ -2066,6 +2424,8 @@ class Main_app(QMainWindow):
             i.hide()
         for i in self.widgets_statistics:
             i.hide()
+        for i in self.widgets_statistics3:
+            i.hide()
         self.ui.Cancel_button5.hide()
         self.ui.Edit_button4.hide()
         self.ui.Save_button4.hide()
@@ -2125,6 +2485,7 @@ class Main_app(QMainWindow):
         self.ui.class3.hide()
         self.ui.subjectline.show()
         self.ui.coeffline.show()
+        self.ui.birtherr.hide()
         self.ui.subject_name.show()
         self.ui.coeff.show()
         self.ui.ClassComboBox3.hide()
@@ -2165,6 +2526,7 @@ class Main_app(QMainWindow):
          self.ui.tableWidget_grades.show()
          self.ui.add_button_subject.hide()
          self.ui.requirederrsubject.hide()
+         self.ui.birtherr.hide()
          self.ui.requirederrcoeff.hide()
          self.ui.cancel_button_subject.hide()
          self.ui.class3.show()
@@ -2445,6 +2807,8 @@ class Main_app(QMainWindow):
             i.hide()
         for i in self.widgets_statistics:
             i.hide()
+        for i in self.widgets_statistics3:
+            i.hide()
         self.wrap_with_shadow(self.ui.tableWidget_att, 70)
         self.refresh_attendance(self.current_user[-1],self.current_password[-1])
 
@@ -2475,6 +2839,8 @@ class Main_app(QMainWindow):
             i.hide()
         for i in self.widgets_statistics:
             i.show()
+        for i in self.widgets_statistics3:
+            i.hide()
         self.ui.Add_top_btn.hide()
         self.ui.View_top_btn.hide()
         self.ui.performane.setStyleSheet(u"QPushButton {font: 700 9pt \"Yu Gothic UI\";\n"
@@ -2535,6 +2901,8 @@ class Main_app(QMainWindow):
         for i in self.widgets_statistics:
             if i not in [self.ui.attendancetop, self.ui.ranking, self.ui.other, self.ui.performane]:
                i.hide()
+        for i in self.widgets_statistics3:
+            i.hide()
 
 
 
@@ -2564,7 +2932,10 @@ class Main_app(QMainWindow):
         for i in self.error_labels:
             i.hide()
         for i in self.widgets_statistics:
+
             i.show()
+        for i in self.widgets_statistics3:
+            i.hide()
         self.ui.Add_top_btn.hide()
         self.ui.View_top_btn.hide()
         self.ui.performane.setStyleSheet(u"QPushButton {font: 700 9pt \"Yu Gothic UI\";\n"
@@ -2583,6 +2954,53 @@ class Main_app(QMainWindow):
         self.refresh_graph2(self.current_user[-1], self.current_password[-1])
         self.animate_page(self.ui.Graph_frame, 1, 0, "white",15,351,321)
         self.animate_page(self.ui.Graph_frame_2, 1, 0, "white",15,351,321)
+
+    def ranking(self):
+        self.ui.info.hide()
+        for i in self.widgets_class:
+            i.hide()
+            self.unwrap_shadow(i)
+        for i in self.widgets_student_add:
+            i.hide()
+            self.unwrap_shadow(i)
+        for j in self.widgets_home:
+            j.hide()
+            self.unwrap_shadow(j)
+        for i in self.widgets_student_view:
+            i.hide()
+            self.unwrap_shadow(i)
+        for i in self.widgets_to_clear:
+            i.clear()
+            self.unwrap_shadow(i)
+        for i in self.widgets_grades:
+            i.hide()
+            self.unwrap_shadow(i)
+        for i in self.widget_Attendance:
+            i.hide()
+            self.unwrap_shadow(i)
+        for i in self.error_labels:
+            i.hide()
+        for i in self.widgets_statistics:
+            if i not in [self.ui.attendancetop, self.ui.ranking, self.ui.other, self.ui.performane]:
+                i.hide()
+        for i in self.widgets_statistics3:
+            i.show()
+
+        self.ui.ranking.setStyleSheet(u"QPushButton {font: 700 9pt \"Yu Gothic UI\";\n"
+                                         "color :rgb(24, 182, 255);\n"
+                                         "border: none;\n"
+                                         "border-bottom: 2px solid rgb(24, 182, 255)\n"
+                                         "}\n"
+                                         "")
+        self.ui.performane.setStyleSheet(u"color: rgb(101, 119, 152);\n"
+                                      "font: 700 9pt \"Yu Gothic UI\";")
+        self.ui.attendancetop.setStyleSheet(u"color: rgb(101, 119, 152);\n"
+                                            "font: 700 9pt \"Yu Gothic UI\";")
+        self.ui.other.setStyleSheet(u"color: rgb(101, 119, 152);\n"
+                                    "font: 700 9pt \"Yu Gothic UI\";")
+
+        self.refresh_graph5(self.current_user[-1], self.current_password[-1])
+        self.refresh_graph6(self.current_user[-1], self.current_password[-1])
 
 
 

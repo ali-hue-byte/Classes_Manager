@@ -2072,6 +2072,25 @@ class Ui_Dialog(object):
                                     "background-color: rgb(25, 86, 179)")
         self.id_lbl_2.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
+        self.Graph_frame_3 = HoverFrame(self.page, start=QRect(590, 140, 351, 321), end=QRect(555, 105, 421, 391),
+                                        start2=QRect(200, 140, 351, 321), end2=QRect(235, 175, 281, 251))
+        self.Graph_frame_3.setObjectName(u"scrollArea_2")
+        self.Graph_frame_3.setGeometry(QRect(590, 140, 351, 321))
+        self.Graph_frame_3.setStyleSheet(u"background-color: rgb(255, 255, 255);\n"
+                                         "border-radius: 15px;\n"
+                                         "border: 2px solid black;")
+
+        self.Graph_frame_4 = HoverFrame(self.page, frame=self.Graph_frame_3, start=QRect(200, 140, 351, 321),
+                                      end=QRect(165, 105, 421, 391), start2=QRect(590, 140, 351, 321),
+                                      end2=QRect(625, 175, 281, 251))
+        self.Graph_frame_3.frame = self.Graph_frame_4
+        self.Graph_frame_3.anim2 = QPropertyAnimation(self.Graph_frame_4, b"geometry")
+        self.Graph_frame_4.setObjectName(u"scrollArea_3")
+        self.Graph_frame_4.setGeometry(QRect(200, 140, 351, 321))
+        self.Graph_frame_4.setStyleSheet(u"background-color: rgb(255, 255, 255);\n"
+                                       "border-radius: 15px;\n"
+                                       "border: 2px solid black;")
+
 
 
 
@@ -2539,6 +2558,4 @@ class Ui_Dialog(object):
 "", None))
         self.label_2_n.setText(QCoreApplication.translate("Dialog", u"Create account", None))
     # retranslateUi
-
-
 

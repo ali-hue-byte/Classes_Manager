@@ -75,7 +75,19 @@ class HoverFrame(QFrame):
                  end3=None,
                  title2=None,
                  start4=None,
-                 end4=None,):
+                 end4=None,
+                 bars=None,
+                 canvas=None,
+                 ax=None,
+                 combo1=None,
+                 com1s=None,
+                 com1e = None,
+
+                 lbl=None,
+                 lbls=None,
+                 lble=None,
+                 wedges=None,
+                 texts=None):
         super().__init__(parent)
         self.anim = QPropertyAnimation(self, b"geometry")
 
@@ -96,11 +108,32 @@ class HoverFrame(QFrame):
         self.title2 = title2
         self.start4 = start4
         self.end4 = end4
+        self.bars = bars
+        self.canvas = canvas
+        self.ax = ax
+        self.combo1 = combo1
+        self.texts = texts
+
+        self.lbl = lbl
+
+        self.com1s = com1s
+        self.com1e = com1e
+
+
+
+        self.lbls = lbls
+        self.lble = lble
+
+        self.wedges = wedges
+        self.saved_colors = None
+
+
 
         self.anim2 = QPropertyAnimation(self.frame, b"geometry")
         self.anim2.setDuration(200)
 
     def enterEvent(self, event):
+        self.saved_colors = None
         self.anim2.stop()
         self.anim.stop()
         self.anim.setStartValue(self.start)
@@ -117,6 +150,42 @@ class HoverFrame(QFrame):
 
         if self.title2:
             animate_title(self.title2,self.start4,self.end4)
+
+        if self.bars and self.canvas :
+            for bar in self.bars:
+                bar.set_facecolor("#9e9e9e")
+                bar.set_edgecolor("#616161")
+            self.ax.tick_params(axis="x", colors="#9e9e9e")
+            self.ax.tick_params(axis="y", colors="#9e9e9e")
+            for spine in self.ax.spines.values():
+                spine.set_edgecolor("#9e9e9e")
+            self.canvas.draw()
+        if self.frame :
+            self.frame.setStyleSheet(u"background-color: rgb(255, 255, 255);\n"
+                                         "border-radius: 15px;\n"
+                                         "border: 2px solid grey;")
+        if self.title :
+            self.title2.setStyleSheet(u"font: 700 14pt \"Arial\";\n"
+                                         "color: #808080;")
+        if self.combo1 and self.lbl :
+            animate_title(self.combo1,self.com1s,self.com1e)
+
+            animate_title(self.lbl,self.lbls,self.lble)
+
+
+
+        if self.wedges :
+            if self.saved_colors == None:
+                self.saved_colors = [wedge.get_facecolor() for wedge in self.wedges]
+            for widget in self.wedges:
+                widget.set_facecolor("#9e9e9e")
+            for t in self.texts:
+                t.set_color("#9e9e9e")
+
+            self.canvas.draw()
+
+
+
 
 
         super().enterEvent(event)
@@ -138,6 +207,36 @@ class HoverFrame(QFrame):
 
         if self.title2:
             animate_title(self.title2,self.end4,self.start4)
+
+        if self.bars and self.canvas :
+            for bar in self.bars:
+                bar.set_facecolor("#2563EB")
+                bar.set_edgecolor("#124187")
+            self.ax.tick_params(axis="x", colors="#000000")
+            self.ax.tick_params(axis="y", colors="#000000")
+            for spine in self.ax.spines.values():
+                spine.set_edgecolor("#000000")
+
+            self.canvas.draw()
+        if self.frame :
+            self.frame.setStyleSheet(u"background-color: rgb(255, 255, 255);\n"
+                                         "border-radius: 15px;\n"
+                                         "border: 2px solid black;")
+        if self.title :
+            self.title2.setStyleSheet(u"font: 700 14pt \"Arial\";\n"
+                                 "color: rgb(34, 34, 34);")
+        if self.combo1 and self.lbl :
+            animate_title(self.combo1,self.com1e,self.com1s)
+
+            animate_title(self.lbl,self.lble,self.lbls)
+
+        if self.wedges :
+            for wedge,color in zip(self.wedges,self.saved_colors):
+                wedge.set_facecolor(color)
+            for t in self.texts:
+                t.set_color("#000000")
+            self.canvas.draw()
+
         super().leaveEvent(event)
 
             
@@ -2093,6 +2192,73 @@ class Ui_Dialog(object):
 
 
 
+        self.class2_3 = QLabel(self.page)
+        self.class2_3.setObjectName(u"class2_2")
+        self.class2_3.setGeometry(QRect(230, 480, 41, 16))
+        self.class2_3.setStyleSheet(u"color: rgb(46, 58, 89);\n"
+                                    "font: 600 12pt \"Segoe UI\";")
+        self.comboBox2_3 = QComboBox(self.page)
+        self.comboBox2_3.setObjectName(u"comboBox2_2")
+        self.comboBox2_3.setGeometry(QRect(290, 470, 231, 41))
+        self.comboBox2_3.setStyleSheet(u"QComboBox { border : 1px solid grey ;\n"
+                                       "border-radius : 15px ;\n"
+                                       "padding : 6px 8px;  \n"
+                                       "background-color: rgb(255,255,255)\n"
+                                       "}\n"
+                                       "QComboBox:drop-down { width: 0;\n"
+                                       "}\n"
+                                       "\n"
+                                       "QComboBox:hover{border: 2px solid black;\n"
+                                       "padding : 5px 7px;\n"
+                                       "}\n"
+                                       "\n"
+                                       "QComboBox:focus {\n"
+                                       "  border : 2px solid #0078d7;\n"
+                                       "}\n"
+                                       "\n"
+                                       "")
+
+
+        self.Graph_frame_3.combo1 = self.comboBox2_3
+
+        self.Graph_frame_3.lbl = self.class2_3
+
+        self.Graph_frame_3.com1s = QPoint(290, 470)
+        self.Graph_frame_3.com1e = QPoint(290, 435)
+
+        self.Graph_frame_3.lbls = QPoint(230, 480)
+        self.Graph_frame_3.lble = QPoint(230, 445)
+
+
+        self.Graph_frame_4.combo1 = self.comboBox2_3
+
+        self.Graph_frame_4.lbl = self.class2_3
+        self.Graph_frame_4.com1s = QPoint(290, 470)
+        self.Graph_frame_4.com1e = QPoint(290, 505)
+
+        self.Graph_frame_4.lbls = QPoint(230, 480)
+        self.Graph_frame_4.lble = QPoint(230, 515)
+
+        self.malesfemales = QLabel(self.page)
+        self.malesfemales.setObjectName(u"average_class")
+        self.malesfemales.setGeometry(QRect(200, 100, 351, 31))
+        self.malesfemales.setStyleSheet(u"font: 700 14pt \"Arial\";\n"
+                                         "color: rgb(34, 34, 34);")
+        self.malesfemales.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+
+        self.students_per_class = QLabel(self.page)
+        self.students_per_class.setObjectName(u"subject_avaeges")
+        self.students_per_class.setGeometry(QRect(590, 100, 351, 31))
+        self.students_per_class.setStyleSheet(u"font: 700 14pt \"Arial\";\n"
+                                           "color: rgb(34, 34, 34);")
+        self.students_per_class.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+
+
+
+
+
 
 
 
@@ -2438,6 +2604,8 @@ class Ui_Dialog(object):
         ___qtablewidgetitem1g.setText(QCoreApplication.translate("Dialog", u"Full Name", None));
 
         self.class2.setText(QCoreApplication.translate("Dialog", u"Class     ", None))
+        self.class2_3.setText(QCoreApplication.translate("Dialog", u"Class     ", None))
+
         self.class3.setText(QCoreApplication.translate("Dialog", u"Class     ", None))
         self.class4.setText(QCoreApplication.translate("Dialog", u"Class     ", None))
         self.date.setText(QCoreApplication.translate("Dialog", u"Date     ", None))
@@ -2510,6 +2678,8 @@ class Ui_Dialog(object):
         self.class2_2.setText(QCoreApplication.translate("Dialog", u"Class     ", None))
         self.average_class.setText(QCoreApplication.translate("Dialog", u"Class Average Scores", None))
         self.top_students.setText(QCoreApplication.translate("Dialog", u"Top 5 Students by Grade", None))
+        self.malesfemales.setText(QCoreApplication.translate("Dialog", u"Gender Distribution", None))
+        self.students_per_class.setText(QCoreApplication.translate("Dialog", u"Students per Class", None))
         self.subject_avaeges.setText(QCoreApplication.translate("Dialog", u"Subject Average Scores", None))
         self.top_students_3.setText(QCoreApplication.translate("Dialog", u"Top 5 Students by Attendance", None))
         self.top1_name_2.setText("")

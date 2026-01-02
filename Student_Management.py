@@ -28,8 +28,12 @@ from Functions import (SALT,
 from PySide6.QtCore import Qt
 import re
 import random
+
+
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.figure import Figure
+
 
 
 class ReadOnlyDelegate(QStyledItemDelegate):
@@ -41,6 +45,7 @@ class ReadOnlyDelegate(QStyledItemDelegate):
 class Main_app(QMainWindow):
     def __init__(self):
         super().__init__()
+
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
         self.delegue = ReadOnlyDelegate()
@@ -249,7 +254,10 @@ class Main_app(QMainWindow):
 
         self.widgets_statistics_2 = [
             self.ui.Graph_frame_3,
-            self.ui.Graph_frame_4
+            self.ui.Graph_frame_4,
+            self.ui.comboBox2_3,
+            self.ui.class2_3,
+
         ]
 
 
@@ -338,6 +346,8 @@ class Main_app(QMainWindow):
         self.ui.comboBox2_2.currentTextChanged.connect(lambda: self.refresh_graph5_C(self.current_user[-1],self.current_password[-1]))
         self.ui.comboBox2_1.currentTextChanged.connect(lambda: self.refresh_graph6_C(self.current_user[-1],self.current_password[-1]))
         self.ui.other.clicked.connect(self.other)
+        self.ui.comboBox2_3.currentTextChanged.connect(
+            lambda: self.refresh_graph7_C(self.current_user[-1], self.current_password[-1]))
 #------------------------------------------------------------------
 
 
@@ -382,12 +392,15 @@ class Main_app(QMainWindow):
         else :
 
 
-            ax.bar(classes, data_classes)
+            bars = ax.bar(classes, data_classes)
             ax.set_ylim(0, 20)
             fig.tight_layout()
             fig.subplots_adjust(bottom=0.2,left=0.15)
             for label in ax.get_xticklabels():
                 label.set_rotation(90)
+            for bar in bars:
+                bar.set_facecolor("#2563EB")
+                bar.set_edgecolor("#1E40AF")
         canvas = FigureCanvas(fig)
         canvas.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         canvas.updateGeometry()
@@ -395,6 +408,11 @@ class Main_app(QMainWindow):
 
 
         layout.addWidget(canvas)
+        if bars :
+           self.ui.Graph_frame_2.bars = bars
+           self.ui.Graph_frame_2.canvas = canvas
+           self.ui.Graph_frame_2.ax = ax
+
 
 
     def refresh_graph2(self,user,password):
@@ -429,17 +447,28 @@ class Main_app(QMainWindow):
             ax.text(0.5, 0.5, "No data available", ha="center", va="center", fontsize=12)
         else :
 
-            ax.bar(subjects, average_per_subject)
+            bars = ax.bar(subjects, average_per_subject)
             ax.set_ylim(0, 20)
             fig.tight_layout()
             fig.subplots_adjust(bottom=0.2, left=0.15)
             for label in ax.get_xticklabels():
                 label.set_rotation(90)
+            for bar in bars:
+                bar.set_facecolor("#2563EB")
+                bar.set_edgecolor("#1E40AF")
 
         canvas = FigureCanvas(fig)
         canvas.updateGeometry()
         canvas.draw()
         layout.addWidget(canvas)
+        if bars :
+           self.ui.Graph_frame.bars = bars
+           self.ui.Graph_frame.canvas = canvas
+           self.ui.Graph_frame.ax = ax
+
+
+
+
 
     def refresh_graph5(self,user,password):
         for i in [self.ui.top1_name,self.ui.top1_id,self.ui.top1_grade,
@@ -638,6 +667,183 @@ class Main_app(QMainWindow):
             j[0].setText(f"{firstname} {lastname}")
             j[1].setText(i[0])
             j[2].setText(f"{i[1]}%")
+
+    def refresh_graph7(self, user, password):
+        data = load()
+        current_class = self.ui.comboBox2_3.currentText()
+        self.ui.comboBox2_3.clear()
+        if self.ui.comboBox2_3.findText("all") == -1:
+            self.ui.comboBox2_3.insertItem(0, "all")
+        for i, x in enumerate(data[user].get("Classes", {}).values(), start=1):
+            if self.ui.comboBox2_3.findText(x["class_Name"]) == -1:
+                self.ui.comboBox2_3.insertItem(i, x["class_Name"])
+        self.ui.comboBox2_3.setCurrentText(current_class)
+        classe = self.ui.comboBox2_3.currentText()
+
+        males = 0
+        females = 0
+
+        for i,j in data[user]["students"].items():
+            if classe != "all":
+                if classe != decrypt_data(j["class"],password,KDF,self.salt):
+                    continue
+            if decrypt_data(j["gender"], password, KDF, self.salt) == "Male":
+                males += 1
+            else:
+                females += 1
+        males_percentage = males / len(data[user]["students"]) * 100 if len(data[user]["students"])!=0 else 0
+        females_percentage = females / len(data[user]["students"]) * 100 if len(data[user]["students"])!=0 else 0
+
+        sizes = [males_percentage, females_percentage]
+        labels = ["Male", "Female"]
+
+
+
+        layout = self.ui.Graph_frame_4.layout()
+        if layout is None:
+            layout = QVBoxLayout(self.ui.Graph_frame_4)
+            self.ui.Graph_frame_4.setLayout(layout)
+        else:
+
+            while layout.count():
+                item = layout.takeAt(0)
+                widget = item.widget()
+                if widget:
+                    widget.setParent(None)
+                    widget.deleteLater()
+
+        fig = Figure(figsize=(5, 5))
+        ax = fig.add_subplot(111)
+
+
+        try :
+           wedges,texts,autotexts=ax.pie(sizes, labels=labels, autopct="%1.1f%%")
+        except (ValueError, ZeroDivisionError):
+            ax.text(0.5, 0.5, "No Data Available",
+                    horizontalalignment='center',
+                    verticalalignment='center',
+                    fontsize=14, color='red',
+                    transform=ax.transAxes)
+            ax.axis('off')
+        canvas = FigureCanvas(fig)
+        canvas.updateGeometry()
+        canvas.draw()
+        self.ui.Graph_frame_3.wedges = wedges
+        self.ui.Graph_frame_3.canvas = canvas
+        self.ui.Graph_frame_3.texts = texts
+        layout.addWidget(canvas)
+
+    def refresh_graph7_C(self, user, password):
+        data = load()
+        current_class = self.ui.comboBox2_3.currentText()
+
+        if self.ui.comboBox2_3.findText("all") == -1:
+            self.ui.comboBox2_3.insertItem(0, "all")
+        for i, x in enumerate(data[user].get("Classes", {}).values(), start=1):
+            if self.ui.comboBox2_3.findText(x["class_Name"]) == -1:
+                self.ui.comboBox2_3.insertItem(i, x["class_Name"])
+        self.ui.comboBox2_3.setCurrentText(current_class)
+        classe = self.ui.comboBox2_3.currentText()
+
+        males = 0
+        females = 0
+
+        for i,j in data[user]["students"].items():
+            if classe != "all":
+                if classe != decrypt_data(j["class"],password,KDF,self.salt):
+                    continue
+            if decrypt_data(j["gender"], password, KDF, self.salt) == "Male":
+                males += 1
+            else:
+                females += 1
+        males_percentage = males / len(data[user]["students"]) * 100 if len(data[user]["students"])!=0 else 0
+        females_percentage = females / len(data[user]["students"]) * 100 if len(data[user]["students"])!=0 else 0
+
+        sizes = [males_percentage, females_percentage]
+        labels = ["Male", "Female"]
+
+        layout = self.ui.Graph_frame_4.layout()
+        if layout is None:
+            layout = QVBoxLayout(self.ui.Graph_frame_4)
+            self.ui.Graph_frame_4.setLayout(layout)
+        else:
+
+            while layout.count():
+                item = layout.takeAt(0)
+                widget = item.widget()
+                if widget:
+                    widget.setParent(None)
+                    widget.deleteLater()
+
+        fig = Figure(figsize=(5, 5))
+        ax = fig.add_subplot(111)
+
+        try:
+            wedges,texts,autotexts=ax.pie(sizes, labels=labels, autopct="%1.1f%%")
+        except (ValueError, ZeroDivisionError):
+            ax.text(0.5, 0.5, "No Data Available",
+                    horizontalalignment='center',
+                    verticalalignment='center',
+                    fontsize=14,
+                    transform=ax.transAxes)
+            ax.axis('off')
+        canvas = FigureCanvas(fig)
+        canvas.updateGeometry()
+        canvas.draw()
+        self.ui.Graph_frame_3.wedges = wedges
+        self.ui.Graph_frame_3.canvas = canvas
+        self.ui.Graph_frame_3.texts = texts
+        layout.addWidget(canvas)
+
+    def refresh_graph8(self,user,password):
+        data = load()
+
+        classes = [x for x in data[user]["Classes"]]
+        classes_data = {}
+        for x in classes:
+            for i,j in data[user]["students"].items():
+                if decrypt_data(j["class"], password, KDF, self.salt) == x:
+                    classes_data[x] = classes_data.get(x, 0)+1
+
+        labels = [x for x in classes_data.keys()]
+        sizes = [x/len(data[user]["students"]) * 100 if len(data[user]["students"])!=0 else 0 for x in classes_data.values()]
+        layout = self.ui.Graph_frame_3.layout()
+        if layout is None:
+            layout = QVBoxLayout(self.ui.Graph_frame_3)
+            self.ui.Graph_frame_3.setLayout(layout)
+        else:
+
+            while layout.count():
+                item = layout.takeAt(0)
+                widget = item.widget()
+                if widget:
+                    widget.setParent(None)
+                    widget.deleteLater()
+
+
+
+        fig = Figure(figsize=(5, 5))
+        ax = fig.add_subplot(111)
+
+        try:
+            wedges,texts,autotexts = ax.pie(sizes, labels=labels, autopct="%1.1f%%")
+        except (ValueError, ZeroDivisionError):
+            ax.text(0.5, 0.5, "No Data Available",
+                    horizontalalignment='center',
+                    verticalalignment='center',
+                    fontsize=14,
+                    transform=ax.transAxes)
+            ax.axis('off')
+        canvas = FigureCanvas(fig)
+        canvas.updateGeometry()
+        canvas.draw()
+        layout.addWidget(canvas)
+
+        self.ui.Graph_frame_4.wedges = wedges
+        self.ui.Graph_frame_4.canvas = canvas
+        self.ui.Graph_frame_4.texts = texts
+
+
 
 
 
@@ -3076,6 +3282,11 @@ class Main_app(QMainWindow):
                                             "font: 700 9pt \"Yu Gothic UI\";")
         self.ui.ranking.setStyleSheet(u"color: rgb(101, 119, 152);\n"
                                     "font: 700 9pt \"Yu Gothic UI\";")
+
+        self.refresh_graph7(self.current_user[-1], self.current_password[-1])
+        self.refresh_graph8(self.current_user[-1], self.current_password[-1])
+        self.animate_page(self.ui.Graph_frame_3, 1, 0, "white", 15, 351, 321)
+        self.animate_page(self.ui.Graph_frame_4, 1, 0, "white", 15, 351, 321)
 
 
 

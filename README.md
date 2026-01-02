@@ -17,12 +17,10 @@ This project is a modern, user-friendly Student Management System built with PyS
 - **Adding classes**-View, creat and edit new Classes
 - **Grades page**-Add, delete subjects and students grades
 - **Attendance page**-Mark, edit, and track student attendance with clear status indicators and real-time updates
-- **Statistics Page** – A page for visualizing student data such as grades and attendance using matplotlib for graphs (with animations on hover) and highlighting top-performing students
+- **Statistics Page** – A page for visualizing student data such as grades, attendanceand gender distribution using matplotlib for graphs (with animations on hover) and highlighting top-performing students
 
 #### Upcoming features
 - Graphs showing attendance trends over time
-- Visualization of gender distribution among students
-- Percentage breakdown of students per class
 - Information page
   
 ---

@@ -1,4 +1,4 @@
-import json
+
 import os
 
 from cryptography.fernet import Fernet
@@ -78,6 +78,7 @@ def check_strength(pss):
             bool(re.search(r"[0-9]", pss)),
             bool(re.search(r"[!@#$%^&*(),.?\":{}|<>]", pss))]
     return all(tests)
+
 
 
 

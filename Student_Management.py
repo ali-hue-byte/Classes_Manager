@@ -1,6 +1,6 @@
 import sys
 from functools import partial
-
+import os
 from PySide6.QtGui import QIcon, QColor, QIntValidator
 from PySide6.QtWidgets import (QApplication,
                                QMainWindow,
@@ -16,7 +16,7 @@ from PySide6.QtWidgets import (QApplication,
                                QItemDelegate, QVBoxLayout, QSizePolicy)
 from App import Ui_Dialog
 from PySide6.QtCore import QPropertyAnimation, QEasingCurve, QPoint, QDate, QRect, QSize
-from Functions import (SALT,
+from Functions import (
                        hash_password,
                        save_data,
                        load_data,
@@ -59,7 +59,7 @@ class Main_app(QMainWindow):
 
 
 
-        self.salt = SALT()
+
 
 
 
@@ -267,7 +267,11 @@ class Main_app(QMainWindow):
             self.ui.comboBox2_5,
             self.ui.dateEdit5,
             self.ui.comboBox2_6,
-            self.ui.comboBox2_7
+            self.ui.comboBox2_7,
+            self.ui.attendace_title,
+            self.ui.attendace_title2,
+            self.ui.year,
+            self.ui.classe
         ]
 
 
@@ -311,6 +315,9 @@ class Main_app(QMainWindow):
             i.hide()
         for i in self.widgets_statistics_4:
             i.hide()
+        for i in [self.ui.comboBox2_5, self.ui.comboBox2_6, self.ui.comboBox2_3]:
+            i.insertItem(0,"all")
+        self.ui.comboBox2_7.insertItem(0,str(QDate.currentDate().year()))
 #----connecting buttons-----------------------------
 
         self.ui.pushButton_n.clicked.connect(self.creat_clicked)
@@ -359,16 +366,21 @@ class Main_app(QMainWindow):
         self.ui.comboBox2_1.currentTextChanged.connect(lambda: self.refresh_graph6_C(self.current_user[-1],self.current_password[-1]))
         self.ui.other.clicked.connect(self.other)
         self.ui.comboBox2_3.currentTextChanged.connect(
-            lambda: self.refresh_graph7_C(self.current_user[-1], self.current_password[-1]))
-        self.ui.comboBox2_5.currentTextChanged.connect(lambda : self.refresh_graph3_C(self.current_user[-1],self.current_password[-1]))
+            lambda: self.refresh_graph7(self.current_user[-1], self.current_password[-1]))
+
+        self.ui.dateEdit5.dateChanged.connect(
+            lambda: self.refresh_graph3(self.current_user[-1], self.current_password[-1]))
+        self.ui.comboBox2_5.currentTextChanged.connect(
+            lambda: self.refresh_graph3(self.current_user[-1], self.current_password[-1]))
         self.ui.comboBox2_6.currentTextChanged.connect(
-            lambda: self.refresh_graph4_C(self.current_user[-1], self.current_password[-1]))
+            lambda: self.refresh_graph4(self.current_user[-1], self.current_password[-1]))
         self.ui.comboBox2_7.currentTextChanged.connect(
-            lambda: self.refresh_graph4_C(self.current_user[-1], self.current_password[-1]))
+            lambda: self.refresh_graph4(self.current_user[-1], self.current_password[-1]))
+
 
         #------------------------------------------------------------------
 
-
+        self.salt = None
         self.animations = []
         self.animations2 = []
     def refresh_graph1(self,user,password):
@@ -490,91 +502,6 @@ class Main_app(QMainWindow):
         data = load()
 
         current_class = self.ui.comboBox2_5.currentText()
-        self.ui.comboBox2_5.clear()
-        if self.ui.comboBox2_5.findText("all") == -1:
-            self.ui.comboBox2_5.insertItem(0, "all")
-        for i, x in enumerate(data[user].get("Classes", {}).values(), start=1):
-            if self.ui.comboBox2_5.findText(x["class_Name"]) == -1:
-                self.ui.comboBox2_5.insertItem(i, x["class_Name"])
-        self.ui.comboBox2_5.setCurrentText(current_class)
-        classe = self.ui.comboBox2_5.currentText()
-        date = self.ui.dateEdit5.date()
-        attendance_data = []
-        students = 0
-        present = 0
-        absent = 0
-        excused = 0
-        other = 0
-        for i,j in data[user]["students"].items():
-            if classe != "all":
-                if decrypt_data(j["class"],password,KDF,self.salt) != classe :
-                    continue
-
-            for a,b in j["attendance"].items():
-                if a != date.toString("yyyy-MM-dd") :
-                    continue
-                if b == "present":
-                    present += 1
-                elif b == "absent":
-                    absent += 1
-                elif b == "excused":
-                    excused += 1
-            students += 1
-
-        attendance_data = [round(present/students * 100),
-                           round(absent/students * 100),
-                           round(excused/students * 100),
-                           round((students-(present+absent+excused))/students * 100)]
-        labels = ["Present","Absent","Excused","Not Assigned"]
-
-
-        layout = self.ui.Graph_frame_8.layout()
-        if layout is None:
-            layout = QVBoxLayout(self.ui.Graph_frame_8)
-            self.ui.Graph_frame_8.setLayout(layout)
-        else:
-
-            while layout.count():
-                item = layout.takeAt(0)
-                widget = item.widget()
-                if widget:
-                    widget.setParent(None)
-                    widget.deleteLater()
-
-        fig = Figure(figsize=(5, 5))
-        ax = fig.add_subplot(111)
-
-        wedges, texts, autotexts = ax.pie(attendance_data, labels=None, autopct="%1.1f%%",radius=1.55)
-        fig.subplots_adjust(bottom=0.3, left=0.15)
-
-
-        colors = ["#22C55E","#EF4444","#F59E0B","#9CA3AF"]
-
-        for w,c in zip(wedges, colors):
-            w.set_facecolor(c)
-
-        fig.legend(
-            wedges,
-            ["Present", "Absent", "Excused", "Not Assigned"],
-            loc="lower center",
-            bbox_to_anchor=(0.5, -0.05),
-            ncol=2,
-            frameon=False,
-            columnspacing=2,
-            handletextpad=0.6
-        )
-
-        canvas = FigureCanvas(fig)
-        canvas.updateGeometry()
-        canvas.draw()
-
-
-        layout.addWidget(canvas)
-
-    def refresh_graph3_C(self,user,password):
-        data = load()
-
-        current_class = self.ui.comboBox2_5.currentText()
 
         if self.ui.comboBox2_5.findText("all") == -1:
             self.ui.comboBox2_5.insertItem(0, "all")
@@ -606,11 +533,8 @@ class Main_app(QMainWindow):
                     excused += 1
             students += 1
 
-        attendance_data = [round(present/students * 100),
-                           round(absent/students * 100),
-                           round(excused/students * 100),
-                           round((students-(present+absent+excused))/students * 100)]
-        labels = ["Present","Absent","Excused","Not Assigned"]
+
+
 
 
         layout = self.ui.Graph_frame_8.layout()
@@ -626,42 +550,55 @@ class Main_app(QMainWindow):
                     widget.setParent(None)
                     widget.deleteLater()
 
-        fig = Figure(figsize=(5, 5))
-        ax = fig.add_subplot(111)
+        fig, ax = plt.subplots(figsize=(5, 5))
+        if students == 0:
+            ax.text(0.5, 0.5, "No Data Available",
+                    horizontalalignment='center',
+                    verticalalignment='center',
+                    fontsize=14,
+                    transform=ax.transAxes)
+            ax.axis('off')
+        else :
+            attendance_data = [round(present / students * 100),
+                               round(absent / students * 100),
+                               round(excused / students * 100),
+                               round((students - (present + absent + excused)) / students * 100)]
+            wedges, texts, autotexts = ax.pie(attendance_data, labels=None, autopct="%1.1f%%", radius=1.55)
+            fig.subplots_adjust(bottom=0.3, left=0.15)
 
-        wedges, texts, autotexts = ax.pie(attendance_data, labels=None, autopct="%1.1f%%", radius = 1.55)
+            colors = ["#22C55E", "#EF4444", "#F59E0B", "#9CA3AF"]
 
-        fig.subplots_adjust(bottom=0.3, left=0.15)
+            for w, c in zip(wedges, colors):
+                w.set_facecolor(c)
+
+            fig.legend(
+                wedges,
+                ["Present", "Absent", "Excused", "Not Assigned"],
+                loc="lower center",
+                bbox_to_anchor=(0.5, -0.05),
+                ncol=2,
+                frameon=False,
+                columnspacing=2,
+                handletextpad=0.6
+            )
 
 
-        colors = ["#22C55E","#EF4444","#F59E0B","#9CA3AF"]
-
-        for w,c in zip(wedges, colors):
-            w.set_facecolor(c)
-
-        fig.legend(
-            wedges,
-            ["Present", "Absent", "Excused", "Not Assigned"],
-            loc="lower center",
-            bbox_to_anchor=(0.5, -0.05),
-            ncol=2,
-            frameon=False,
-            columnspacing=2,
-            handletextpad=0.6
-        )
 
         canvas = FigureCanvas(fig)
         canvas.updateGeometry()
         canvas.draw()
 
+
         layout.addWidget(canvas)
+
+
 
     def refresh_graph4(self,user,password):
         data = load()
 
         current_class = self.ui.comboBox2_6.currentText()
         year1 = self.ui.comboBox2_7.currentText()
-        self.ui.comboBox2_6.clear()
+
         if self.ui.comboBox2_6.findText("all") == -1:
             self.ui.comboBox2_6.insertItem(0, "all")
         for i, x in enumerate(data[user].get("Classes", {}).values(), start=1):
@@ -671,7 +608,7 @@ class Main_app(QMainWindow):
         classe = self.ui.comboBox2_6.currentText()
 
 
-        self.ui.comboBox2_7.clear()
+
         years = []
         for x,y in data[user].get("students", {}).items():
             if classe != "all":
@@ -737,8 +674,7 @@ class Main_app(QMainWindow):
                     widget.setParent(None)
                     widget.deleteLater()
 
-        fig = Figure(figsize=(5, 5))
-        ax = fig.add_subplot(111)
+        fig, ax = plt.subplots(figsize=(5, 5))
         percentages = []
         months = [
             "January", "February", "March", "April", "May", "June",
@@ -759,106 +695,6 @@ class Main_app(QMainWindow):
         canvas.draw()
         layout.addWidget(canvas)
 
-    def refresh_graph4_C(self, user, password):
-        data = load()
-
-        current_class = self.ui.comboBox2_6.currentText()
-        year1 = self.ui.comboBox2_7.currentText()
-
-        if self.ui.comboBox2_6.findText("all") == -1:
-            self.ui.comboBox2_6.insertItem(0, "all")
-        for i, x in enumerate(data[user].get("Classes", {}).values(), start=1):
-            if self.ui.comboBox2_6.findText(x["class_Name"]) == -1:
-                self.ui.comboBox2_6.insertItem(i, x["class_Name"])
-        self.ui.comboBox2_6.setCurrentText(current_class)
-        classe = self.ui.comboBox2_6.currentText()
-
-
-        years = []
-        for x, y in data[user].get("students", {}).items():
-            if classe != "all":
-                if decrypt_data(y["class"], password, KDF, self.salt) != classe:
-                    continue
-            for j in y["attendance"]:
-                if j[:4] not in years:
-                    years.append(j[:4])
-        for a, x in enumerate(years):
-            if self.ui.comboBox2_7.findText(x) == -1:
-                self.ui.comboBox2_7.insertItem(a, x)
-        self.ui.comboBox2_7.setCurrentText(year1)
-        attendance = []
-        months_data = {
-            "01": 0,
-            "02": 0,
-            "03": 0,
-            "04": 0,
-            "05": 0,
-            "06": 0,
-            "07": 0,
-            "08": 0,
-            "09": 0,
-            "10": 0,
-            "11": 0,
-            "12": 0
-        }
-
-        year = self.ui.comboBox2_7.currentText()
-        for x, y in data[user].get("students", {}).items():
-            if classe != "all":
-                if decrypt_data(y["class"], password, KDF, self.salt) != classe:
-                    continue
-            for date, status in y["attendance"].items():
-
-                if date[:4] != year:
-                    continue
-                if status == "present":
-                    months_data[date[5:7]] = months_data.get(date[5:7], 0) + 1
-
-        d = 0
-        for i, y in data[user].get("students", {}).items():
-
-            if classe != "all":
-                if decrypt_data(y["class"], password, KDF, self.salt) != classe:
-                    continue
-            for j, k in y["attendance"].items():
-                if j[:4] != year:
-                    continue
-                d += 1
-
-        layout = self.ui.Graph_frame_7.layout()
-        if layout is None:
-            layout = QVBoxLayout(self.ui.Graph_frame_7)
-            self.ui.Graph_frame_7.setLayout(layout)
-        else:
-
-            while layout.count():
-                item = layout.takeAt(0)
-                widget = item.widget()
-                if widget:
-                    widget.setParent(None)
-                    widget.deleteLater()
-
-        fig = Figure(figsize=(5, 5))
-        ax = fig.add_subplot(111)
-        percentages = []
-        months = [
-            "January", "February", "March", "April", "May", "June",
-            "July", "August", "September", "October", "November", "December"
-        ]
-        if d == 0:
-            percentages = [0] * 12
-        else:
-            percentages = [round(x / d * 100) for x in months_data.values()]
-        ax.plot(months, percentages)
-        for label in ax.get_xticklabels():
-            label.set_rotation(90)
-        ax.set_ylim(0, 100)
-        fig.subplots_adjust(bottom=0.3, right=0.95, left=0.08)
-
-        canvas = FigureCanvas(fig)
-        canvas.updateGeometry()
-        canvas.draw()
-        layout.addWidget(canvas)
 
 
 
@@ -1067,7 +903,7 @@ class Main_app(QMainWindow):
         autotexts = None
         data = load()
         current_class = self.ui.comboBox2_3.currentText()
-        self.ui.comboBox2_3.clear()
+
         if self.ui.comboBox2_3.findText("all") == -1:
             self.ui.comboBox2_3.insertItem(0, "all")
         for i, x in enumerate(data[user].get("Classes", {}).values(), start=1):
@@ -1136,77 +972,7 @@ class Main_app(QMainWindow):
         self.ui.Graph_frame_3.texts = texts
         layout.addWidget(canvas)
 
-    def refresh_graph7_C(self, user, password):
-        wedges = None
-        texts = None
-        autotexts = None
-        data = load()
-        current_class = self.ui.comboBox2_3.currentText()
 
-        if self.ui.comboBox2_3.findText("all") == -1:
-            self.ui.comboBox2_3.insertItem(0, "all")
-        for i, x in enumerate(data[user].get("Classes", {}).values(), start=1):
-            if self.ui.comboBox2_3.findText(x["class_Name"]) == -1:
-                self.ui.comboBox2_3.insertItem(i, x["class_Name"])
-        self.ui.comboBox2_3.setCurrentText(current_class)
-        classe = self.ui.comboBox2_3.currentText()
-
-        males = 0
-        females = 0
-
-        for i,j in data[user]["students"].items():
-            if classe != "all":
-                if classe != decrypt_data(j["class"],password,KDF,self.salt):
-                    continue
-            if decrypt_data(j["gender"], password, KDF, self.salt) == "Male":
-                males += 1
-            else:
-                females += 1
-        males_percentage = males / len(data[user]["students"]) * 100 if len(data[user]["students"])!=0 else 0
-        females_percentage = females / len(data[user]["students"]) * 100 if len(data[user]["students"])!=0 else 0
-
-        sizes = [males_percentage, females_percentage]
-        labels = ["Male", "Female"]
-
-        layout = self.ui.Graph_frame_4.layout()
-        if layout is None:
-            layout = QVBoxLayout(self.ui.Graph_frame_4)
-            self.ui.Graph_frame_4.setLayout(layout)
-        else:
-
-            while layout.count():
-                item = layout.takeAt(0)
-                widget = item.widget()
-                if widget:
-                    widget.setParent(None)
-                    widget.deleteLater()
-
-        fig = Figure(figsize=(5, 5))
-        ax = fig.add_subplot(111)
-
-        try:
-            wedges,texts,autotexts=ax.pie(sizes, labels=labels, autopct="%1.1f%%")
-        except (ValueError, ZeroDivisionError):
-            ax.text(0.5, 0.5, "No Data Available",
-                    horizontalalignment='center',
-                    verticalalignment='center',
-                    fontsize=14,
-                    transform=ax.transAxes)
-            ax.axis('off')
-        if len(data[user]["students"])==0:
-            ax.text(0.5, 0.5, "No Data Available",
-                    horizontalalignment='center',
-                    verticalalignment='center',
-                    fontsize=14,
-                    transform=ax.transAxes)
-            ax.axis('off')
-        canvas = FigureCanvas(fig)
-        canvas.updateGeometry()
-        canvas.draw()
-        self.ui.Graph_frame_3.wedges = wedges
-        self.ui.Graph_frame_3.canvas = canvas
-        self.ui.Graph_frame_3.texts = texts
-        layout.addWidget(canvas)
 
     def refresh_graph8(self,user,password):
         data = load()
@@ -2128,8 +1894,8 @@ class Main_app(QMainWindow):
             self.update_line(self.ui.lineEdit_2_n)
             self.ui.label_errn.show()
             return
-
-        new_user = {"username":username, "password":hash_password(password,SALT())}
+        salt = os.urandom(16)
+        new_user = {"username":username, "password":hash_password(password,salt),"salt":salt.hex()}
         data.append(new_user)
         self.current_user.append(username)
         self.current_password.append(password)
@@ -2145,6 +1911,7 @@ class Main_app(QMainWindow):
         for i in self.lines:
             i.clear()
             self.reset_line(i)
+        self.salt = self.SALT(self.current_user[-1])
 
         self.ui.label_6.setText(str(len(loaded2[self.current_user[-1]]["Subjects"])))
         self.ui.label_4.setText(str(len(loaded2[self.current_user[-1]]["Classes"])))
@@ -2171,7 +1938,7 @@ class Main_app(QMainWindow):
             self.ui.label_errn.repaint()
             return
         for i in data:
-            if i["username"] == username and i["password"] == hash_password(password, SALT()):
+            if i["username"] == username and i["password"] == hash_password(password, bytes.fromhex(i["salt"])):
                 self.reset_line(self.ui.lineEdit_5)
                 self.reset_line(self.ui.lineEdit_6)
                 self.ui.label_errn.hide()
@@ -2185,6 +1952,7 @@ class Main_app(QMainWindow):
                 self.ui.label_6.setText(str(len(data2[self.current_user[-1]]["Subjects"])))
                 self.ui.label_4.setText(str(len(data2[self.current_user[-1]]["Classes"])))
                 self.ui.label_2.setText(str(len(data2[self.current_user[-1]]["students"])))
+                self.salt = self.SALT(self.current_user[-1])
 
 
                 for i in self.lines:
@@ -2816,7 +2584,7 @@ class Main_app(QMainWindow):
                    "attendance":{}}
 
 
-        data[self.current_user[-1]]["students"][student_id] = student
+        data[self.current_user[-1]]["students"][str(student_id)] = student
         data[self.current_user[-1]]["Classes"][self.classe]["Total_students"] = int(data[self.current_user[-1]]["Classes"][self.classe].get("Total_students", 0)) + 1
         save(data)
         self.refresh_add(self.current_user[-1],self.current_password[-1])
@@ -3574,11 +3342,11 @@ class Main_app(QMainWindow):
             i.hide()
         for i in self.widgets_statistics_4:
             i.show()
-
-        self.refresh_graph3(self.current_user[-1],self.current_password[-1])
+        self.refresh_graph3(self.current_user[-1], self.current_password[-1])
         self.refresh_graph4(self.current_user[-1], self.current_password[-1])
         self.animate_page(self.ui.Graph_frame_7, 1, 0, "white", 15, 561, 331)
         self.animate_page(self.ui.Graph_frame_8, 1, 0, "white", 15, 191, 181)
+
 
 
 
@@ -3689,6 +3457,7 @@ class Main_app(QMainWindow):
         self.animate_page(self.ui.Graph_frame_6, 1, 0, "white", 45, 351, 341)
 
 
+
     def other(self):
         self.ui.info.hide()
         for i in self.widgets_class:
@@ -3742,10 +3511,12 @@ class Main_app(QMainWindow):
         self.animate_page(self.ui.Graph_frame_3, 1, 0, "white", 15, 351, 321)
         self.animate_page(self.ui.Graph_frame_4, 1, 0, "white", 15, 351, 321)
 
-
-
-
-
+    def SALT(self,user):
+        data = load_data()
+        for i in data:
+            if i["username"] == user:
+                salt = i["salt"]
+        return bytes.fromhex(salt)
 
 
 
@@ -3757,4 +3528,3 @@ if __name__ == "__main__":
     window = Main_app()
     window.show()
     sys.exit(app.exec())
-

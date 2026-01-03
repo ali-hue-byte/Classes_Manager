@@ -19,6 +19,14 @@ This project is a modern, user-friendly Student Management System built with PyS
 - **Attendance Page**-Mark, edit, and track student attendance with clear status indicators and real-time updates
 - **Statistics Page** – A page for visualizing student data such as grades, attendance and gender distribution using matplotlib for graphs (with animations on hover) and highlighting top-performing students (real-time updates)
 
+---
+
+### Upcoming Features
+
+- Data storage with SQLite: replacing Pickle for faster, more reliable, and scalable data management.
+- Configurable maximum marks: teachers can set the maximum score for each subject or assessment.
+
+
   
 ---
 

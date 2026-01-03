@@ -8,10 +8,11 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 import base64
 from PySide6.QtCore import QPropertyAnimation, QEasingCurve
+import pickle
 
-DATA_FILE = "data.json"
-USER = "users.json"
-SALT_file = "salt"
+DATA_FILE = "data.pkl"
+USER = "users.pkl"
+
 
 
 
@@ -28,37 +29,29 @@ def animate_title(title, start, end):
 
 def load():
     if os.path.exists(DATA_FILE):
-        with open(DATA_FILE, "r") as f:
-            return json.load(f)
+        with open(DATA_FILE, "rb") as f:
+            return pickle.load(f)
     else:
         return {}
 
 def save(data):
-    with open(DATA_FILE, "w") as f:
-        return json.dump(data, f, indent=4)
+    with open(DATA_FILE, "wb") as f:
+        pickle.dump(data, f)
 
 
 def load_data():
     if os.path.exists(USER):
-        with open(USER, "r") as f:
-            return json.load(f)
+        with open(USER, "rb") as f:
+            return pickle.load(f)
     else:
         return []
 
 def save_data(data):
-    with open(USER, "w") as f:
-        return json.dump(data, f, indent=4)
+    with open(USER, "wb") as f:
+        pickle.dump(data, f)
 
 
-def SALT():
-    if os.path.exists(SALT_file):
-        with open(SALT_file, "r") as f:
-            salt = bytes.fromhex(f.read())
-    else:
-        salt = os.urandom(16)
-        with open(SALT_file, "w") as f:
-            f.write(salt.hex())
-    return salt
+
 
 def KDF(password, salt):
     e_password = password.encode() if isinstance(password, str) else password

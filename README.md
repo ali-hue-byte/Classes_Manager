@@ -14,9 +14,9 @@ This project is a modern, user-friendly Student Management System built with PyS
 - All stored student data is protected using encryption based on a Key Derivation Function (KDF)
 - Dynamic, interconnected tables that automatically update classes, subjects, students, and grades in real time
 - **Students Information page**- View, manage and edit students details
-- **Adding classes**-View, creat and edit new Classes
-- **Grades page**-Add, delete subjects and students grades
-- **Attendance page**-Mark, edit, and track student attendance with clear status indicators and real-time updates
+- **Adding Classes**-View, creat and edit new Classes
+- **Grades Page**-Add, delete subjects and students grades
+- **Attendance Page**-Mark, edit, and track student attendance with clear status indicators and real-time updates
 - **Statistics Page** – A page for visualizing student data such as grades, attendance and gender distribution using matplotlib for graphs (with animations on hover) and highlighting top-performing students (real-time updates)
 
   
@@ -50,6 +50,8 @@ python Student_Management.py
 - **Student_Management.py** – The main Python file used to run the application.
 - **App.py** – The Python file generated from Qt Designer that contains all the UI widgets and layouts.
 - **Functions.py** - Python file containing helper functions for user authentication, password hashing, validation, and user data management used throughout the app.
+- **data.pkl** - Binary storage file (Pickle) used to persist application data (students, classes, marks, attendance records).
+- **users.pkl** - Binary storage file (Pickle) containing user authentication data, including unique per-user salts and salted password hashes.
 
 ## Screenshots 
 

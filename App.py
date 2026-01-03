@@ -2376,6 +2376,31 @@ class Ui_Dialog(object):
                                        "\n"
                                        "")
 
+        self.attendace_title = QLabel(self.page)
+        self.attendace_title.setObjectName(u"average_class")
+        self.attendace_title.setGeometry(QRect(170, 100, 511, 31))
+        self.attendace_title.setStyleSheet(u"font: 700 14pt \"Arial\";\n"
+                                         "color: rgb(34, 34, 34);")
+        self.attendace_title.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.attendace_title2 = QLabel(self.page)
+        self.attendace_title2.setObjectName(u"average_class")
+        self.attendace_title2.setGeometry(QRect(680, 100, 311, 31))
+        self.attendace_title2.setStyleSheet(u"font: 700 14pt \"Arial\";\n"
+                                         "color: rgb(34, 34, 34);")
+        self.attendace_title2.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.classe = QLabel(self.page)
+        self.classe.setObjectName(u"average_class")
+        self.classe.setGeometry(QRect(160, 495, 100, 31))
+        self.classe.setStyleSheet(u"color: rgb(46, 58, 89);\n"
+                                    "font: 600 12pt \"Segoe UI\";")
+        self.classe.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.year = QLabel(self.page)
+        self.year.setObjectName(u"average_class")
+        self.year.setGeometry(QRect(420, 495, 100, 31))
+        self.year.setStyleSheet(u"color: rgb(46, 58, 89);\n"
+                                    "font: 600 12pt \"Segoe UI\";")
+        self.year.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
 
 
 
@@ -2680,6 +2705,10 @@ class Ui_Dialog(object):
         self.lastnameline.setText("")
         self.label_22.setText(QCoreApplication.translate("Dialog", u"Academic info ", None))
         self.label_23.setText(QCoreApplication.translate("Dialog", u"Contact info ", None))
+        self.attendace_title.setText(QCoreApplication.translate("Dialog", u"Monthly Attendance Rate (%) ", None))
+        self.attendace_title2.setText(QCoreApplication.translate("Dialog", u"Attendance Status Distribution ", None))
+        self.classe.setText(QCoreApplication.translate("Dialog", u"Class ", None))
+        self.year.setText(QCoreApplication.translate("Dialog", u"Year ", None))
         self.Emailine.setText("")
         self.Emailine.setPlaceholderText(QCoreApplication.translate("Dialog", u"example123@gmail.com", None))
         self.AdressLine.setText("")
@@ -2850,6 +2879,4 @@ class Ui_Dialog(object):
 "", None))
         self.label_2_n.setText(QCoreApplication.translate("Dialog", u"Create account", None))
     # retranslateUi
-
-
 

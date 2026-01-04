@@ -20,7 +20,6 @@ from Functions import (
     hash_password,
     save_data,
     load_data,
-    check_strength,
     KDF2,
     decrypt_data,
     encrypt_data,
@@ -2135,10 +2134,38 @@ class Main_app(QMainWindow):
                 self.update_line(self.ui.lineEdit_n)
                 self.ui.label_errn.show()
                 return
-        if not check_strength(password):
+        if len(password) < 8:
             self.reset_line(self.ui.lineEdit_n)
             self.reset_line(self.ui.lineEdit_2_n)
-            self.ui.label_errn.setText("Your password is too weak. Please choose a stronger one.")
+            self.ui.label_errn.setText("The password must be at least 8 characters long.")
+            self.update_line(self.ui.lineEdit_2_n)
+            self.ui.label_errn.show()
+            return
+        elif not re.search(r"[A-Z]", password) :
+            self.reset_line(self.ui.lineEdit_n)
+            self.reset_line(self.ui.lineEdit_2_n)
+            self.ui.label_errn.setText("The password must include at least one uppercase letter.")
+            self.update_line(self.ui.lineEdit_2_n)
+            self.ui.label_errn.show()
+            return
+        elif not re.search(r"[a-z]", password) :
+            self.reset_line(self.ui.lineEdit_n)
+            self.reset_line(self.ui.lineEdit_2_n)
+            self.ui.label_errn.setText("The password must include at least one lowercase letter.")
+            self.update_line(self.ui.lineEdit_2_n)
+            self.ui.label_errn.show()
+            return
+        elif not re.search(r"[0-9]", password) :
+            self.reset_line(self.ui.lineEdit_n)
+            self.reset_line(self.ui.lineEdit_2_n)
+            self.ui.label_errn.setText("The password must include at least one number.")
+            self.update_line(self.ui.lineEdit_2_n)
+            self.ui.label_errn.show()
+            return
+        elif not re.search(r"[!@#$%^&*(),.?\":{}|<>]", password):
+            self.reset_line(self.ui.lineEdit_n)
+            self.reset_line(self.ui.lineEdit_2_n)
+            self.ui.label_errn.setText("The password must include at least one special character.")
             self.update_line(self.ui.lineEdit_2_n)
             self.ui.label_errn.show()
             return

@@ -1,7 +1,5 @@
 
-import json
 import os
-
 from cryptography.fernet import Fernet
 import hashlib
 import re
@@ -11,6 +9,8 @@ import base64
 from PySide6.QtCore import QPropertyAnimation, QEasingCurve
 import pickle
 import sqlite3
+
+
 DATA_FILE = "data.pkl"
 USER = "users.pkl"
 
@@ -114,6 +114,7 @@ def check_strength(pss):
             bool(re.search(r"[0-9]", pss)),
             bool(re.search(r"[!@#$%^&*(),.?\":{}|<>]", pss))]
     return all(tests)
+
 
 
 

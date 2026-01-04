@@ -331,7 +331,7 @@ class Main_app(QMainWindow):
             self.ui.from_combobox,
             self.ui.to_lbl,
             self.ui.to_combobox,
-            self.ui.id_lbl,
+            self.ui.id_lbl2,
             self.ui.id_combobox
         ]
 
@@ -1642,8 +1642,9 @@ class Main_app(QMainWindow):
 
     def refresh_view(self, user, password):
 
-        self.ui.ClassComboBox2.clear()
+
         current_class1 = self.ui.ClassComboBox2.currentText()
+        self.ui.ClassComboBox2.clear()
 
         self.unwrap_shadow(self.ui.tableWidget)
 
@@ -1687,9 +1688,9 @@ class Main_app(QMainWindow):
             self.ui.tableWidget.setItem(row, 2,
                                         QTableWidgetItem(decrypt_data(y[4],  self.kdf)))
             self.ui.tableWidget.setItem(row, 3, QTableWidgetItem(decrypt_data(y[6], self.kdf)))
+            self.ui.tableWidget.setItem(row, 4, QTableWidgetItem(decrypt_data(y[7], self.kdf)))
             self.ui.tableWidget.setItem(row, 5, QTableWidgetItem(decrypt_data(y[9], self.kdf)))
-            self.ui.tableWidget.setItem(row, 4, QTableWidgetItem(decrypt_data(y[8], self.kdf)))
-            self.ui.tableWidget.setItem(row, 6, QTableWidgetItem(decrypt_data(y[7], self.kdf)))
+            self.ui.tableWidget.setItem(row, 6, QTableWidgetItem(decrypt_data(y[8], self.kdf)))
             self.container = QWidget()
             self.container.setGeometry(QRect(0, 0, 100, 40))
             self.delete_btn = QPushButton(self.container)
@@ -1761,9 +1762,9 @@ class Main_app(QMainWindow):
             self.ui.tableWidget.setItem(row, 2,
                                         QTableWidgetItem(decrypt_data(y[4], self.kdf)))
             self.ui.tableWidget.setItem(row, 3, QTableWidgetItem(decrypt_data(y[6], self.kdf)))
+            self.ui.tableWidget.setItem(row, 4, QTableWidgetItem(decrypt_data(y[7], self.kdf)))
             self.ui.tableWidget.setItem(row, 5, QTableWidgetItem(decrypt_data(y[9], self.kdf)))
-            self.ui.tableWidget.setItem(row, 4, QTableWidgetItem(decrypt_data(y[8], self.kdf)))
-            self.ui.tableWidget.setItem(row, 6, QTableWidgetItem(decrypt_data(y[7], self.kdf)))
+            self.ui.tableWidget.setItem(row, 6, QTableWidgetItem(decrypt_data(y[8], self.kdf)))
             self.container = QWidget()
             self.container.setGeometry(QRect(0, 0, 100, 40))
             self.delete_btn = QPushButton(self.container)
@@ -2887,8 +2888,8 @@ class Main_app(QMainWindow):
             encrypt_data(self.date_str, self.kdf),
             encrypt_data(self.classe, self.kdf),
             encrypt_data(self.gender, self.kdf),
-            encrypt_data(self.email, self.kdf),
-            encrypt_data(self.number,  self.kdf),
+            encrypt_data(self.number, self.kdf),
+            encrypt_data(self.email,  self.kdf),
             encrypt_data(self.address,  self.kdf)
         )
         c.execute("SELECT * FROM classes WHERE user=?", (self.current_user[-1],))
@@ -3874,6 +3875,28 @@ class Main_app(QMainWindow):
         self.ui.View_top_btn.hide()
         self.wrap_with_shadow(self.ui.transfer_btn,70)
         self.wrap_with_shadow(self.ui.set_btn,70)
+
+        c.execute("SELECT class_name FROM classes WHERE user = ?",(self.current_user[-1],))
+        class_rows = c.fetchall()
+        classes = [x[0] for x in class_rows]
+
+
+
+        for i,j in enumerate(classes):
+            if self.ui.to_combobox.findText(j) == -1:
+                self.ui.to_combobox.insertItem(i, j)
+            if self.ui.from_combobox.findText(j) == -1:
+                self.ui.from_combobox.insertItem(i, j)
+        classe = self.ui.to_combobox.currentText()
+        self.refresh_combo_id(self.current_user[-1], classe)
+
+    def refresh_combo_id(self,user,classe):
+        c.execute("SELECT student_id FROM students WHERE user =? AND class = ?",(user,classe))
+        students_rows = c.fetchall()
+        students = [x[0] for x in students_rows]
+        for i,j in enumerate(students):
+            if self.ui.id_combobox.findText(j) == -1:
+                self.ui.id_combobox.insertItem(i, j)
 
 
 if __name__ == "__main__":

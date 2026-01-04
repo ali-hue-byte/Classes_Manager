@@ -271,7 +271,8 @@ class Main_app(QMainWindow):
             self.ui.requirederrfirst_3,
             self.ui.requirederrsubject,
             self.ui.requirederrcoeff,
-            self.ui.birtherr
+            self.ui.birtherr,
+            self.ui.errscore_lbl
 
         ]
 
@@ -323,7 +324,6 @@ class Main_app(QMainWindow):
             self.ui.score_settings_lbl,
             self.ui.max_score_lbl,
             self.ui.score_line,
-            self.ui.errscore_lbl,
             self.ui.set_btn,
             self.ui.transfe_lbl,
             self.ui.transfer_btn,
@@ -444,6 +444,9 @@ class Main_app(QMainWindow):
         self.ui.comboBox2_7.currentTextChanged.connect(
             lambda: self.refresh_graph4(self.current_user[-1], self.current_password[-1]))
         self.ui.info_button.clicked.connect(self.edit_page)
+        self.ui.from_combobox.currentTextChanged.connect(lambda : self.refresh_combo_id(self.current_user[-1], self.ui.from_combobox.currentText()))
+        self.ui.transfer_btn.clicked.connect(self.transfer)
+        self.ui.set_btn.clicked.connect(self.set)
 
         # ------------------------------------------------------------------
 
@@ -452,6 +455,10 @@ class Main_app(QMainWindow):
         self.animations2 = []
 
     def refresh_graph1(self, user, password):
+        data = load_data()
+        for i in data :
+            if i["username"] == user :
+                max_score = i["max_score"]
         bars = None
 
         c.execute("SELECT * FROM students WHERE user=?", (user,))
@@ -502,7 +509,7 @@ class Main_app(QMainWindow):
         else:
 
             bars = ax.bar(classes, data_classes)
-            ax.set_ylim(0, 20)
+            ax.set_ylim(0, int(max_score))
             fig.tight_layout()
             fig.subplots_adjust(bottom=0.2, left=0.15)
             for label in ax.get_xticklabels():
@@ -522,6 +529,10 @@ class Main_app(QMainWindow):
             self.ui.Graph_frame_2.ax = ax
 
     def refresh_graph2(self, user, password):
+        data = load_data()
+        for i in data :
+            if i["username"] == user :
+                max_score = i["max_score"]
         bars = None
         c.execute("SELECT subject_name FROM subjects WHERE user=?", (user,))
         subjects_rows = c.fetchall()
@@ -560,7 +571,7 @@ class Main_app(QMainWindow):
         else:
 
             bars = ax.bar(subjects, average_per_subject)
-            ax.set_ylim(0, 20)
+            ax.set_ylim(0, int(max_score))
             fig.tight_layout()
             fig.subplots_adjust(bottom=0.2, left=0.15)
             for label in ax.get_xticklabels():
@@ -1428,6 +1439,10 @@ class Main_app(QMainWindow):
         self.wrap_with_shadow2(self.ui.tableWidget_att, 70)
 
     def refresh_grades(self, user, password):
+        data = load_data()
+        for i in data :
+            if i["username"] == user :
+                max_score = i["max_score"]
         self.unwrap_shadow(self.ui.tableWidget_grades)
 
         current_class1 = self.ui.ClassComboBox3.currentText()
@@ -1491,7 +1506,7 @@ class Main_app(QMainWindow):
                                                                           2)))) if total_coeff != 0 else QTableWidgetItem(
                 "")
             item = self.ui.tableWidget_grades.item(row, self.ui.tableWidget_grades.columnCount() - 1)
-            if total_coeff != 0 and sum(average) / total_coeff < 10:
+            if total_coeff != 0 and sum(average) / total_coeff < (int(max_score)//2):
                 if item:
                     item.setBackground(QColor("#FADBD8"))
             else:
@@ -1509,6 +1524,10 @@ class Main_app(QMainWindow):
         self.wrap_with_shadow2(self.ui.tableWidget_grades, 70)
 
     def refresh_grades_C(self, user, password):
+        data = load_data()
+        for i in data :
+            if i["username"] == user :
+                max_score = i["max_score"]
         self.unwrap_shadow(self.ui.tableWidget_grades)
 
         current_class1 = self.ui.ClassComboBox3.currentText()
@@ -1571,7 +1590,7 @@ class Main_app(QMainWindow):
                                                                           2)))) if total_coeff != 0 else QTableWidgetItem(
                 "")
             item = self.ui.tableWidget_grades.item(row, self.ui.tableWidget_grades.columnCount() - 1)
-            if total_coeff != 0 and sum(average) / total_coeff < 10:
+            if total_coeff != 0 and sum(average) / total_coeff < (int(max_score)//2):
                 if item:
                     item.setBackground(QColor("#FADBD8"))
             else:
@@ -2171,7 +2190,7 @@ class Main_app(QMainWindow):
             self.ui.label_errn.show()
             return
         salt = os.urandom(16)
-        new_user = {"username": username, "password": hash_password(password, salt), "salt": salt.hex()}
+        new_user = {"username": username, "password": hash_password(password, salt), "salt": salt.hex(),"max_score":20}
         data.append(new_user)
         self.current_user.append(username)
         self.current_password.append(password)
@@ -3458,6 +3477,10 @@ class Main_app(QMainWindow):
         self.ui.tableWidget_grades.setEditTriggers(QTableWidget.NoEditTriggers)
 
     def Save_btn_4(self):
+        data = load_data()
+        for i in data:
+            if i["username"] == self.current_user[-1]:
+                max_score = i["max_score"]
 
         err = False
         entering_data = {}
@@ -3490,7 +3513,7 @@ class Main_app(QMainWindow):
                     item = self.ui.tableWidget_grades.item(i, j)
                     item.setBackground(QColor("#F8D7DA"))
 
-                if round(sum(grades) / len(grades), 2) > 20:
+                if round(sum(grades) / len(grades), 2) > int(max_score):
                     err = True
                     item = self.ui.tableWidget_grades.item(i, j)
                     item.setBackground(QColor("#F8D7DA"))
@@ -3564,6 +3587,7 @@ class Main_app(QMainWindow):
         self.refresh_attendance(self.current_user[-1], self.current_password[-1])
 
     def statistics(self):
+
         self.ui.info.hide()
         for i in self.widgets_class:
             i.hide()
@@ -3879,6 +3903,7 @@ class Main_app(QMainWindow):
         c.execute("SELECT class_name FROM classes WHERE user = ?",(self.current_user[-1],))
         class_rows = c.fetchall()
         classes = [x[0] for x in class_rows]
+        self.reset_line2(self.ui.score_line)
 
 
 
@@ -3890,13 +3915,58 @@ class Main_app(QMainWindow):
         classe = self.ui.to_combobox.currentText()
         self.refresh_combo_id(self.current_user[-1], classe)
 
+
     def refresh_combo_id(self,user,classe):
-        c.execute("SELECT student_id FROM students WHERE user =? AND class = ?",(user,classe))
+        c.execute("SELECT student_id,class FROM students WHERE user =? ",(user,))
         students_rows = c.fetchall()
-        students = [x[0] for x in students_rows]
+        students = []
+        self.ui.id_combobox.clear()
+        for i in students_rows:
+            if decrypt_data(i[1],self.kdf) == classe :
+                students.append(str(i[0]))
         for i,j in enumerate(students):
             if self.ui.id_combobox.findText(j) == -1:
                 self.ui.id_combobox.insertItem(i, j)
+
+    def transfer(self):
+
+        to = self.ui.to_combobox.currentText()
+        student = self.ui.id_combobox.currentText()
+        c.execute("UPDATE students SET class =? WHERE user =? AND student_id = ?",(encrypt_data(to,self.kdf), self.current_user[-1],student))
+        conn.commit()
+
+        self.refresh_combo_id(self.current_user[-1], self.ui.from_combobox.currentText())
+
+    def set(self):
+        data = load_data()
+        err=False
+        c.execute("SELECT grade FROM grades WHERE user =?",(self.current_user[-1],))
+        grades = c.fetchall()
+        grades2 = [int(x[0]) for x in grades]
+        score = self.ui.score_line.text()
+
+        if not re.fullmatch(r"[0-9]+",score):
+            self.ui.errscore_lbl.setText("Invalid Score")
+            self.ui.errscore_lbl.show()
+            self.update_line2(self.ui.score_line)
+            return
+        for i in grades2 :
+            if i> int(score):
+                err = True
+        if err:
+            self.ui.errscore_lbl.setText("Some marks exceed the maximum score you entered.")
+            self.update_line2(self.ui.score_line)
+            self.ui.errscore_lbl.show()
+            return
+        self.reset_line2(self.ui.score_line)
+        self.ui.errscore_lbl.hide()
+        for i in data:
+            if i["username"] == self.current_user[-1]:
+                i.update({"max_score": score})
+        self.ui.score_line.setText("")
+
+        save_data(data)
+
 
 
 if __name__ == "__main__":

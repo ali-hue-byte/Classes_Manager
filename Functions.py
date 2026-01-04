@@ -1,5 +1,6 @@
-
+import json
 import os
+
 from cryptography.fernet import Fernet
 import hashlib
 import re
@@ -9,9 +10,7 @@ import base64
 from PySide6.QtCore import QPropertyAnimation, QEasingCurve
 import pickle
 import sqlite3
-
-
-
+DATA_FILE = "data.pkl"
 USER = "users.pkl"
 
 conn = sqlite3.connect("data.db")
@@ -44,7 +43,9 @@ def add_grade(user, id , subject, grade):
               (user, id, subject, grade))
 
     conn.commit()
-
+def select_student(user,id):
+    c.execute("SELECT * FROM students WHERE student_id = ? AND user = ?",(id,user))
+    return c.fetchone()
 def select_class(user,classe):
     c.execute("SELECT * FROM classes WHERE user = ? AND class_name = ?", ( user,classe))
     return c.fetchone()
@@ -102,17 +103,6 @@ def decrypt_data(data, fernet):
 
 def hash_password(password, salt):
     return hashlib.sha256(password.encode() + salt).hexdigest()
-
-
-def check_strength(pss):
-
-    tests = [len(pss) >= 8,
-            bool(re.search(r"[A-Z]", pss)),
-            bool(re.search(r"[a-z]", pss)),
-            bool(re.search(r"[0-9]", pss)),
-            bool(re.search(r"[!@#$%^&*(),.?\":{}|<>]", pss))]
-    return all(tests)
-
 
 
 

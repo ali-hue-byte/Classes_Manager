@@ -30,6 +30,7 @@ from Functions import (
     add_subject,
     add_grade,
     mark_attendance,
+select_student,
 select_class,
 delete_student,
 delete_class,
@@ -106,6 +107,7 @@ class Main_app(QMainWindow):
         self.wrap_with_shadow(self.ui.frame_3, 90)
         self.wrap_with_shadow(self.ui.frame_2, 20)
         self.wrap_with_shadow(self.ui.frame, 20)
+
 
         self.setFixedSize(990, 560)
         self.ui.label_errn.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -318,6 +320,22 @@ class Main_app(QMainWindow):
             self.ui.classe
         ]
 
+        self.widgets_edit = [
+            self.ui.score_settings_lbl,
+            self.ui.max_score_lbl,
+            self.ui.score_line,
+            self.ui.errscore_lbl,
+            self.ui.set_btn,
+            self.ui.transfe_lbl,
+            self.ui.transfer_btn,
+            self.ui.from_lbl,
+            self.ui.from_combobox,
+            self.ui.to_lbl,
+            self.ui.to_combobox,
+            self.ui.id_lbl,
+            self.ui.id_combobox
+        ]
+
         self.widgets_acc = [{"widget": self.ui.frame_n, "pos_off": QPoint(-490, 50), "pos_on": QPoint(560, 50)},
                             {"widget": self.ui.label_3_n, "pos_off": QPoint(-450, 190), "pos_on": QPoint(600, 190)},
                             {"widget": self.ui.label_4_n, "pos_off": QPoint(-450, 280), "pos_on": QPoint(600, 280)},
@@ -356,6 +374,8 @@ class Main_app(QMainWindow):
         for i in self.widgets_statistics_2:
             i.hide()
         for i in self.widgets_statistics_4:
+            i.hide()
+        for i in self.widgets_edit:
             i.hide()
         for i in [self.ui.comboBox2_5, self.ui.comboBox2_6, self.ui.comboBox2_3]:
             i.insertItem(0, "all")
@@ -424,6 +444,7 @@ class Main_app(QMainWindow):
             lambda: self.refresh_graph4(self.current_user[-1], self.current_password[-1]))
         self.ui.comboBox2_7.currentTextChanged.connect(
             lambda: self.refresh_graph4(self.current_user[-1], self.current_password[-1]))
+        self.ui.info_button.clicked.connect(self.edit_page)
 
         # ------------------------------------------------------------------
 
@@ -1266,8 +1287,15 @@ class Main_app(QMainWindow):
             excused.clicked.connect(partial(excusedt))
 
             self.ui.tableWidget_att.setCellWidget(row, 2, frame)
+        for row in range(self.ui.tableWidget_att.rowCount()):
+            for col in range(self.ui.tableWidget_att.columnCount()):
+                item = self.ui.tableWidget_att.item(row, col)
+                if item is None:
+                    item = QTableWidgetItem("")
+                    self.ui.tableWidget_att.setItem(row, col, item)
+                item.setTextAlignment(Qt.AlignCenter)
 
-        self.wrap_with_shadow(self.ui.tableWidget_att, 70)
+        self.wrap_with_shadow2(self.ui.tableWidget_att, 70)
 
     def refresh_attendance_C(self, user, password):
         c.execute("SELECT class_name FROM classes WHERE user = ? ",(user,))
@@ -1390,8 +1418,15 @@ class Main_app(QMainWindow):
             excused.clicked.connect(partial(excusedt))
 
             self.ui.tableWidget_att.setCellWidget(row, 2, frame)
+        for row in range(self.ui.tableWidget_att.rowCount()):
+            for col in range(self.ui.tableWidget_att.columnCount()):
+                item = self.ui.tableWidget_att.item(row, col)
+                if item is None:
+                    item = QTableWidgetItem("")
+                    self.ui.tableWidget_att.setItem(row, col, item)
+                item.setTextAlignment(Qt.AlignCenter)
 
-        self.wrap_with_shadow(self.ui.tableWidget_att, 70)
+        self.wrap_with_shadow2(self.ui.tableWidget_att, 70)
 
     def refresh_grades(self, user, password):
         self.unwrap_shadow(self.ui.tableWidget_grades)
@@ -1464,7 +1499,15 @@ class Main_app(QMainWindow):
                 if item:
                     item.setBackground(QColor("#D4EDDA"))
 
-        self.wrap_with_shadow(self.ui.tableWidget_grades, 70)
+        for row in range(self.ui.tableWidget_grades.rowCount()):
+            for col in range(self.ui.tableWidget_grades.columnCount()):
+                item = self.ui.tableWidget_grades.item(row, col)
+                if item is None:
+                    item = QTableWidgetItem("")
+                    self.ui.tableWidget.setItem(row, col, item)
+                item.setTextAlignment(Qt.AlignCenter)
+
+        self.wrap_with_shadow2(self.ui.tableWidget_grades, 70)
 
     def refresh_grades_C(self, user, password):
         self.unwrap_shadow(self.ui.tableWidget_grades)
@@ -1536,7 +1579,15 @@ class Main_app(QMainWindow):
                 if item:
                     item.setBackground(QColor("#D4EDDA"))
 
-        self.wrap_with_shadow(self.ui.tableWidget_grades, 70)
+        for row in range(self.ui.tableWidget_grades.rowCount()):
+            for col in range(self.ui.tableWidget_grades.columnCount()):
+                item = self.ui.tableWidget_grades.item(row, col)
+                if item is None:
+                    item = QTableWidgetItem("")
+                    self.ui.tableWidget_grades.setItem(row, col, item)
+                item.setTextAlignment(Qt.AlignCenter)
+
+        self.wrap_with_shadow2(self.ui.tableWidget_grades, 70)
 
     def refresh_subject(self, user):
         self.ui.tableWidget_subjects.setRowCount(0)
@@ -1571,8 +1622,15 @@ class Main_app(QMainWindow):
             self.delete_btn2.setGeometry(QRect(65, 2, 60, 30))
             self.delete_btn2.clicked.connect(partial(delete_subject))
             self.ui.tableWidget_subjects.setCellWidget(i, 2, self.container2)
+        for row in range(self.ui.tableWidget_subjects.rowCount()):
+            for col in range(self.ui.tableWidget_subjects.columnCount()):
+                item = self.ui.tableWidget_subjects.item(row, col)
+                if item is None:
+                    item = QTableWidgetItem("")
+                    self.ui.tableWidget_subjects.setItem(row, col, item)
+                item.setTextAlignment(Qt.AlignCenter)
 
-        self.wrap_with_shadow(self.ui.tableWidget_subjects, 70)
+        self.wrap_with_shadow2(self.ui.tableWidget_subjects, 70)
 
     def refresh_add(self, user, password):
 
@@ -1631,8 +1689,8 @@ class Main_app(QMainWindow):
                                         QTableWidgetItem(decrypt_data(y[4],  self.kdf)))
             self.ui.tableWidget.setItem(row, 3, QTableWidgetItem(decrypt_data(y[6], self.kdf)))
             self.ui.tableWidget.setItem(row, 5, QTableWidgetItem(decrypt_data(y[9], self.kdf)))
-            self.ui.tableWidget.setItem(row, 4, QTableWidgetItem(decrypt_data(y[7], self.kdf)))
-            self.ui.tableWidget.setItem(row, 6, QTableWidgetItem(decrypt_data(y[8], self.kdf)))
+            self.ui.tableWidget.setItem(row, 4, QTableWidgetItem(decrypt_data(y[8], self.kdf)))
+            self.ui.tableWidget.setItem(row, 6, QTableWidgetItem(decrypt_data(y[7], self.kdf)))
             self.container = QWidget()
             self.container.setGeometry(QRect(0, 0, 100, 40))
             self.delete_btn = QPushButton(self.container)
@@ -1650,7 +1708,14 @@ class Main_app(QMainWindow):
             self.delete_btn.setGeometry(QRect(20, 2, 50, 30))
             self.delete_btn.clicked.connect(partial(delete_btn))
             self.ui.tableWidget.setCellWidget(row, 7, self.container)
-            self.wrap_with_shadow(self.ui.tableWidget, 70)
+            for row in range(self.ui.tableWidget.rowCount()):
+                for col in range(self.ui.tableWidget.columnCount()):
+                    item = self.ui.tableWidget.item(row, col)
+                    if item is None:
+                        item = QTableWidgetItem("")
+                        self.ui.tableWidget.setItem(row, col, item)
+                    item.setTextAlignment(Qt.AlignCenter)
+        self.wrap_with_shadow2(self.ui.tableWidget, 70)
 
 
     def refresh_view_C(self, user, password):
@@ -1698,8 +1763,8 @@ class Main_app(QMainWindow):
                                         QTableWidgetItem(decrypt_data(y[4], self.kdf)))
             self.ui.tableWidget.setItem(row, 3, QTableWidgetItem(decrypt_data(y[6], self.kdf)))
             self.ui.tableWidget.setItem(row, 5, QTableWidgetItem(decrypt_data(y[9], self.kdf)))
-            self.ui.tableWidget.setItem(row, 4, QTableWidgetItem(decrypt_data(y[7], self.kdf)))
-            self.ui.tableWidget.setItem(row, 6, QTableWidgetItem(decrypt_data(y[8], self.kdf)))
+            self.ui.tableWidget.setItem(row, 4, QTableWidgetItem(decrypt_data(y[8], self.kdf)))
+            self.ui.tableWidget.setItem(row, 6, QTableWidgetItem(decrypt_data(y[7], self.kdf)))
             self.container = QWidget()
             self.container.setGeometry(QRect(0, 0, 100, 40))
             self.delete_btn = QPushButton(self.container)
@@ -1717,7 +1782,14 @@ class Main_app(QMainWindow):
             self.delete_btn.setGeometry(QRect(20, 2, 50, 30))
             self.delete_btn.clicked.connect(partial(delete_btn))
             self.ui.tableWidget.setCellWidget(row, 7, self.container)
-            self.wrap_with_shadow(self.ui.tableWidget, 70)
+            for row in range(self.ui.tableWidget.rowCount()):
+                for col in range(self.ui.tableWidget.columnCount()):
+                    item = self.ui.tableWidget.item(row, col)
+                    if item is None:
+                        item = QTableWidgetItem("")
+                        self.ui.tableWidget.setItem(row, col, item)
+                    item.setTextAlignment(Qt.AlignCenter)
+        self.wrap_with_shadow2(self.ui.tableWidget, 70)
 
 
 
@@ -1746,7 +1818,7 @@ class Main_app(QMainWindow):
                 self.refresh_class(user, password)
                 self.refresh_view(user, password)
                 self.refresh_add(user, password)
-                self.wrap_with_shadow(self.ui.tableWidget_class, 70)
+                self.wrap_with_shadow2(self.ui.tableWidget_class, 70)
 
             self.ui.tableWidget_class.insertRow(j)
 
@@ -1771,6 +1843,7 @@ class Main_app(QMainWindow):
             self.delete_btn_.setIcon(icon)
             self.delete_btn_.clicked.connect(partial(delete_class2))
             self.ui.tableWidget_class.setCellWidget(j, 3, self.container_)
+        self.wrap_with_shadow2(self.ui.tableWidget_class, 70)
 
     def Edit_btn(self):
         self.ui.Save_button.show()
@@ -1826,7 +1899,7 @@ class Main_app(QMainWindow):
             else:
 
                 reset()
-            if (email != "" and not email.endswith("@gmail.com")):
+            if (email != "" and (not email.endswith(".com")or not re.search("@",email))):
                 error(i, 6)
 
                 err = True
@@ -2239,44 +2312,63 @@ class Main_app(QMainWindow):
     def animate_btn(self):
         anim = QPropertyAnimation(self.ui.lineEdit_5, b"pos")
 
-    def wrap_with_shadow(self, frame, x):
+    def wrap_with_shadow(self,widget, opacity=120):
 
-        wrapper = getattr(frame, "_shadow_wrapper", None)
 
-        if wrapper:
-            try:
-                _ = wrapper.graphicsEffect()
-                shadow = wrapper.graphicsEffect()
-                if shadow:
-                    shadow.setColor(QColor(0, 0, 0, x))
-                return
-            except RuntimeError:
-                wrapper = None
+        shadow = widget.graphicsEffect()
 
-        parent = frame.parentWidget()
+        if isinstance(shadow, QGraphicsDropShadowEffect):
+            shadow.setColor(QColor(0, 0, 0, opacity))
+            return
 
-        wrapper = QFrame(parent)
-        wrapper.setGeometry(
-            frame.x() - 10,
-            frame.y() - 10,
-            frame.width() + 20,
-            frame.height() + 20
-        )
-        wrapper.setStyleSheet("background: transparent;")
-
-        frame.setParent(wrapper)
-        frame.move(10, 10)
-
-        shadow = QGraphicsDropShadowEffect(wrapper)
+        shadow = QGraphicsDropShadowEffect(widget)
         shadow.setBlurRadius(25)
         shadow.setXOffset(0)
         shadow.setYOffset(6)
-        shadow.setColor(QColor(0, 0, 0, x))
-        wrapper.setGraphicsEffect(shadow)
+        shadow.setColor(QColor(0, 0, 0, opacity))
 
-        wrapper.show()
+        widget.setGraphicsEffect(shadow)
 
-        frame._shadow_wrapper = wrapper
+    def wrap_with_shadow2(self, frame, x):
+
+            wrapper = getattr(frame, "_shadow_wrapper", None)
+
+            if wrapper:
+                try:
+                    _ = wrapper.graphicsEffect()
+                    shadow = wrapper.graphicsEffect()
+                    if shadow:
+                        shadow.setColor(QColor(0, 0, 0, x))
+                    return
+                except RuntimeError:
+                    wrapper = None
+
+            parent = frame.parentWidget()
+
+            wrapper = QFrame(parent)
+            wrapper.setGeometry(
+                frame.x() - 10,
+                frame.y() - 10,
+                frame.width() + 20,
+                frame.height() + 20
+            )
+            wrapper.setStyleSheet("background: transparent;")
+
+            frame.setParent(wrapper)
+            frame.move(10, 10)
+
+            shadow = QGraphicsDropShadowEffect(wrapper)
+            shadow.setBlurRadius(25)
+            shadow.setXOffset(0)
+            shadow.setYOffset(6)
+            shadow.setColor(QColor(0, 0, 0, x))
+            wrapper.setGraphicsEffect(shadow)
+
+            wrapper.show()
+
+            frame._shadow_wrapper = wrapper
+
+
 
     def unwrap_shadow(self, frame):
         wrapper = getattr(frame, "_shadow_wrapper", None)
@@ -2333,6 +2425,9 @@ class Main_app(QMainWindow):
             i.hide()
         for i in self.widgets_statistics_4:
             i.hide()
+        for i in self.widgets_edit:
+            i.hide()
+            self.unwrap_shadow(i)
 
         for i in [self.ui.lastnameline, self.ui.Firstnameline]:
             self.reset_line2(i)
@@ -2541,6 +2636,9 @@ class Main_app(QMainWindow):
             i.hide()
         for i in self.widgets_statistics_4:
             i.hide()
+        for i in self.widgets_edit:
+            i.hide()
+            self.unwrap_shadow(i)
         self.ui.dateEdit.setDate(QDate.currentDate())
 
     def add_btn_clicked(self):
@@ -2639,7 +2737,7 @@ class Main_app(QMainWindow):
             self.reset_line2(self.ui.lastnameline)
 
         if self.email != "":
-            if not self.email.endswith("@gmail.com"):
+            if not self.email.endswith(".com") or not re.search("@",self.email):
                 self.ui.requirederrfirst_2.show()
                 self.update_line2(self.ui.Emailine)
                 err = True
@@ -2699,9 +2797,9 @@ class Main_app(QMainWindow):
                                                 "\n"
                                                 "")
         c.execute("SELECT * FROM classes WHERE user=? AND class_name=?", (self.current_user[-1],self.classe))
-        rows_classes = c.fetchall()
-        print(rows_classes)
-        if int(rows_classes[0][3]) == int(rows_classes[0][2]):
+        rows_classes = c.fetchone()
+
+        if int(rows_classes[3]) == int(rows_classes[2]):
             err = True
             self.ui.errclasse.setText("This Class is full")
             self.ui.errclasse.show()
@@ -2868,7 +2966,7 @@ class Main_app(QMainWindow):
             i.hide()
 
         self.ui.Edit_button.setGeometry(
-            QRect(810, 500, 91, 31)) if not self.ui.Edit_button.isVisible() else self.ui.Edit_button.show()
+            QRect(810, 500, 91, 31))
         self.wrap_with_shadow(self.ui.Edit_button, 70)
 
         self.ui.Cancel_button2.hide()
@@ -2883,6 +2981,7 @@ class Main_app(QMainWindow):
         self.ui.Add_top_btn.setStyleSheet(u"color: rgb(101, 119, 152);\n"
                                           "font: 700 9pt \"Yu Gothic UI\";")
         self.refresh_view(self.current_user[-1], self.current_password[-1])
+
 
     def classe_clicked(self):
         self.ui.info.hide()
@@ -2915,6 +3014,9 @@ class Main_app(QMainWindow):
             i.hide()
         for i in self.widgets_statistics_4:
             i.hide()
+        for i in self.widgets_edit:
+            i.hide()
+            self.unwrap_shadow(i)
 
         self.ui.Subject_top_btn.setStyleSheet(u"QPushButton {font: 700 9pt \"Yu Gothic UI\";\n"
                                               "color :rgb(24, 182, 255);\n"
@@ -2929,17 +3031,22 @@ class Main_app(QMainWindow):
         self.wrap_with_shadow(self.ui.add_button_class, 70)
         self.wrap_with_shadow(self.ui.cancel_button_class, 70)
         self.ui.Edit_button2.setGeometry(
-            QRect(810, 500, 91, 31)) if not self.ui.Edit_button2.isVisible() else self.ui.Edit_button2.show()
+            QRect(810, 500, 91, 31))
+
         self.wrap_with_shadow(self.ui.Edit_button2, 70)
 
         self.ui.Save_button2.hide()
         self.ui.Cancel_button3.hide()
+
 
         self.ui.Add_top_btn.hide()
         self.ui.View_top_btn.hide()
         self.refresh_class(self.current_user[-1], self.current_password[-1])
 
     def Add_class_clicked(self):
+        c.execute("SELECT class_name FROM classes WHERE user=?",(self.current_user[-1],))
+        classes_rows = c.fetchall()
+        classes = [x[0] for x in classes_rows]
         self.class_ = self.ui.Classnameline.text()
         self.MaxxStudents = self.ui.maxstudentsline.text()
 
@@ -2947,9 +3054,16 @@ class Main_app(QMainWindow):
         err = False
         if self.class_ == "" or not re.fullmatch(r"[A-Za-z0-9 ]+", self.class_) or len(self.class_) < 2:
             err = True
+            self.ui.requirederrclass.setText("Please Enter a Valid Class Name")
             self.update_line2(self.ui.Classnameline)
             self.ui.requirederrclass.show()
+        elif self.class_ in classes:
+            err = True
+            self.update_line2(self.ui.Classnameline)
+            self.ui.requirederrclass.setText("Class Already exists")
+            self.ui.requirederrclass.show()
         else:
+            self.ui.requirederrclass.setText("Please Enter a Valid Class Name")
             self.reset_line2(self.ui.Classnameline)
             self.ui.requirederrclass.hide()
         if self.MaxxStudents == "" or not self.MaxxStudents.isdigit():
@@ -3024,6 +3138,9 @@ class Main_app(QMainWindow):
             i.hide()
         for i in self.widgets_statistics_4:
             i.hide()
+        for i in self.widgets_edit:
+            i.hide()
+            self.unwrap_shadow(i)
         self.ui.Cancel_button5.hide()
         self.ui.Edit_button4.hide()
         self.ui.Save_button4.hide()
@@ -3031,7 +3148,7 @@ class Main_app(QMainWindow):
         self.ui.Save_button3.hide()
 
         self.ui.Edit_button3.setGeometry(
-            QRect(810, 500, 91, 31)) if not self.ui.Edit_button3.isVisible() else self.ui.Edit_button3.show()
+            QRect(810, 500, 91, 31))
 
         self.wrap_with_shadow(self.ui.Edit_button3, 70)
         self.ui.tableWidget_grades.hide()
@@ -3071,7 +3188,7 @@ class Main_app(QMainWindow):
 
         self.ui.Edit_button3.show()
         self.ui.Edit_button3.setGeometry(
-            QRect(810, 500, 91, 31)) if not self.ui.Edit_button3.isVisible() else self.ui.Edit_button3.show()
+            QRect(810, 500, 91, 31))
         self.wrap_with_shadow(self.ui.Edit_button3, 70)
         self.ui.tableWidget_subjects.show()
         self.ui.tableWidget_grades.hide()
@@ -3110,7 +3227,7 @@ class Main_app(QMainWindow):
         self.ui.info.show()
         self.ui.Edit_button4.show()
         self.ui.Edit_button4.setGeometry(
-            QRect(810, 500, 91, 31)) if not self.ui.Edit_button4.isVisible() else self.ui.Edit_button4.show()
+            QRect(810, 500, 91, 31))
         self.wrap_with_shadow(self.ui.Edit_button4, 70)
         self.unwrap_shadow(self.ui.Cancel_button5)
         self.unwrap_shadow(self.ui.Save_button4)
@@ -3412,6 +3529,9 @@ class Main_app(QMainWindow):
             i.hide()
         for i in self.widgets_statistics_4:
             i.hide()
+        for i in self.widgets_edit:
+            i.hide()
+            self.unwrap_shadow(i)
         self.wrap_with_shadow(self.ui.tableWidget_att, 70)
         self.refresh_attendance(self.current_user[-1], self.current_password[-1])
 
@@ -3448,6 +3568,9 @@ class Main_app(QMainWindow):
             i.hide()
         for i in self.widgets_statistics_4:
             i.hide()
+        for i in self.widgets_edit:
+            i.hide()
+            self.unwrap_shadow(i)
         self.ui.Add_top_btn.hide()
         self.ui.View_top_btn.hide()
         self.ui.performane.setStyleSheet(u"QPushButton {font: 700 9pt \"Yu Gothic UI\";\n"
@@ -3659,6 +3782,7 @@ class Main_app(QMainWindow):
         for i in self.widgets_statistics_4:
             i.hide()
 
+
         self.ui.other.setStyleSheet(u"QPushButton {font: 700 9pt \"Yu Gothic UI\";\n"
                                     "color :rgb(24, 182, 255);\n"
                                     "border: none;\n"
@@ -3684,13 +3808,50 @@ class Main_app(QMainWindow):
                 salt = i["salt"]
         return bytes.fromhex(salt)
 
+    def edit_page(self):
+        self.ui.info.hide()
+        for i in self.widgets_class:
+            i.hide()
+            self.unwrap_shadow(i)
+        for i in self.widgets_student_add:
+            i.hide()
+            self.unwrap_shadow(i)
+        for j in self.widgets_home:
+            j.hide()
+            self.unwrap_shadow(j)
+        for i in self.widgets_student_view:
+            i.hide()
+            self.unwrap_shadow(i)
+        for i in self.widgets_to_clear:
+            i.clear()
+            self.unwrap_shadow(i)
+        for i in self.widgets_grades:
+            i.hide()
+            self.unwrap_shadow(i)
+        for i in self.widget_Attendance:
+            i.hide()
+            self.unwrap_shadow(i)
+        for i in self.error_labels:
+            i.hide()
+        for i in self.widgets_statistics:
+            i.hide()
+        for i in self.widgets_statistics3:
+            i.hide()
+        for i in self.widgets_statistics_2:
+            i.hide()
+        for i in self.widgets_statistics_4:
+            i.hide()
+        for i in self.widgets_edit:
+            i.show()
+        self.ui.Add_top_btn.hide()
+        self.ui.View_top_btn.hide()
+        self.wrap_with_shadow(self.ui.transfer_btn,70)
+        self.wrap_with_shadow(self.ui.set_btn,70)
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = Main_app()
     window.show()
     sys.exit(app.exec())
-
-
-
 

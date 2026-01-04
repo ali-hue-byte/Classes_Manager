@@ -2,7 +2,7 @@ import sys
 from functools import partial
 import os
 
-from PyQt6.lupdate import user
+
 from PySide6.QtGui import QIcon, QColor, QIntValidator
 from PySide6.QtWidgets import (QApplication,
                                QMainWindow,
@@ -3982,4 +3982,5 @@ if __name__ == "__main__":
     window = Main_app()
     window.show()
     sys.exit(app.exec())
+
 

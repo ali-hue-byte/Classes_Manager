@@ -374,7 +374,7 @@ class Ui_Dialog(object):
         self.frame.setFrameShadow(QFrame.Shadow.Raised)
         self.Students_button = QPushButton(self.frame)
         self.Students_button.setObjectName(u"Students_button")
-        self.Students_button.setGeometry(QRect(0, 140, 151, 61))
+        self.Students_button.setGeometry(QRect(0, 200, 151, 61))
         self.Students_button.setStyleSheet(u"QPushButton{font: 900 9pt \"Segoe UI\";\n"
 "color: rgb(255, 255, 255);\n"
 "text-align: left;\n"
@@ -477,7 +477,7 @@ class Ui_Dialog(object):
         self.Statistics_button.setFlat(True)
         self.Classes_button = QPushButton(self.frame)
         self.Classes_button.setObjectName(u"Classes_button")
-        self.Classes_button.setGeometry(QRect(0, 200, 151, 61))
+        self.Classes_button.setGeometry(QRect(0, 140, 151, 61))
         sizePolicy = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
         sizePolicy.setHorizontalStretch(16)
         sizePolicy.setVerticalStretch(0)
@@ -2401,6 +2401,141 @@ class Ui_Dialog(object):
                                     "font: 600 12pt \"Segoe UI\";")
         self.year.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
+        self.transfer_btn = HoverButton(self.page)
+        self.transfer_btn.setObjectName(u"transfer_btn")
+        self.transfer_btn.setGeometry(QRect(520, 510, 91, 31))
+        self.transfer_btn.setStyleSheet(u"QPushButton{background-color: rgb(37, 99, 235);\n"
+                                        "color : rgb(255,255,255);\n"
+                                        "font: 700 11pt \"Microsoft PhagsPa\";\n"
+                                        "border-radius: 15px}\n"
+                                        "\n"
+                                        "QPushButton:hover {background-color:  rgb(25, 86, 179);\n"
+                                        "color: rgb(255,255,255)\n"
+                                        "}")
+        self.score_settings_lbl = QLabel(self.page)
+        self.score_settings_lbl.setObjectName(u"score_settings_lbl")
+        self.score_settings_lbl.setGeometry(QRect(180, 105, 241, 41))
+        self.score_settings_lbl.setStyleSheet(u"font: 700 20pt \"Segoe UI Variable\";\n"
+                                              "color: rgb(51, 51, 51);")
+        self.score_line = QLineEdit(self.page)
+        self.score_line.setObjectName(u"score_line")
+        self.score_line.setGeometry(QRect(340, 170, 221, 41))
+        self.score_line.setStyleSheet(u"QLineEdit { border : 1px solid grey ;\n"
+                                      "border-radius : 15px ;\n"
+                                      "padding : 6px 8px;\n"
+                                      "background-color: rgb(255,255,255)\n"
+                                      "}\n"
+                                      "\n"
+                                      "QLineEdit:hover{border: 2px solid black;\n"
+                                      "padding : 5px 7px;\n"
+                                      "}\n"
+                                      "\n"
+                                      "QLineEdit:focus {\n"
+                                      "  border : 2px solid #0078d7;\n"
+                                      "}\n"
+                                      "\n"
+                                      "")
+        self.transfe_lbl = QLabel(self.page)
+        self.transfe_lbl.setObjectName(u"transfe_lbl")
+        self.transfe_lbl.setGeometry(QRect(180, 320, 251, 31))
+        self.transfe_lbl.setStyleSheet(u"font: 700 20pt \"Segoe UI Variable\";\n"
+                                       "color: rgb(51, 51, 51);")
+        self.to_combobox = QComboBox(self.page)
+        self.to_combobox.setObjectName(u"to_combobox")
+        self.to_combobox.setGeometry(QRect(680, 440, 221, 41))
+        self.to_combobox.setStyleSheet(u"QComboBox { border : 1px solid grey ;\n"
+                                       "border-radius : 15px ;\n"
+                                       "padding : 6px 8px;  \n"
+                                       "background-color: rgb(255,255,255)\n"
+                                       "}\n"
+                                       "QComboBox:drop-down { width: 0;\n"
+                                       "}\n"
+                                       "\n"
+                                       "QComboBox:hover{border: 2px solid black;\n"
+                                       "padding : 5px 7px;\n"
+                                       "}\n"
+                                       "\n"
+                                       "QComboBox:focus {\n"
+                                       "  border : 2px solid #0078d7;\n"
+                                       "}\n"
+                                       "\n"
+                                       "")
+        self.errscore_lbl = QLabel(self.page)
+        self.errscore_lbl.setObjectName(u"errscore_lbl")
+        self.errscore_lbl.setGeometry(QRect(340, 220, 111, 16))
+        self.errscore_lbl.setStyleSheet(u"color: rgb(220, 38, 38);")
+        self.max_score_lbl = QLabel(self.page)
+        self.max_score_lbl.setObjectName(u"max_score_lbl")
+        self.max_score_lbl.setGeometry(QRect(170, 180, 161, 16))
+        self.max_score_lbl.setStyleSheet(u"color: rgb(46, 58, 89);\n"
+                                         "font: 600 12pt \"Segoe UI\";")
+        self.to_lbl = QLabel(self.page)
+        self.to_lbl.setObjectName(u"to_lbl")
+        self.to_lbl.setGeometry(QRect(630, 450, 21, 16))
+        self.to_lbl.setStyleSheet(u"color: rgb(46, 58, 89);\n"
+                                  "font: 600 12pt \"Segoe UI\";")
+        self.from_combobox = QComboBox(self.page)
+        self.from_combobox.setObjectName(u"from_combobox")
+        self.from_combobox.setGeometry(QRect(300, 440, 221, 41))
+        self.from_combobox.setStyleSheet(u"QComboBox { border : 1px solid grey ;\n"
+                                         "border-radius : 15px ;\n"
+                                         "padding : 6px 8px;  \n"
+                                         "background-color: rgb(255,255,255)\n"
+                                         "}\n"
+                                         "QComboBox:drop-down { width: 0;\n"
+                                         "}\n"
+                                         "\n"
+                                         "QComboBox:hover{border: 2px solid black;\n"
+                                         "padding : 5px 7px;\n"
+                                         "}\n"
+                                         "\n"
+                                         "QComboBox:focus {\n"
+                                         "  border : 2px solid #0078d7;\n"
+                                         "}\n"
+                                         "\n"
+                                         "")
+        self.set_btn = HoverButton(self.page)
+        self.set_btn.setObjectName(u"set_btn")
+        self.set_btn.setGeometry(QRect(520, 260, 91, 31))
+        self.set_btn.setStyleSheet(u"QPushButton{background-color: rgb(37, 99, 235);\n"
+                                   "color : rgb(255,255,255);\n"
+                                   "font: 700 11pt \"Microsoft PhagsPa\";\n"
+                                   "border-radius: 15px}\n"
+                                   "\n"
+                                   "QPushButton:hover {background-color:  rgb(25, 86, 179);\n"
+                                   "color: rgb(255,255,255)\n"
+                                   "}")
+        self.id_combobox = QComboBox(self.page)
+        self.id_combobox.setObjectName(u"id_combobox")
+        self.id_combobox.setGeometry(QRect(490, 370, 241, 41))
+        self.id_combobox.setStyleSheet(u"QComboBox { border : 1px solid grey ;\n"
+                                       "border-radius : 15px ;\n"
+                                       "padding : 6px 8px;  \n"
+                                       "background-color: rgb(255,255,255)\n"
+                                       "}\n"
+                                       "QComboBox:drop-down { width: 0;\n"
+                                       "}\n"
+                                       "\n"
+                                       "QComboBox:hover{border: 2px solid black;\n"
+                                       "padding : 5px 7px;\n"
+                                       "}\n"
+                                       "\n"
+                                       "QComboBox:focus {\n"
+                                       "  border : 2px solid #0078d7;\n"
+                                       "}\n"
+                                       "\n"
+                                       "")
+        self.from_lbl = QLabel(self.page)
+        self.from_lbl.setObjectName(u"from_lbl")
+        self.from_lbl.setGeometry(QRect(230, 450, 51, 16))
+        self.from_lbl.setStyleSheet(u"color: rgb(46, 58, 89);\n"
+                                    "font: 600 12pt \"Segoe UI\";")
+        self.id_lbl = QLabel(self.page)
+        self.id_lbl.setObjectName(u"id_lbl")
+        self.id_lbl.setGeometry(QRect(390, 380, 81, 16))
+        self.id_lbl.setStyleSheet(u"color: rgb(46, 58, 89);\n"
+                                  "font: 600 12pt \"Segoe UI\";")
+
 
 
 
@@ -2732,6 +2867,16 @@ class Ui_Dialog(object):
         self.Cancel_button5.setText(QCoreApplication.translate("Dialog", u"Cancel", None))
         self.requirederrfirst.setText(QCoreApplication.translate("Dialog", u"This field is required", None))
         self.requirederrlast.setText(QCoreApplication.translate("Dialog", u"This field is required", None))
+        self.transfer_btn.setText(QCoreApplication.translate("Dialog", u"Transfer", None))
+        self.score_settings_lbl.setText(QCoreApplication.translate("Dialog", u"Score Settings", None))
+        self.score_line.setText("")
+        self.transfe_lbl.setText(QCoreApplication.translate("Dialog", u"Transfer Student", None))
+        self.errscore_lbl.setText(QCoreApplication.translate("Dialog", u"This field is required", None))
+        self.max_score_lbl.setText(QCoreApplication.translate("Dialog", u"Set Maximum Score", None))
+        self.to_lbl.setText(QCoreApplication.translate("Dialog", u"To", None))
+        self.set_btn.setText(QCoreApplication.translate("Dialog", u"Set", None))
+        self.from_lbl.setText(QCoreApplication.translate("Dialog", u"From", None))
+        self.id_lbl.setText(QCoreApplication.translate("Dialog", u"Student ID", None))
         ___qtablewidgetitem = self.tableWidget.horizontalHeaderItem(0)
         ___qtablewidgetitem.setText(QCoreApplication.translate("Dialog", u"ID", None));
         ___qtablewidgetitem1 = self.tableWidget.horizontalHeaderItem(1)

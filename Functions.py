@@ -11,7 +11,7 @@ import pickle
 import sqlite3
 
 
-DATA_FILE = "data.pkl"
+
 USER = "users.pkl"
 
 conn = sqlite3.connect("data.db")
@@ -114,6 +114,7 @@ def check_strength(pss):
             bool(re.search(r"[0-9]", pss)),
             bool(re.search(r"[!@#$%^&*(),.?\":{}|<>]", pss))]
     return all(tests)
+
 
 
 

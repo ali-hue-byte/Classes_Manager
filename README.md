@@ -24,7 +24,7 @@ This project is a modern, user-friendly Student Management System built with PyS
 
 ### Upcoming Features
 
--Change Student's Class – Allows updating a student’s class assignment in the database.
+- Change Student's Class – Allows updating a student’s class assignment in the database.
 - Configurable maximum marks: teachers can set the maximum score.
 
 

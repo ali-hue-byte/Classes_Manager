@@ -2530,10 +2530,10 @@ class Ui_Dialog(object):
         self.from_lbl.setGeometry(QRect(230, 450, 51, 16))
         self.from_lbl.setStyleSheet(u"color: rgb(46, 58, 89);\n"
                                     "font: 600 12pt \"Segoe UI\";")
-        self.id_lbl = QLabel(self.page)
-        self.id_lbl.setObjectName(u"id_lbl")
-        self.id_lbl.setGeometry(QRect(390, 380, 81, 16))
-        self.id_lbl.setStyleSheet(u"color: rgb(46, 58, 89);\n"
+        self.id_lbl2 = QLabel(self.page)
+        self.id_lbl2.setObjectName(u"id_lbl")
+        self.id_lbl2.setGeometry(QRect(390, 380, 100, 16))
+        self.id_lbl2.setStyleSheet(u"color: rgb(46, 58, 89);\n"
                                   "font: 600 12pt \"Segoe UI\";")
 
 
@@ -2876,7 +2876,7 @@ class Ui_Dialog(object):
         self.to_lbl.setText(QCoreApplication.translate("Dialog", u"To", None))
         self.set_btn.setText(QCoreApplication.translate("Dialog", u"Set", None))
         self.from_lbl.setText(QCoreApplication.translate("Dialog", u"From", None))
-        self.id_lbl.setText(QCoreApplication.translate("Dialog", u"Student ID", None))
+        self.id_lbl2.setText(QCoreApplication.translate("Dialog", u"Student ID", None))
         ___qtablewidgetitem = self.tableWidget.horizontalHeaderItem(0)
         ___qtablewidgetitem.setText(QCoreApplication.translate("Dialog", u"ID", None));
         ___qtablewidgetitem1 = self.tableWidget.horizontalHeaderItem(1)

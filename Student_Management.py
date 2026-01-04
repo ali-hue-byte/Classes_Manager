@@ -1,6 +1,8 @@
 import sys
 from functools import partial
 import os
+
+from PyQt6.lupdate import user
 from PySide6.QtGui import QIcon, QColor, QIntValidator
 from PySide6.QtWidgets import (QApplication,
                                QMainWindow,
@@ -29,7 +31,6 @@ from Functions import (
     add_subject,
     add_grade,
     mark_attendance,
-select_student,
 select_class,
 delete_student,
 delete_class,
@@ -332,7 +333,8 @@ class Main_app(QMainWindow):
             self.ui.to_lbl,
             self.ui.to_combobox,
             self.ui.id_lbl2,
-            self.ui.id_combobox
+            self.ui.id_combobox,
+            self.ui.info2
         ]
 
         self.widgets_acc = [{"widget": self.ui.frame_n, "pos_off": QPoint(-490, 50), "pos_on": QPoint(560, 50)},
@@ -3897,6 +3899,10 @@ class Main_app(QMainWindow):
             i.show()
         self.ui.Add_top_btn.hide()
         self.ui.View_top_btn.hide()
+        data = load_data()
+        for i in data:
+            if i["username"] == self.current_user[-1] and int(i["max_score"]) == 20 :
+                self.ui.info2.hide()
         self.wrap_with_shadow(self.ui.transfer_btn,70)
         self.wrap_with_shadow(self.ui.set_btn,70)
 
@@ -3938,6 +3944,7 @@ class Main_app(QMainWindow):
         self.refresh_combo_id(self.current_user[-1], self.ui.from_combobox.currentText())
 
     def set(self):
+        self.ui.info2.hide()
         data = load_data()
         err=False
         c.execute("SELECT grade FROM grades WHERE user =?",(self.current_user[-1],))
@@ -3966,6 +3973,7 @@ class Main_app(QMainWindow):
         self.ui.score_line.setText("")
 
         save_data(data)
+        self.ui.info2.show() if int(score) != 20 else self.ui.info2.hide()
 
 
 

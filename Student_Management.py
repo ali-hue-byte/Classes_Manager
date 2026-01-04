@@ -30,7 +30,6 @@ from Functions import (
     add_subject,
     add_grade,
     mark_attendance,
-select_student,
 select_class,
 delete_student,
 delete_class,
@@ -3691,6 +3690,7 @@ if __name__ == "__main__":
     window = Main_app()
     window.show()
     sys.exit(app.exec())
+
 
 
 

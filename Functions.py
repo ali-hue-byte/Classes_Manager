@@ -44,9 +44,7 @@ def add_grade(user, id , subject, grade):
               (user, id, subject, grade))
 
     conn.commit()
-def select_student(user,id):
-    c.execute("SELECT * FROM students WHERE student_id = ? AND user = ?",(id,user))
-    return c.fetchone()
+
 def select_class(user,classe):
     c.execute("SELECT * FROM classes WHERE user = ? AND class_name = ?", ( user,classe))
     return c.fetchone()
@@ -114,6 +112,7 @@ def check_strength(pss):
             bool(re.search(r"[0-9]", pss)),
             bool(re.search(r"[!@#$%^&*(),.?\":{}|<>]", pss))]
     return all(tests)
+
 
 
 

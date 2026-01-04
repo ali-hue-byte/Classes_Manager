@@ -3,7 +3,7 @@ import os
 
 from cryptography.fernet import Fernet
 import hashlib
-import re
+
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 import base64
@@ -101,6 +101,7 @@ def decrypt_data(data, fernet):
 
 def hash_password(password, salt):
     return hashlib.sha256(password.encode() + salt).hexdigest()
+
 
 
 

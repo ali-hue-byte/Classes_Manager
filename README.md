@@ -17,16 +17,10 @@ This project is a modern, user-friendly Student Management System built with PyS
 - **Adding Classes**-View, creat and edit new Classes
 - **Grades Page**-Add, delete subjects and students grades
 - **Attendance Page**-Mark, edit, and track student attendance with clear status indicators and real-time updates
-- **Statistics Page** – A page for visualizing student data such as grades, attendance and gender distribution using matplotlib for graphs (with animations on hover) and highlighting top-performing students (real-time updates)
-- **Data storage** – Uses SQLite for student data and pickles for user information (passwords are never stored in raw form).
-
----
-
-### Upcoming Features
-
-- Change Student's Class – Allows updating a student’s class assignment in the database.
-- Configurable maximum marks: teachers can set the maximum score.
-
+- **Statistics Page**– A page for visualizing student data such as grades, attendance and gender distribution using matplotlib for graphs (with animations on hover) and highlighting top-performing students (real-time updates)
+- **Data storage**– Uses SQLite for student data and pickles for user information (passwords are never stored in raw form).
+- **Change Student's Class**– Allows updating a student’s class assignment in the database.
+- **Configurable maximum marks**- Teachers can set the maximum score.
 
   
 ---

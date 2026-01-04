@@ -2417,6 +2417,13 @@ class Ui_Dialog(object):
         self.score_settings_lbl.setGeometry(QRect(180, 105, 241, 41))
         self.score_settings_lbl.setStyleSheet(u"font: 700 20pt \"Segoe UI Variable\";\n"
                                               "color: rgb(51, 51, 51);")
+        self.info2 = QLabel(self.page)
+        self.info2.setObjectName(u"requirederrfirst_22")
+        self.info2.setGeometry(QRect(340, 220, 180, 16))
+        self.info2.setStyleSheet(u"color: #6B7280;\n"
+                                 u"font-size: 11px;")
+
+
         self.score_line = QLineEdit(self.page)
         self.score_line.setObjectName(u"score_line")
         self.score_line.setGeometry(QRect(340, 170, 221, 41))
@@ -2869,7 +2876,9 @@ class Ui_Dialog(object):
         self.requirederrlast.setText(QCoreApplication.translate("Dialog", u"This field is required", None))
         self.transfer_btn.setText(QCoreApplication.translate("Dialog", u"Transfer", None))
         self.score_settings_lbl.setText(QCoreApplication.translate("Dialog", u"Score Settings", None))
-        self.score_line.setText("")
+
+        self.score_line.setPlaceholderText("20")
+
         self.transfe_lbl.setText(QCoreApplication.translate("Dialog", u"Transfer Student", None))
         self.errscore_lbl.setText(QCoreApplication.translate("Dialog", u"", None))
         self.max_score_lbl.setText(QCoreApplication.translate("Dialog", u"Set Maximum Score", None))
@@ -2913,6 +2922,9 @@ class Ui_Dialog(object):
         self.errlbl.setText(QCoreApplication.translate("Dialog", u"Please ensure all entered information is correct", None))
         self.info.setText(
             QCoreApplication.translate("Dialog", u"You can enter multiple marks separated by spaces (for multiple exams)", None))
+        self.info2.setText(
+            QCoreApplication.translate("Dialog",u"Default value: 20", None))
+
         self.errclasse.setText(QCoreApplication.translate("Dialog", u"There are no classes yet", None))
         self.requirederrclass.setText(QCoreApplication.translate("Dialog", u"Please Enter a Valid Class Name", None))
         self.requirederrmax.setText(QCoreApplication.translate("Dialog", u"Please enter a valid numeric value", None))

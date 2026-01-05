@@ -36,9 +36,7 @@ cd Class_Manager
 2. Install the required dependencies:
 
 ```bash
-pip install PySide6
-pip install cryptography
-pip install matplotlib
+python -m pip install matplotlib PySide6 cryptography
 ```
 3. Run the main application:
 

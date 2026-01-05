@@ -16,7 +16,7 @@ from PySide6.QtWidgets import (QApplication,
                                QTableWidget,
                                QStyledItemDelegate,
                                QItemDelegate, QVBoxLayout, QSizePolicy)
-from App import Ui_Dialog
+from App import Ui_Dialog, InfoButton
 from PySide6.QtCore import QPropertyAnimation, QEasingCurve, QPoint, QDate, QRect, QSize
 from Functions import (
     hash_password,
@@ -1196,7 +1196,12 @@ class Main_app(QMainWindow):
         current_class = self.ui.ClassComboBox4.currentText()
         self.unwrap_shadow(self.ui.tableWidget_att)
         self.ui.tableWidget_att.setRowCount(0)
+        x = 860
+        y = 170
+        h = 20
+        w = 60
         for i in students:
+
             date = self.ui.dateEdit2.date().toString("yyyy-MM-dd")
             c.execute("SELECT status FROM attendance WHERE user = ? AND student_id = ? AND date = ?",
                       (user, i[0], date))
@@ -1236,15 +1241,17 @@ class Main_app(QMainWindow):
             iconex = QIcon()
             iconex.addFile(u"icons/excused.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
 
-            absent = QPushButton(frame)
+            absent = InfoButton(frame,self.ui.page,"Absent",QRect(x,y,w,h))
             absent.setGeometry(QRect(130, 2, 50, 36))
             absent.setIcon(iconabs)
-            present = QPushButton(frame)
+
+            present = InfoButton(frame,self.ui.page,"Present",QRect(x-120,y,w,h))
             present.setGeometry(QRect(10, 2, 50, 36))
             present.setIcon(iconpre)
-            excused = QPushButton(frame)
+            excused = InfoButton(frame,self.ui.page,"Excused",QRect(x-60,y,w,h))
             excused.setGeometry(QRect(70, 2, 50, 36))
             excused.setIcon(iconex)
+            y += 40
             for widget in [absent, present, excused]:
                 widget.setStyleSheet("QPushButton{background-color: rgb(255, 255, 255);\n"
                                      "border-radius: 5px;\n"
@@ -3344,7 +3351,7 @@ class Main_app(QMainWindow):
 
         c.execute("SELECT * FROM students WHERE user = ?", (self.current_user[-1],))
         students_rows = c.fetchall()
-        
+
 
         for i in students_rows:
             add_grade(self.current_user[-1], i[0],subject,0)
@@ -3982,6 +3989,4 @@ if __name__ == "__main__":
     window = Main_app()
     window.show()
     sys.exit(app.exec())
-
-
 

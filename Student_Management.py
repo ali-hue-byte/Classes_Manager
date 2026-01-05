@@ -3344,7 +3344,7 @@ class Main_app(QMainWindow):
 
         c.execute("SELECT * FROM students WHERE user = ?", (self.current_user[-1],))
         students_rows = c.fetchall()
-        print(students_rows)
+        
 
         for i in students_rows:
             add_grade(self.current_user[-1], i[0],subject,0)
@@ -3982,5 +3982,6 @@ if __name__ == "__main__":
     window = Main_app()
     window.show()
     sys.exit(app.exec())
+
 
 

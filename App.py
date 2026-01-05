@@ -23,6 +23,29 @@ from PySide6.QtWidgets import (QApplication, QDialog, QFrame, QLabel,
                                QAbstractItemView, QScrollArea, QGraphicsDropShadowEffect)
 
 
+class InfoButton(QPushButton):
+    def __init__(self, parent=None,page=None,text=None,pos=None):
+        super().__init__(parent)
+        self.label = QLabel(page)
+        self.label.setText(text)
+        self.label.setGeometry(pos)
+
+
+        self.label.setStyleSheet(u"QLabel{\n"
+                                 "background-color: #E6EBF2;\n"
+                                 "border : 1px solid #CBD5E1;\n"
+                                 "color: #1F2A44;\n"
+                                 "border-radius: 5px;\n"
+                                 "font-size: 12px;\n"
+                                 "}")
+        self.label.setAlignment(Qt.AlignCenter)
+        self.label.hide()
+    def enterEvent(self, event):
+        self.label.show()
+        self.label.raise_()
+    def leaveEvent(self, event):
+        self.label.hide()
+
 class HoverButton(QPushButton):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -30,7 +53,6 @@ class HoverButton(QPushButton):
         self.anim.setDuration(100)
         self.anim.setEasingCurve(QEasingCurve.Type.InOutQuad)
         self.original_rect = None
-
 
 
     def enterEvent(self, event):

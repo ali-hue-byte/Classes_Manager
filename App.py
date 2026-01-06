@@ -40,12 +40,20 @@ class InfoButton(QPushButton):
                                  "}")
         self.label.setAlignment(Qt.AlignCenter)
         self.label.hide()
-    def enterEvent(self, event):
-        self.label.show()
-        self.label.raise_()
-    def leaveEvent(self, event):
-        self.label.hide()
 
+        self.hover_timer = QTimer(self)
+        self.hover_timer.setSingleShot(True)
+        self.hover_timer.timeout.connect(self.label.show)
+
+    def enterEvent(self, event):
+        self.hover_timer.start(500)
+
+        self.label.raise_()
+
+    def leaveEvent(self, event):
+        self.hover_timer.stop()
+        self.label.hide()
+      
 class HoverButton(QPushButton):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -3058,4 +3066,5 @@ class Ui_Dialog(object):
 "", None))
         self.label_2_n.setText(QCoreApplication.translate("Dialog", u"Create account", None))
     # retranslateUi
+
 

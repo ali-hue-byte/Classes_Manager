@@ -489,7 +489,7 @@ class Main_app(QMainWindow):
                     c.execute("SELECT coeff FROM subjects WHERE user = ? AND subject_name = ?",(user,k[2]))
                     coeff = c.fetchone()[0]
                     student_average.append(float(k[3]) * int(coeff))
-                class_average.append(sum(student_average) / sum(coeffs))
+                class_average.append(sum(student_average) / sum(coeffs)) if sum(coeffs) !=0 else None
             data_classes.append(sum(class_average) / len(class_average)) if len(
                 class_average) > 0 else data_classes.append(0)
         layout = self.ui.Graph_frame.layout()
@@ -506,7 +506,7 @@ class Main_app(QMainWindow):
                     widget.deleteLater()
         fig, ax = plt.subplots(figsize=(5, 3))
 
-        if classes == []:
+        if classes == [] or sum(coeffs) == 0:
             ax.text(0.5, 0.5, "No data available", ha="center", va="center", fontsize=12)
         else:
 
@@ -2287,6 +2287,7 @@ class Main_app(QMainWindow):
         return
 
     def creat_acc_animation(self, widgets, widgets2):
+
         self.ui.label_errn.hide()
         for i in self.lines:
             self.reset_line(i)
@@ -2312,7 +2313,10 @@ class Main_app(QMainWindow):
             self.animations.append(anim)
             self.empty(self.lines)
 
+
+
     def creat_log_animation(self, widgets, widgets2):
+
         self.ui.label_errn.hide()
         for i in self.lines:
             self.reset_line(i)
@@ -2337,6 +2341,7 @@ class Main_app(QMainWindow):
             anim.start()
             self.animations2.append(anim)
             self.empty(self.lines)
+
 
     def animate_page(self, pag, x, y, color="black", b=0, w=990, h=560):
 
@@ -2364,6 +2369,7 @@ class Main_app(QMainWindow):
             overlay.deleteLater()
 
         anim.finished.connect(on_finished)
+
 
     def animate_btn(self):
         anim = QPropertyAnimation(self.ui.lineEdit_5, b"pos")

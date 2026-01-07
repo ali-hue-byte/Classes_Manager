@@ -51,8 +51,7 @@ python Student_Management.py
 - **Student_Management.py** – The main Python file used to run the application.
 - **App.py** – The Python file generated from Qt Designer that contains all the UI widgets and layouts.
 - **Functions.py** - Python file containing helper functions for user authentication, password hashing, validation, and user data management used throughout the app.
-- **data.pkl** - Binary storage file (Pickle) used to persist application data (students, classes, marks, attendance records).
-- **users.pkl** - Binary storage file (Pickle) containing user authentication data, including unique per-user salts and salted password hashes.
+
 
 ## Screenshots 
 

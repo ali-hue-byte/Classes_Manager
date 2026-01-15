@@ -50,7 +50,7 @@ python Student_Management.py
 
 - **Student_Management.py** – The main Python file used to run the application.
 - **App.py** – The Python file generated from Qt Designer that contains all the UI widgets and layouts.
-- **Functions.py** - Python file containing helper functions for user authentication, password hashing, validation, and user data management used throughout the app.
+- **Functions.py** - Python file containing helper functions used throughout the app.
 
 
 ## Screenshots 

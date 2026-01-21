@@ -44,8 +44,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 import sqlite3
 
-
-conn = sqlite3.connect('data.db')
+# Connecting to SQLite and creating tables if they don't existconn = sqlite3.connect('data.db')
 c = conn.cursor()
 c.execute('''CREATE TABLE IF NOT EXISTS students (
                     student_id INTEGER,
@@ -87,6 +86,7 @@ c.execute('''CREATE TABLE IF NOT EXISTS attendance (
                    PRIMARY KEY (user, student_id, date))''')
 conn.commit()
 
+# This delegate makes table cells read-only
 class ReadOnlyDelegate(QStyledItemDelegate):
     def createEditor(self, parent, option, index):
         return None
@@ -113,6 +113,9 @@ class Main_app(QMainWindow):
         self.ui.label_errn.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.icon_show = QIcon("icons/view_pss.png")
         self.icon_hide = QIcon("icons/hide_pss.png")
+
+      # Lists of widgets grouped by purpose.
+      # These lists are used for operations like clearing fields, enabling/disabling, showing/hiding, or accessing values.
 
         self.widgets_to_clear = [
             self.ui.Firstnameline,
@@ -337,6 +340,7 @@ class Main_app(QMainWindow):
             self.ui.info2
         ]
 
+        # Helpful Lists in animations
         self.widgets_acc = [{"widget": self.ui.frame_n, "pos_off": QPoint(-490, 50), "pos_on": QPoint(560, 50)},
                             {"widget": self.ui.label_3_n, "pos_off": QPoint(-450, 190), "pos_on": QPoint(600, 190)},
                             {"widget": self.ui.label_4_n, "pos_off": QPoint(-450, 280), "pos_on": QPoint(600, 280)},
@@ -354,6 +358,8 @@ class Main_app(QMainWindow):
                             {"widget": self.ui.label_11, "pos_on": QPoint(80, 280), "pos_off": QPoint(1080, 280)},
                             {"widget": self.ui.label_12, "pos_on": QPoint(630, 100), "pos_off": QPoint(1630, 100)},
                             {"widget": self.ui.label_13, "pos_on": QPoint(640, 180), "pos_off": QPoint(1640, 180)}]
+
+      
         self.lines = [self.ui.lineEdit_n, self.ui.lineEdit_2_n, self.ui.lineEdit_5, self.ui.lineEdit_6]
 
         for i in self.widgets_student_add:
@@ -381,7 +387,7 @@ class Main_app(QMainWindow):
         for i in [self.ui.comboBox2_5, self.ui.comboBox2_6, self.ui.comboBox2_3]:
             i.insertItem(0, "all")
         self.ui.comboBox2_7.insertItem(0, str(QDate.currentDate().year()))
-        # ----connecting buttons-----------------------------
+        # ----Connecting Buttons-----------------------------
 
         self.ui.pushButton_n.clicked.connect(self.creat_clicked)
         self.ui.pushButton_5.clicked.connect(self.log_clicked)
@@ -3995,4 +4001,5 @@ if __name__ == "__main__":
     window = Main_app()
     window.show()
     sys.exit(app.exec())
+
 
